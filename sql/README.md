@@ -452,7 +452,7 @@ src/
 │   ├── Club.php           // Infos club
 │   ├── Equipe.php         // Gestion équipes (✅ existant)
 │   ├── Competition.php    // Gestion compétitions
-│   ├── Match.php          // Requêtes matchs (✅ existant)
+│   ├── MatchModel.php     // Requêtes matchs (✅ existant)
 │   └── Stats.php          // Statistiques (✅ existant)
 ├── API/
 │   └── FFFApiClient.php   // (✅ existant)
@@ -463,7 +463,7 @@ src/
     └── Logger.php         // (✅ existant)
 ```
 
-### Exemple Model Match.php (avec logos adversaires)
+### Exemple Model MatchModel.php (avec logos adversaires)
 
 ```php
 class Match

@@ -1,18 +1,19 @@
 <?php
+declare(strict_types=1);
+
 // Forcer affichage erreurs
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
-declare(strict_types=1);
 
 /**
  * API Résultats - FC Chiche
  * Endpoint pour récupérer les derniers résultats
  */
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../src/Models/Match.php';
-require_once __DIR__ . '/../src/Models/Stats.php';
+$basePath = dirname(__DIR__, 2);
+require_once $basePath . '/config/bootstrap.php';
+require_once $basePath . '/src/Models/MatchModel.php';
+require_once $basePath . '/src/Models/Stats.php';
 
 
 
@@ -24,7 +25,7 @@ try {
     // Validation
     assert($limit > 0 && $limit <= 50, 'Limit must be between 1 and 50');
     
-    $matchModel = new Match();
+    $matchModel = new MatchModel();
     $statsModel = new Stats();
     
     // Parser l'équipe (format "SEM 1" => category="SEM", number=1)

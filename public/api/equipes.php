@@ -1,17 +1,18 @@
 <?php
+declare(strict_types=1);
+
 // Forcer affichage erreurs
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
-declare(strict_types=1);
 
 /**
  * API Équipes - FC Chiche
  * Endpoint pour récupérer la liste des équipes
  */
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../src/Models/Equipe.php';
+$basePath = dirname(__DIR__, 2);
+require_once $basePath . '/config/bootstrap.php';
+require_once $basePath . '/src/Models/Equipe.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
