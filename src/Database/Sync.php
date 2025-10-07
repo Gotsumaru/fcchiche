@@ -48,8 +48,10 @@ class Sync
             
             $stats['club'] = $this->syncClub();
             $stats['equipes'] = $this->syncEquipes();
-            $stats['calendrier'] = $this->syncCalendrier();
-            $stats['resultats'] = $this->syncResultats();
+            
+            $matchs_data = $this->syncAllMatchs();
+            $stats['calendrier'] = $matchs_data['calendrier'];
+            $stats['resultats'] = $matchs_data['resultats'];
             
             $this->pdo->commit();
             $this->logger->info('Synchronisation complète réussie', $stats);
@@ -395,41 +397,24 @@ class Sync
     }
     
     /**
-     * Synchroniser calendrier
+     * Synchroniser TOUS les matchs via nouvelle méthode API
      *
-     * @return int Nombre matchs synchronisés
+     * @return array ['calendrier' => count, 'resultats' => count]
      */
-    private function syncCalendrier(): int
+    private function syncAllMatchs(): array
     {
-        $data = $this->api->getCalendrier();
+        $matchs_data = $this->api->getAllMatchs();
         
-        if ($data === null || !isset($data['hydra:member'])) {
-            throw new Exception('Failed to fetch calendrier from API');
-        }
+        $calendrier_count = $this->syncMatchs($matchs_data['calendrier'], false);
+        $resultats_count = $this->syncMatchs($matchs_data['resultats'], true);
         
-        $count = $this->syncMatchs($data['hydra:member'], false);
         $this->updateConfigValue('last_sync_calendrier', date('Y-m-d H:i:s'));
-        
-        return $count;
-    }
-    
-    /**
-     * Synchroniser résultats
-     *
-     * @return int Nombre résultats synchronisés
-     */
-    private function syncResultats(): int
-    {
-        $data = $this->api->getResultats();
-        
-        if ($data === null || !isset($data['hydra:member'])) {
-            throw new Exception('Failed to fetch resultats from API');
-        }
-        
-        $count = $this->syncMatchs($data['hydra:member'], true);
         $this->updateConfigValue('last_sync_resultats', date('Y-m-d H:i:s'));
         
-        return $count;
+        return [
+            'calendrier' => $calendrier_count,
+            'resultats' => $resultats_count
+        ];
     }
     
     /**
@@ -442,7 +427,7 @@ class Sync
     private function syncMatchs(array $matchs, bool $is_result): int
     {
         $count = 0;
-        $max_iterations = 100;
+        $max_iterations = 200;
         
         foreach ($matchs as $match) {
             if ($count >= $max_iterations) {
