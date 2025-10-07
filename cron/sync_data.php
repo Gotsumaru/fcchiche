@@ -9,8 +9,7 @@ declare(strict_types=1);
  * Fréquence : 2 fois par jour (8h et 20h)
  */
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/bootstrap.php';
 require_once __DIR__ . '/../src/Database/Sync.php';
 require_once __DIR__ . '/../src/Utils/Logger.php';
 

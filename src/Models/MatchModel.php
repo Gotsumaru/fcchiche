@@ -1,11 +1,10 @@
 <?php
 declare(strict_types=1);
 
-
 /**
- * Model Match - Gestion des matchs (résultats et calendrier)
+ * MatchModel - Gestion des matchs (résultats et calendrier)
  */
-class Match
+class MatchModel
 {
     private PDO $pdo;
     private int $club_id;
@@ -29,7 +28,14 @@ class Match
      */
     public function getLastResults(int $limit = 5, ?string $category = null, ?int $number = null): array
     {
-        assert($limit > 0 && $limit <= 100, 'Limit must be between 1 and 100');
+        assert($this->pdo instanceof PDO, 'PDO instance must be initialised');
+        assert($this->club_id > 0, 'Club ID must be positive');
+        assert($limit > 0, 'Limit must be positive');
+        assert($limit <= 100, 'Limit must be 100 or less');
+
+        if (($category === null) !== ($number === null)) {
+            throw new \InvalidArgumentException('Category and number must be provided together');
+        }
         
         $sql = "SELECT 
             m.id,
@@ -92,7 +98,13 @@ class Match
         
         $stmt = $this->pdo->prepare($sql);
         foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
+            $paramName = ':' . $key;
+            if (is_int($value)) {
+                $stmt->bindValue($paramName, $value, PDO::PARAM_INT);
+                continue;
+            }
+
+            $stmt->bindValue($paramName, (string) $value, PDO::PARAM_STR);
         }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
@@ -110,7 +122,14 @@ class Match
      */
     public function getUpcomingMatches(int $limit = 5, ?string $category = null, ?int $number = null): array
     {
-        assert($limit > 0 && $limit <= 100, 'Limit must be between 1 and 100');
+        assert($this->pdo instanceof PDO, 'PDO instance must be initialised');
+        assert($this->club_id > 0, 'Club ID must be positive');
+        assert($limit > 0, 'Limit must be positive');
+        assert($limit <= 100, 'Limit must be 100 or less');
+
+        if (($category === null) !== ($number === null)) {
+            throw new \InvalidArgumentException('Category and number must be provided together');
+        }
         
         $sql = "SELECT 
             m.id,
@@ -163,7 +182,13 @@ class Match
         
         $stmt = $this->pdo->prepare($sql);
         foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
+            $paramName = ':' . $key;
+            if (is_int($value)) {
+                $stmt->bindValue($paramName, $value, PDO::PARAM_INT);
+                continue;
+            }
+
+            $stmt->bindValue($paramName, (string) $value, PDO::PARAM_STR);
         }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
@@ -181,10 +206,12 @@ class Match
      */
     public function getTeamSchedule(string $category, int $number, bool $only_upcoming = false): array
     {
+        assert($this->pdo instanceof PDO, 'PDO instance must be initialised');
+        assert($this->club_id > 0, 'Club ID must be positive');
         assert(!empty($category), 'Category cannot be empty');
         assert($number > 0, 'Number must be positive');
-        
-        $sql = "SELECT 
+
+        $sql = "SELECT
             m.id,
             m.ma_no,
             DATE_FORMAT(m.date, '%d/%m/%Y') AS date_fr,
@@ -232,7 +259,10 @@ class Match
      */
     public function getWeekSchedule(): array
     {
-        $sql = "SELECT 
+        assert($this->pdo instanceof PDO, 'PDO instance must be initialised');
+        assert($this->club_id > 0, 'Club ID must be positive');
+
+        $sql = "SELECT
             m.id,
             DATE_FORMAT(m.date, '%a %d/%m') AS jour,
             m.date,
@@ -276,7 +306,10 @@ class Match
      */
     public function getLastCupResults(): array
     {
-        $sql = "SELECT 
+        assert($this->pdo instanceof PDO, 'PDO instance must be initialised');
+        assert($this->club_id > 0, 'Club ID must be positive');
+
+        $sql = "SELECT
             c.name AS coupe,
             DATE_FORMAT(m.date, '%d/%m/%Y') AS date_fr,
             m.date,
@@ -331,6 +364,9 @@ class Match
      */
     public function getMatchById(int $ma_no): ?array
     {
+        assert($this->pdo instanceof PDO, 'PDO instance must be initialised');
+        assert($this->club_id > 0, 'Club ID must be positive');
+        assert(is_int($ma_no), 'Match number must be an integer');
         assert($ma_no > 0, 'Match number must be positive');
         
         $sql = "SELECT 

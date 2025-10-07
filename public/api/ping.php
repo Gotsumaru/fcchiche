@@ -17,9 +17,10 @@ echo "   __FILE__ = " . __FILE__ . "\n\n";
 echo "2. Vérification fichiers:\n";
 
 $files_to_check = [
+    'config/bootstrap.php' => __DIR__ . '/../../config/bootstrap.php',
     'config/config.php' => __DIR__ . '/../../config/config.php',
     'config/database.php' => __DIR__ . '/../../config/database.php',
-    'src/Models/Match.php' => __DIR__ . '/../../src/Models/Match.php',
+    'src/Models/MatchModel.php' => __DIR__ . '/../../src/Models/MatchModel.php',
     'src/Models/Stats.php' => __DIR__ . '/../../src/Models/Stats.php',
     'src/Models/Equipe.php' => __DIR__ . '/../../src/Models/Equipe.php',
     'src/Utils/Logger.php' => __DIR__ . '/../../src/Utils/Logger.php',
@@ -37,8 +38,8 @@ foreach ($files_to_check as $name => $path) {
 
 echo "\n3. Test chargement config:\n";
 try {
-    require_once __DIR__ . '/../../config/database.php';
-    echo "   ✓ config.php chargé\n";
+    require_once __DIR__ . '/../../config/bootstrap.php';
+    echo "   ✓ config.php chargé via bootstrap\n";
     echo "   - DB_HOST: " . DB_HOST . "\n";
     echo "   - DB_NAME: " . DB_NAME . "\n";
     echo "   - API_FFF_CLUB_ID: " . API_FFF_CLUB_ID . "\n";
@@ -49,7 +50,7 @@ try {
 
 echo "\n4. Test connexion PDO:\n";
 try {
-    require_once __DIR__ . '/../../config/database.php';
+    require_once __DIR__ . '/../../config/bootstrap.php';
     $pdo = Database::getInstance();
     echo "   ✓ PDO connecté\n";
     
