@@ -40,6 +40,7 @@ class Sync
             'equipes' => 0,
             'calendrier' => 0,
             'resultats' => 0,
+            'clubs_cache' => 0,
             'errors' => []
         ];
         
@@ -52,6 +53,7 @@ class Sync
             $matchs_data = $this->syncAllMatchs();
             $stats['calendrier'] = $matchs_data['calendrier'];
             $stats['resultats'] = $matchs_data['resultats'];
+            $stats['clubs_cache'] = $matchs_data['clubs_cache'];
             
             $this->pdo->commit();
             $this->logger->info('Synchronisation complète réussie', $stats);
@@ -399,7 +401,7 @@ class Sync
     /**
      * Synchroniser TOUS les matchs via nouvelle méthode API
      *
-     * @return array ['calendrier' => count, 'resultats' => count]
+     * @return array ['calendrier' => count, 'resultats' => count, 'clubs_cache' => count]
      */
     private function syncAllMatchs(): array
     {
@@ -408,13 +410,84 @@ class Sync
         $calendrier_count = $this->syncMatchs($matchs_data['calendrier'], false);
         $resultats_count = $this->syncMatchs($matchs_data['resultats'], true);
         
+        // Mettre à jour le cache des clubs adverses
+        $clubs_cache_count = $this->updateClubsCache($matchs_data['calendrier'], $matchs_data['resultats']);
+        
         $this->updateConfigValue('last_sync_calendrier', date('Y-m-d H:i:s'));
         $this->updateConfigValue('last_sync_resultats', date('Y-m-d H:i:s'));
         
         return [
             'calendrier' => $calendrier_count,
-            'resultats' => $resultats_count
+            'resultats' => $resultats_count,
+            'clubs_cache' => $clubs_cache_count
         ];
+    }
+    
+    /**
+     * Mettre à jour cache des clubs adverses
+     *
+     * @param array $calendrier_matchs Matchs calendrier
+     * @param array $resultats_matchs Matchs résultats
+     * @return int Nombre clubs mis à jour
+     */
+    private function updateClubsCache(array $calendrier_matchs, array $resultats_matchs): int
+    {
+        $all_matchs = array_merge($calendrier_matchs, $resultats_matchs);
+        $clubs_data = [];
+        
+        foreach ($all_matchs as $match) {
+            // Club domicile
+            if (isset($match['home']['club']['cl_no']) && $match['home']['club']['cl_no'] != API_FFF_CLUB_ID) {
+                $cl_no = $match['home']['club']['cl_no'];
+                $clubs_data[$cl_no] = [
+                    'cl_no' => $cl_no,
+                    'name' => $match['home']['short_name'] ?? null,
+                    'short_name' => $match['home']['short_name'] ?? null,
+                    'logo_url' => $match['home']['club']['logo'] ?? null
+                ];
+            }
+            
+            // Club extérieur
+            if (isset($match['away']['club']['cl_no']) && $match['away']['club']['cl_no'] != API_FFF_CLUB_ID) {
+                $cl_no = $match['away']['club']['cl_no'];
+                $clubs_data[$cl_no] = [
+                    'cl_no' => $cl_no,
+                    'name' => $match['away']['short_name'] ?? null,
+                    'short_name' => $match['away']['short_name'] ?? null,
+                    'logo_url' => $match['away']['club']['logo'] ?? null
+                ];
+            }
+        }
+        
+        $count = 0;
+        $max_iterations = 100;
+        
+        foreach ($clubs_data as $club) {
+            if ($count >= $max_iterations) {
+                break;
+            }
+            
+            $sql = "INSERT INTO " . DB_PREFIX . "clubs_cache (
+                cl_no, name, short_name, logo_url
+            ) VALUES (
+                :cl_no, :name, :short_name, :logo_url
+            ) ON DUPLICATE KEY UPDATE
+                name = VALUES(name),
+                short_name = VALUES(short_name),
+                logo_url = VALUES(logo_url)";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'cl_no' => $club['cl_no'],
+                'name' => $club['name'],
+                'short_name' => $club['short_name'],
+                'logo_url' => $club['logo_url']
+            ]);
+            
+            $count++;
+        }
+        
+        return $count;
     }
     
     /**
