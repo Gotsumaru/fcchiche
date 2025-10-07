@@ -1,0 +1,20 @@
+# .htaccess RACINE - Redirection vers public/
+# Placer ce fichier à la racine du projet (fcchiche-refonte/)
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Rediriger toutes les requêtes vers public/
+    RewriteRule ^$ public/ [L]
+    RewriteRule ^((?!public/).*)$ public/$1 [L,NC]
+</IfModule>
+
+# Bloquer accès aux dossiers sensibles
+<FilesMatch "^(config|src|logs|sql)">
+    Require all denied
+</FilesMatch>
+
+# Bloquer accès fichiers .git, .env, etc.
+<FilesMatch "^\.(git|env|htaccess)">
+    Require all denied
+</FilesMatch>

@@ -17,8 +17,9 @@
                      │
                      └─────► pprod_matchs (liens via home/away_club_id)
                                    │
-                                   └─────► pprod_competitions
-                                   └─────► pprod_terrains (optionnel)
+                                   ├─────► pprod_competitions
+                                   ├─────► pprod_terrains (optionnel)
+                                   └─────► pprod_clubs_cache (logos clubs adverses)
 ```
 
 ---
@@ -46,7 +47,34 @@ district_name        VARCHAR(255)
 
 ---
 
-### 2. `pprod_equipes`
+### 2. `pprod_clubs_cache`
+**⭐ NOUVEAU - Cache des clubs adverses (logos et infos)**
+
+```sql
+-- Colonnes principales
+id                INT UNSIGNED PRIMARY KEY
+cl_no             INT UNSIGNED UNIQUE  -- ID club API FFF
+name              VARCHAR(255)
+short_name        VARCHAR(100)
+logo_url          TEXT                 -- Logo du club adverse
+created_at        TIMESTAMP
+updated_at        TIMESTAMP
+
+-- Index
+INDEX idx_cl_no (cl_no)
+```
+
+**Usage :** 
+- Stocke les informations des clubs adverses rencontrés
+- Permet d'afficher les logos des équipes adverses sans appel API supplémentaire
+- Mis à jour automatiquement lors de la synchronisation des matchs
+- Exclut le club FC Chiche (cl_no = 5403)
+
+**Synchronisation :** Alimentée par `Sync::updateClubsCache()` depuis les matchs calendrier/résultats
+
+---
+
+### 3. `pprod_equipes`
 **Les 6 équipes du club**
 
 ```sql
@@ -77,7 +105,7 @@ UNIQUE KEY unique_team (club_id, category_code, number, season)
 
 ---
 
-### 3. `pprod_competitions`
+### 4. `pprod_competitions`
 **Les 11 compétitions (championnats + coupes)**
 
 ```sql
@@ -115,7 +143,7 @@ INDEX idx_type (type)
 
 ---
 
-### 4. `pprod_matchs`
+### 5. `pprod_matchs`
 **Tous les matchs (résultats + calendrier)**
 
 ```sql
@@ -182,7 +210,7 @@ INDEX idx_is_result (is_result)
 
 ## Requêtes SQL Essentielles
 
-### 1. Récupérer les 5 derniers résultats
+### 1. Récupérer les 5 derniers résultats (avec logos clubs adverses)
 
 ```sql
 SELECT 
@@ -212,20 +240,27 @@ SELECT
     END AS resultat,
     c.name AS competition,
     c.type AS competition_type,
-    CONCAT(e.category_code, ' ', e.number) AS equipe_chiche
+    CONCAT(e.category_code, ' ', e.number) AS equipe_chiche,
+    -- ⭐ NOUVEAU : Logo club adverse
+    CASE 
+        WHEN m.home_club_id = 5403 THEN cc_away.logo_url
+        ELSE cc_home.logo_url
+    END AS logo_adversaire
 FROM pprod_matchs m
 JOIN pprod_competitions c ON m.competition_id = c.id
 LEFT JOIN pprod_equipes e ON (
     (m.home_club_id = 5403 AND e.category_code = m.home_team_category AND e.number = m.home_team_number)
     OR (m.away_club_id = 5403 AND e.category_code = m.away_team_category AND e.number = m.away_team_number)
 )
+LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
+LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
 WHERE m.is_result = 1
   AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
 ORDER BY m.date DESC, m.time DESC
 LIMIT 5;
 ```
 
-### 2. Récupérer les 5 prochains matchs
+### 2. Récupérer les 5 prochains matchs (avec logos)
 
 ```sql
 SELECT 
@@ -241,7 +276,12 @@ SELECT
     c.type AS competition_type,
     t.name AS terrain,
     t.city AS ville_terrain,
-    CONCAT(e.category_code, ' ', e.number) AS equipe_chiche
+    CONCAT(e.category_code, ' ', e.number) AS equipe_chiche,
+    -- ⭐ NOUVEAU : Logo club adverse
+    CASE 
+        WHEN m.home_club_id = 5403 THEN cc_away.logo_url
+        ELSE cc_home.logo_url
+    END AS logo_adversaire
 FROM pprod_matchs m
 JOIN pprod_competitions c ON m.competition_id = c.id
 LEFT JOIN pprod_terrains t ON m.terrain_id = t.id
@@ -249,6 +289,8 @@ LEFT JOIN pprod_equipes e ON (
     (m.home_club_id = 5403 AND e.category_code = m.home_team_category AND e.number = m.home_team_number)
     OR (m.away_club_id = 5403 AND e.category_code = m.away_team_category AND e.number = m.away_team_number)
 )
+LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
+LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
 WHERE m.is_result = 0
   AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
   AND m.date >= CURDATE()
@@ -270,9 +312,15 @@ SELECT
     m.away_score,
     c.name AS competition,
     m.poule_journee_number AS journee,
-    m.is_result
+    m.is_result,
+    CASE 
+        WHEN m.home_club_id = 5403 THEN cc_away.logo_url
+        ELSE cc_home.logo_url
+    END AS logo_adversaire
 FROM pprod_matchs m
 JOIN pprod_competitions c ON m.competition_id = c.id
+LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
+LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
 WHERE (
     (m.home_club_id = 5403 AND m.home_team_category = 'SEM' AND m.home_team_number = 1)
     OR (m.away_club_id = 5403 AND m.away_team_category = 'SEM' AND m.away_team_number = 1)
@@ -335,9 +383,15 @@ SELECT
                 WHEN m.away_score > m.home_score THEN 'Qualifié'
                 ELSE 'Éliminé'
             END
-    END AS statut
+    END AS statut,
+    CASE 
+        WHEN m.home_club_id = 5403 THEN cc_away.logo_url
+        ELSE cc_home.logo_url
+    END AS logo_adversaire
 FROM pprod_matchs m
 JOIN pprod_competitions c ON m.competition_id = c.id
+LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
+LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
 WHERE m.is_result = 1
   AND c.type = 'CP'  -- CP = Coupe
   AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
@@ -366,7 +420,11 @@ SELECT
         ELSE m.home_team_name
     END AS adversaire,
     c.name AS competition,
-    t.name AS terrain
+    t.name AS terrain,
+    CASE 
+        WHEN m.home_club_id = 5403 THEN cc_away.logo_url
+        ELSE cc_home.logo_url
+    END AS logo_adversaire
 FROM pprod_matchs m
 JOIN pprod_competitions c ON m.competition_id = c.id
 LEFT JOIN pprod_terrains t ON m.terrain_id = t.id
@@ -374,6 +432,8 @@ LEFT JOIN pprod_equipes e ON (
     (m.home_club_id = 5403 AND e.category_code = m.home_team_category AND e.number = m.home_team_number)
     OR (m.away_club_id = 5403 AND e.category_code = m.away_team_category AND e.number = m.away_team_number)
 )
+LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
+LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
 WHERE m.is_result = 0
   AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
   AND m.date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
@@ -390,20 +450,20 @@ ORDER BY m.date ASC, m.time ASC;
 src/
 ├── Models/
 │   ├── Club.php           // Infos club
-│   ├── Equipe.php         // Gestion équipes
+│   ├── Equipe.php         // Gestion équipes (✅ existant)
 │   ├── Competition.php    // Gestion compétitions
-│   ├── Match.php          // Requêtes matchs
-│   └── Stats.php          // Statistiques
+│   ├── Match.php          // Requêtes matchs (✅ existant)
+│   └── Stats.php          // Statistiques (✅ existant)
 ├── API/
-│   └── FFFApiClient.php   // (existant)
+│   └── FFFApiClient.php   // (✅ existant)
 ├── Database/
-│   ├── Sync.php           // (existant)
-│   └── Database.php       // (existant)
+│   ├── Sync.php           // (✅ existant)
+│   └── Database.php       // (✅ existant)
 └── Utils/
-    └── Logger.php         // (existant)
+    └── Logger.php         // (✅ existant)
 ```
 
-### Exemple Model Match.php
+### Exemple Model Match.php (avec logos adversaires)
 
 ```php
 class Match
@@ -416,32 +476,50 @@ class Match
     }
     
     /**
-     * Récupérer derniers résultats
+     * Récupérer derniers résultats avec logos adversaires
      */
     public function getLastResults(int $limit = 5): array
     {
-        $sql = "SELECT ... (voir requête SQL ci-dessus)";
+        $sql = "SELECT 
+            m.*,
+            c.name AS competition_name,
+            CASE 
+                WHEN m.home_club_id = 5403 THEN cc_away.logo_url
+                ELSE cc_home.logo_url
+            END AS logo_adversaire
+        FROM pprod_matchs m
+        JOIN pprod_competitions c ON m.competition_id = c.id
+        LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
+        LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
+        WHERE m.is_result = 1
+          AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
+        ORDER BY m.date DESC
+        LIMIT :limit";
+        
         $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    
-    /**
-     * Récupérer prochains matchs
-     */
-    public function getUpcomingMatches(int $limit = 5): array
-    {
-        // ...
-    }
-    
-    /**
-     * Calendrier d'une équipe
-     */
-    public function getTeamSchedule(string $category, int $number): array
-    {
-        // ...
-    }
 }
+```
+
+---
+
+## Schéma Complet Mis à Jour
+
+```sql
+-- ⭐ NOUVELLE TABLE - Cache clubs adverses
+CREATE TABLE IF NOT EXISTS pprod_clubs_cache (
+    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    cl_no INT UNSIGNED UNIQUE NOT NULL,
+    name VARCHAR(255),
+    short_name VARCHAR(100),
+    logo_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_cl_no (cl_no)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
@@ -457,7 +535,7 @@ Les coupes ont un format API différent :
 
 ### Identifiants Uniques
 
-- `cl_no` = ID club API (5403)
+- `cl_no` = ID club API (5403 pour FC Chiche)
 - `cp_no` = ID compétition API
 - `ma_no` = ID match API (unique, même si reporté)
 
@@ -466,6 +544,7 @@ Les coupes ont un format API différent :
 - `terrain_id` : Parfois non défini au moment de la création du match
 - `home_score` / `away_score` : NULL si match non joué
 - `initial_date` : NULL si jamais reporté
+- `logo_url` dans `pprod_clubs_cache` : NULL si non disponible dans API
 
 ### Index Critiques
 
@@ -473,6 +552,14 @@ Les index suivants sont essentiels pour les performances :
 - `idx_date` sur `pprod_matchs(date)`
 - `idx_is_result` sur `pprod_matchs(is_result)`
 - `idx_home_club` / `idx_away_club` sur `pprod_matchs`
+- `idx_cl_no` sur `pprod_clubs_cache` ⭐ NOUVEAU
+
+### Cache Clubs Adverses
+
+- Table `pprod_clubs_cache` alimentée automatiquement par `Sync::updateClubsCache()`
+- Contient uniquement les clubs adverses (exclut cl_no = 5403)
+- Mise à jour lors de chaque synchronisation de matchs
+- Permet l'affichage rapide des logos sans appel API supplémentaire
 
 ---
 
@@ -481,13 +568,19 @@ Les index suivants sont essentiels pour les performances :
 - [x] Tables créées
 - [x] Script synchronisation fonctionnel
 - [x] CRON configuré (8h et 20h)
-- [ ] Adapter format coupes dans FFFApiClient.php
+- [x] Table clubs_cache pour logos adversaires ⭐ NOUVEAU
+- [x] Méthode getAllMatchs() via engagements
 - [ ] Créer Models PHP pour requêtes
 - [ ] Créer pages web (index, calendrier, résultats)
 - [ ] PWA (manifest.json, service worker)
 
 ---
 
-**Version :** 1.0  
+**Version :** 1.1  
 **Dernière mise à jour :** Octobre 2025  
+**Changelog :**
+- Ajout table `pprod_clubs_cache` pour cache logos clubs adverses
+- Mise à jour requêtes SQL avec JOIN sur clubs_cache
+- Documentation méthode `Sync::updateClubsCache()`
+
 **Maintenu par :** FC Chiche Dev Team
