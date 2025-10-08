@@ -14,6 +14,9 @@
                      ├─────► pprod_engagements (pivot équipe-compétition)
                      │             │
                      │             └─────► pprod_competitions (11 compétitions)
+                     │                           │
+                     │                           ├─────► pprod_matchs
+                     │                           └─────► pprod_classements ⭐ NOUVEAU
                      │
                      └─────► pprod_matchs (liens via home/away_club_id)
                                    │
@@ -48,7 +51,7 @@ district_name        VARCHAR(255)
 ---
 
 ### 2. `pprod_clubs_cache`
-**⭐ NOUVEAU - Cache des clubs adverses (logos et infos)**
+**Cache des clubs adverses (logos et infos)**
 
 ```sql
 -- Colonnes principales
@@ -74,76 +77,7 @@ INDEX idx_cl_no (cl_no)
 
 ---
 
-### 3. `pprod_equipes`
-**Les 6 équipes du club**
-
-```sql
--- Colonnes principales
-id                INT UNSIGNED PRIMARY KEY
-club_id           INT UNSIGNED (FK → pprod_club)
-category_code     VARCHAR(10)  -- SEM, U17, U15, U13
-number            TINYINT      -- 1, 2, 3, 4, 5, 6
-code              TINYINT      -- Code interne FFF
-short_name        VARCHAR(255) -- "CHICHE FC"
-type              VARCHAR(5)   -- "C" (Club)
-season            INT          -- 2025
-category_label    VARCHAR(100) -- "Senior Libre", "U17 - U16 Libre"
-category_gender   CHAR(1)      -- "M" (Masculin)
-diffusable        TINYINT(1)   -- 0/1
-
--- Index
-UNIQUE KEY unique_team (club_id, category_code, number, season)
-```
-
-**Équipes actuelles :**
-- SEM 1 : Seniors 1 (Départemental 3)
-- SEM 3 : Seniors 2 (Départemental 5)
-- SEM 6 : Seniors 3 (Départemental 5)
-- U17 4 : U17
-- U15 2 : U15
-- U13 5 : U13
-
----
-
-### 4. `pprod_competitions`
-**Les 11 compétitions (championnats + coupes)**
-
-```sql
--- Colonnes principales
-id                    INT UNSIGNED PRIMARY KEY
-cp_no                 INT UNSIGNED UNIQUE  -- ID API FFF
-season                INT UNSIGNED         -- 2025
-type                  VARCHAR(10)          -- CH (Championnat) / CP (Coupe)
-name                  VARCHAR(255)
-level                 VARCHAR(10)          -- F/L/D (Fédération/Ligue/District)
-cdg_cg_no             INT UNSIGNED
-cdg_name              VARCHAR(255)
-external_updated_at   DATETIME
-
--- Index
-INDEX idx_cp_no (cp_no)
-INDEX idx_season (season)
-INDEX idx_type (type)
-```
-
-**Compétitions actuelles :**
-
-| cp_no  | Type | Nom                                    | Level |
-|--------|------|----------------------------------------|-------|
-| 435164 | CP   | COUPE DE FRANCE CRÉDIT AGRICOLE        | F     |
-| 435202 | CP   | Coupe de Nouvelle-Aquitaine            | L     |
-| 436839 | CP   | Coupe des Deux-Sèvres                  | D     |
-| 436838 | CP   | Coupe Saboureau                        | D     |
-| 436831 | CH   | Seniors Départemental 3                | D     |
-| 436833 | CH   | Seniors Départemental 5 -1ère phase-   | D     |
-| 442762 | CH   | U17 -2ème Division-                    | D     |
-| 442766 | CH   | U15 A7                                 | D     |
-| 442777 | CH   | U13 -4ème Division-                    | D     |
-| 442789 | CP   | U17 Coupe Départementale               | D     |
-
----
-
-### 5. `pprod_matchs`
+### 3. `pprod_matchs`
 **Tous les matchs (résultats + calendrier)**
 
 ```sql
@@ -208,157 +142,210 @@ INDEX idx_is_result (is_result)
 
 ---
 
+### 4. `pprod_classements` ⭐ NOUVEAU
+**Classements par journée (historisation complète)**
+
+```sql
+-- Colonnes principales
+id                      INT UNSIGNED PRIMARY KEY
+competition_id          INT UNSIGNED (FK → pprod_competitions)
+season                  INT UNSIGNED            -- 2025
+date                    DATE NOT NULL           -- Date de la journée
+cj_no                   TINYINT UNSIGNED        -- Numéro journée
+type                    VARCHAR(5)              -- J (Journée)
+
+-- Identification équipe
+cl_no                   INT UNSIGNED            -- ID club
+team_category           VARCHAR(10)             -- SEM, U17, U15, U13
+team_number             TINYINT UNSIGNED
+team_short_name         VARCHAR(255)
+
+-- Classement et points
+ranking                 TINYINT UNSIGNED        -- Position classement
+point_count             TINYINT UNSIGNED        -- Points
+penalty_point_count     TINYINT UNSIGNED        -- Pénalités
+
+-- Statistiques matchs
+total_games_count       TINYINT UNSIGNED        -- Matchs joués
+won_games_count         TINYINT UNSIGNED        -- Victoires
+draw_games_count        TINYINT UNSIGNED        -- Nuls
+lost_games_count        TINYINT UNSIGNED        -- Défaites
+forfeits_games_count    TINYINT UNSIGNED        -- Forfaits
+
+-- Statistiques buts
+goals_for_count         SMALLINT UNSIGNED       -- Buts pour
+goals_against_count     SMALLINT UNSIGNED       -- Buts contre
+goals_diff              SMALLINT                -- Différence buts
+
+-- Poule
+phase_number            TINYINT UNSIGNED
+poule_stage_number      TINYINT UNSIGNED
+poule_name              VARCHAR(255)            -- Ex: "POULE B"
+
+-- Flags
+is_forfait              TINYINT(1)              -- Forfait général
+
+-- Métadonnées
+external_updated_at     DATETIME
+created_at              TIMESTAMP
+updated_at              TIMESTAMP
+
+-- Contraintes et index
+FOREIGN KEY (competition_id) REFERENCES pprod_competitions(id)
+UNIQUE KEY unique_classement (competition_id, cl_no, cj_no, season)
+INDEX idx_competition (competition_id)
+INDEX idx_cl_no (cl_no)
+INDEX idx_season (season)
+INDEX idx_date (date)
+INDEX idx_ranking (ranking)
+```
+
+**Usage :**
+- Stocke l'historique complet des classements à chaque journée
+- Permet d'afficher l'évolution du classement dans le temps
+- Clé unique : `(competition_id, cl_no, cj_no, season)` - une ligne par équipe par journée
+- Synchronisé uniquement pour les championnats (type = 'CH')
+
+**Synchronisation :** Alimentée par `Sync::syncClassements()` via `FFFApiClient::getAllClassements()`
+
+---
+
+### 5. `pprod_equipes`
+**Les 6 équipes du club**
+
+```sql
+-- Colonnes principales
+id                INT UNSIGNED PRIMARY KEY
+club_id           INT UNSIGNED (FK → pprod_club)
+category_code     VARCHAR(10)  -- SEM, U17, U15, U13
+number            TINYINT      -- 1, 2, 3, 4, 5, 6
+code              TINYINT      -- Code interne FFF
+short_name        VARCHAR(255) -- "CHICHE FC"
+type              VARCHAR(5)   -- "C" (Club)
+season            INT          -- 2025
+category_label    VARCHAR(100) -- "Senior Libre", "U17 - U16 Libre"
+category_gender   CHAR(1)      -- "M" (Masculin)
+diffusable        TINYINT(1)   -- 0/1
+
+-- Index
+UNIQUE KEY unique_team (club_id, category_code, number, season)
+```
+
+**Équipes actuelles :**
+- SEM 1 : Seniors 1 (Départemental 3)
+- SEM 3 : Seniors 2 (Départemental 5)
+- SEM 6 : Seniors 3 (Départemental 5)
+- U17 4 : U17
+- U15 2 : U15
+- U13 5 : U13
+
+---
+
+### 6. `pprod_competitions`
+**Les 11 compétitions (championnats + coupes)**
+
+```sql
+-- Colonnes principales
+id                    INT UNSIGNED PRIMARY KEY
+cp_no                 INT UNSIGNED UNIQUE  -- ID API FFF
+season                INT UNSIGNED         -- 2025
+type                  VARCHAR(10)          -- CH (Championnat) / CP (Coupe)
+name                  VARCHAR(255)
+level                 VARCHAR(10)          -- F/L/D (Fédération/Ligue/District)
+cdg_cg_no             INT UNSIGNED
+cdg_name              VARCHAR(255)
+external_updated_at   DATETIME
+
+-- Index
+INDEX idx_cp_no (cp_no)
+INDEX idx_season (season)
+INDEX idx_type (type)
+```
+
+**Compétitions actuelles :**
+
+| cp_no  | Type | Nom                                    | Level |
+|--------|------|----------------------------------------|-------|
+| 435164 | CP   | COUPE DE FRANCE CRÉDIT AGRICOLE        | F     |
+| 435202 | CP   | Coupe de Nouvelle-Aquitaine            | L     |
+| 436839 | CP   | Coupe des Deux-Sèvres                  | D     |
+| 436838 | CP   | Coupe Saboureau                        | D     |
+| 436831 | CH   | Seniors Départemental 3                | D     |
+| 436833 | CH   | Seniors Départemental 5 -1ère phase-   | D     |
+| 442762 | CH   | U17 -2ème Division-                    | D     |
+| 442766 | CH   | U15 A7                                 | D     |
+| 442777 | CH   | U13 -4ème Division-                    | D     |
+| 442789 | CP   | U17 Coupe Départementale               | D     |
+
+---
+
 ## Requêtes SQL Essentielles
 
-### 1. Récupérer les 5 derniers résultats (avec logos clubs adverses)
+### 1. Dernier classement d'une compétition (affichage)
 
 ```sql
 SELECT 
-    DATE_FORMAT(m.date, '%d/%m/%Y') AS date,
-    m.time,
-    CASE 
-        WHEN m.home_club_id = 5403 THEN 'DOM'
-        ELSE 'EXT'
-    END AS lieu,
-    m.home_team_name AS domicile,
-    m.home_score,
-    m.away_score,
-    m.away_team_name AS exterieur,
-    CASE 
-        WHEN m.home_club_id = 5403 THEN
-            CASE 
-                WHEN m.home_score > m.away_score THEN 'V'
-                WHEN m.home_score < m.away_score THEN 'D'
-                ELSE 'N'
-            END
-        ELSE
-            CASE 
-                WHEN m.away_score > m.home_score THEN 'V'
-                WHEN m.away_score < m.home_score THEN 'D'
-                ELSE 'N'
-            END
-    END AS resultat,
-    c.name AS competition,
-    c.type AS competition_type,
-    CONCAT(e.category_code, ' ', e.number) AS equipe_chiche,
-    -- ⭐ NOUVEAU : Logo club adverse
-    CASE 
-        WHEN m.home_club_id = 5403 THEN cc_away.logo_url
-        ELSE cc_home.logo_url
-    END AS logo_adversaire
-FROM pprod_matchs m
-JOIN pprod_competitions c ON m.competition_id = c.id
-LEFT JOIN pprod_equipes e ON (
-    (m.home_club_id = 5403 AND e.category_code = m.home_team_category AND e.number = m.home_team_number)
-    OR (m.away_club_id = 5403 AND e.category_code = m.away_team_category AND e.number = m.away_team_number)
-)
-LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
-LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
-WHERE m.is_result = 1
-  AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
-ORDER BY m.date DESC, m.time DESC
-LIMIT 5;
+    c.ranking AS position,
+    c.team_short_name AS equipe,
+    cc.logo_url AS logo,
+    c.point_count AS pts,
+    c.total_games_count AS joues,
+    c.won_games_count AS g,
+    c.draw_games_count AS n,
+    c.lost_games_count AS p,
+    c.goals_for_count AS bp,
+    c.goals_against_count AS bc,
+    c.goals_diff AS diff,
+    c.cl_no = 5403 AS is_chiche
+FROM pprod_classements c
+LEFT JOIN pprod_clubs_cache cc ON c.cl_no = cc.cl_no
+WHERE c.competition_id = :competition_id
+  AND c.cj_no = (
+    SELECT MAX(cj_no) 
+    FROM pprod_classements 
+    WHERE competition_id = :competition_id
+  )
+ORDER BY c.ranking ASC;
 ```
 
-### 2. Récupérer les 5 prochains matchs (avec logos)
+### 2. Classement actuel équipe FC Chiche
 
 ```sql
 SELECT 
-    DATE_FORMAT(m.date, '%d/%m/%Y') AS date,
-    m.time,
-    CASE 
-        WHEN m.home_club_id = 5403 THEN 'DOM'
-        ELSE 'EXT'
-    END AS lieu,
-    m.home_team_name AS domicile,
-    m.away_team_name AS exterieur,
-    c.name AS competition,
-    c.type AS competition_type,
-    t.name AS terrain,
-    t.city AS ville_terrain,
-    CONCAT(e.category_code, ' ', e.number) AS equipe_chiche,
-    -- ⭐ NOUVEAU : Logo club adverse
-    CASE 
-        WHEN m.home_club_id = 5403 THEN cc_away.logo_url
-        ELSE cc_home.logo_url
-    END AS logo_adversaire
-FROM pprod_matchs m
-JOIN pprod_competitions c ON m.competition_id = c.id
-LEFT JOIN pprod_terrains t ON m.terrain_id = t.id
-LEFT JOIN pprod_equipes e ON (
-    (m.home_club_id = 5403 AND e.category_code = m.home_team_category AND e.number = m.home_team_number)
-    OR (m.away_club_id = 5403 AND e.category_code = m.away_team_category AND e.number = m.away_team_number)
-)
-LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
-LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
-WHERE m.is_result = 0
-  AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
-  AND m.date >= CURDATE()
-ORDER BY m.date ASC, m.time ASC
-LIMIT 5;
+    comp.name AS competition,
+    c.ranking AS position,
+    c.point_count AS points,
+    c.total_games_count AS matchs_joues,
+    c.goals_diff AS diff_buts,
+    c.cj_no AS journee_actuelle
+FROM pprod_classements c
+JOIN pprod_competitions comp ON c.competition_id = comp.id
+WHERE c.cl_no = 5403
+  AND c.cj_no = (
+    SELECT MAX(cj_no) 
+    FROM pprod_classements c2 
+    WHERE c2.competition_id = c.competition_id 
+      AND c2.cl_no = 5403
+  )
+ORDER BY comp.name;
 ```
 
-### 3. Calendrier complet d'une équipe
-
-```sql
--- Exemple pour Seniors 1 (SEM 1)
-SELECT 
-    DATE_FORMAT(m.date, '%d/%m/%Y') AS date,
-    m.time,
-    CASE WHEN m.home_club_id = 5403 THEN 'DOM' ELSE 'EXT' END AS lieu,
-    m.home_team_name AS domicile,
-    m.away_team_name AS exterieur,
-    m.home_score,
-    m.away_score,
-    c.name AS competition,
-    m.poule_journee_number AS journee,
-    m.is_result,
-    CASE 
-        WHEN m.home_club_id = 5403 THEN cc_away.logo_url
-        ELSE cc_home.logo_url
-    END AS logo_adversaire
-FROM pprod_matchs m
-JOIN pprod_competitions c ON m.competition_id = c.id
-LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
-LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
-WHERE (
-    (m.home_club_id = 5403 AND m.home_team_category = 'SEM' AND m.home_team_number = 1)
-    OR (m.away_club_id = 5403 AND m.away_team_category = 'SEM' AND m.away_team_number = 1)
-)
-ORDER BY m.date ASC, m.time ASC;
-```
-
-### 4. Statistiques d'une équipe (bilan saison)
+### 3. Évolution position dans classement
 
 ```sql
 SELECT 
-    COUNT(*) AS matchs_joues,
-    SUM(CASE 
-        WHEN m.home_club_id = 5403 THEN
-            CASE WHEN m.home_score > m.away_score THEN 1 ELSE 0 END
-        ELSE
-            CASE WHEN m.away_score > m.home_score THEN 1 ELSE 0 END
-    END) AS victoires,
-    SUM(CASE 
-        WHEN m.home_score = m.away_score THEN 1 ELSE 0 
-    END) AS nuls,
-    SUM(CASE 
-        WHEN m.home_club_id = 5403 THEN
-            CASE WHEN m.home_score < m.away_score THEN 1 ELSE 0 END
-        ELSE
-            CASE WHEN m.away_score < m.home_score THEN 1 ELSE 0 END
-    END) AS defaites,
-    SUM(CASE WHEN m.home_club_id = 5403 THEN m.home_score ELSE m.away_score END) AS buts_pour,
-    SUM(CASE WHEN m.home_club_id = 5403 THEN m.away_score ELSE m.home_score END) AS buts_contre
-FROM pprod_matchs m
-WHERE m.is_result = 1
-  AND (
-    (m.home_club_id = 5403 AND m.home_team_category = 'SEM' AND m.home_team_number = 1)
-    OR (m.away_club_id = 5403 AND m.away_team_category = 'SEM' AND m.away_team_number = 1)
-  );
+    c.date,
+    c.cj_no AS journee,
+    c.ranking AS position,
+    c.point_count AS points,
+    c.goals_diff AS diff
+FROM pprod_classements c
+WHERE c.competition_id = :competition_id
+  AND c.cl_no = 5403
+ORDER BY c.cj_no ASC;
 ```
 
-### 5. Dernier résultat de chaque coupe (pour affichage)
+### 4. Dernier résultat de chaque coupe (pour affichage)
 
 ```sql
 SELECT 
@@ -393,10 +380,9 @@ JOIN pprod_competitions c ON m.competition_id = c.id
 LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
 LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
 WHERE m.is_result = 1
-  AND c.type = 'CP'  -- CP = Coupe
+  AND c.type = 'CP'
   AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
   AND m.id IN (
-    -- Dernier match de chaque coupe
     SELECT MAX(m2.id)
     FROM pprod_matchs m2
     WHERE m2.competition_id = m.competition_id
@@ -407,137 +393,23 @@ WHERE m.is_result = 1
 ORDER BY m.date DESC;
 ```
 
-### 6. Planning de la semaine (tous matchs dans 7 jours)
-
-```sql
-SELECT 
-    DATE_FORMAT(m.date, '%a %d/%m') AS jour,
-    m.time,
-    CONCAT(e.category_code, ' ', e.number) AS equipe,
-    CASE WHEN m.home_club_id = 5403 THEN 'DOM' ELSE 'EXT' END AS lieu,
-    CASE 
-        WHEN m.home_club_id = 5403 THEN m.away_team_name
-        ELSE m.home_team_name
-    END AS adversaire,
-    c.name AS competition,
-    t.name AS terrain,
-    CASE 
-        WHEN m.home_club_id = 5403 THEN cc_away.logo_url
-        ELSE cc_home.logo_url
-    END AS logo_adversaire
-FROM pprod_matchs m
-JOIN pprod_competitions c ON m.competition_id = c.id
-LEFT JOIN pprod_terrains t ON m.terrain_id = t.id
-LEFT JOIN pprod_equipes e ON (
-    (m.home_club_id = 5403 AND e.category_code = m.home_team_category AND e.number = m.home_team_number)
-    OR (m.away_club_id = 5403 AND e.category_code = m.away_team_category AND e.number = m.away_team_number)
-)
-LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
-LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
-WHERE m.is_result = 0
-  AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
-  AND m.date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
-ORDER BY m.date ASC, m.time ASC;
-```
-
 ---
 
-## Classes PHP Recommandées
+## Points d'attention
 
-### Structure suggérée
+### Format API Variable
 
-```php
-src/
-├── Models/
-│   ├── Club.php           // Infos club
-│   ├── Equipe.php         // Gestion équipes (✅ existant)
-│   ├── Competition.php    // Gestion compétitions
-│   ├── MatchModel.php     // Requêtes matchs (✅ existant)
-│   └── Stats.php          // Statistiques (✅ existant)
-├── API/
-│   └── FFFApiClient.php   // (✅ existant)
-├── Database/
-│   ├── Sync.php           // (✅ existant)
-│   └── Database.php       // (✅ existant)
-└── Utils/
-    └── Logger.php         // (✅ existant)
-```
-
-### Exemple Model MatchModel.php (avec logos adversaires)
-
-```php
-class Match
-{
-    private PDO $pdo;
-    
-    public function __construct()
-    {
-        $this->pdo = Database::getInstance();
-    }
-    
-    /**
-     * Récupérer derniers résultats avec logos adversaires
-     */
-    public function getLastResults(int $limit = 5): array
-    {
-        $sql = "SELECT 
-            m.*,
-            c.name AS competition_name,
-            CASE 
-                WHEN m.home_club_id = 5403 THEN cc_away.logo_url
-                ELSE cc_home.logo_url
-            END AS logo_adversaire
-        FROM pprod_matchs m
-        JOIN pprod_competitions c ON m.competition_id = c.id
-        LEFT JOIN pprod_clubs_cache cc_home ON m.home_club_id = cc_home.cl_no
-        LEFT JOIN pprod_clubs_cache cc_away ON m.away_club_id = cc_away.cl_no
-        WHERE m.is_result = 1
-          AND (m.home_club_id = 5403 OR m.away_club_id = 5403)
-        ORDER BY m.date DESC
-        LIMIT :limit";
-        
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-}
-```
-
----
-
-## Schéma Complet Mis à Jour
-
-```sql
--- ⭐ NOUVELLE TABLE - Cache clubs adverses
-CREATE TABLE IF NOT EXISTS pprod_clubs_cache (
-    id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    cl_no INT UNSIGNED UNIQUE NOT NULL,
-    name VARCHAR(255),
-    short_name VARCHAR(100),
-    logo_url TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_cl_no (cl_no)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
-
----
-
-## Notes Importantes
-
-### Gestion des Coupes
-
-Les coupes ont un format API différent :
 - Pas toujours de structure `hydra:member`
 - Possibles matchs éliminatoires uniques
 - Garder uniquement : **dernier résultat + matchs à venir**
+- Classements disponibles uniquement pour les championnats (type = 'CH')
 
 ### Identifiants Uniques
 
 - `cl_no` = ID club API (5403 pour FC Chiche)
 - `cp_no` = ID compétition API
 - `ma_no` = ID match API (unique, même si reporté)
+- `cj_no` = Numéro de journée (classement)
 
 ### Champs Nullable
 
@@ -552,14 +424,23 @@ Les index suivants sont essentiels pour les performances :
 - `idx_date` sur `pprod_matchs(date)`
 - `idx_is_result` sur `pprod_matchs(is_result)`
 - `idx_home_club` / `idx_away_club` sur `pprod_matchs`
-- `idx_cl_no` sur `pprod_clubs_cache` ⭐ NOUVEAU
+- `idx_cl_no` sur `pprod_clubs_cache`
+- `idx_competition` sur `pprod_classements` ⭐ NOUVEAU
+- `idx_ranking` sur `pprod_classements` ⭐ NOUVEAU
 
-### Cache Clubs Adverses
+### Cache et Données Externes
 
 - Table `pprod_clubs_cache` alimentée automatiquement par `Sync::updateClubsCache()`
 - Contient uniquement les clubs adverses (exclut cl_no = 5403)
 - Mise à jour lors de chaque synchronisation de matchs
 - Permet l'affichage rapide des logos sans appel API supplémentaire
+
+### Historisation Classements ⭐ NOUVEAU
+
+- Table `pprod_classements` historise chaque journée
+- Permet de tracer l'évolution du classement dans le temps
+- Synchronisée uniquement pour les championnats (type = 'CH')
+- Clé unique : `(competition_id, cl_no, cj_no, season)`
 
 ---
 
@@ -568,17 +449,23 @@ Les index suivants sont essentiels pour les performances :
 - [x] Tables créées
 - [x] Script synchronisation fonctionnel
 - [x] CRON configuré (8h et 20h)
-- [x] Table clubs_cache pour logos adversaires ⭐ NOUVEAU
+- [x] Table clubs_cache pour logos adversaires
 - [x] Méthode getAllMatchs() via engagements
-- [ ] Créer Models PHP pour requêtes
-- [ ] Créer pages web (index, calendrier, résultats)
+- [x] Table classements avec historisation ⭐ NOUVEAU
+- [x] Synchronisation classements automatique ⭐ NOUVEAU
+- [ ] Créer Models PHP pour requêtes (ajouter ClassementModel)
+- [ ] Créer pages web (index, calendrier, résultats, classements)
 - [ ] PWA (manifest.json, service worker)
 
 ---
 
-**Version :** 1.1  
+**Version :** 1.2  
 **Dernière mise à jour :** Octobre 2025  
 **Changelog :**
+- Ajout table `pprod_classements` pour historisation classements ⭐ NOUVEAU
+- Ajout méthodes API `getClassement()` et `getAllClassements()` ⭐ NOUVEAU
+- Ajout synchronisation automatique classements dans `Sync::syncClassements()` ⭐ NOUVEAU
+- Ajout requêtes SQL pour affichage classements ⭐ NOUVEAU
 - Ajout table `pprod_clubs_cache` pour cache logos clubs adverses
 - Mise à jour requêtes SQL avec JOIN sur clubs_cache
 - Documentation méthode `Sync::updateClubsCache()`

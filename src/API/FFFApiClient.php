@@ -80,6 +80,99 @@ class FFFApiClient
         
         return $data;
     }
+
+    /**
+     * Récupérer classement d'une compétition/phase/poule
+     * 
+     * URL format: /api/compets/{cp_no}/phases/{phase_no}/poules/{poule_no}/classement_journees
+     *
+     * @param int $cp_no Numéro compétition
+     * @param int $phase_no Numéro phase
+     * @param int $poule_no Numéro poule
+     * @return array|null Données classement ou null si erreur
+     */
+    public function getClassement(int $cp_no, int $phase_no, int $poule_no): ?array
+    {
+        assert($cp_no > 0, 'Competition number must be positive');
+        assert($phase_no >= 0, 'Phase number must be >= 0');
+        assert($poule_no >= 0, 'Poule number must be >= 0');
+        
+        $endpoint = sprintf(
+            '/compets/%d/phases/%d/poules/%d/classement_journees',
+            $cp_no,
+            $phase_no,
+            $poule_no
+        );
+        
+        $data = $this->makeRequest($endpoint);
+        
+        if ($data !== null && isset($data['hydra:member'])) {
+            return $data;
+        }
+        
+        if ($data !== null && isset($data[0])) {
+            return [
+                'hydra:member' => $data,
+                'hydra:totalItems' => count($data)
+            ];
+        }
+        
+        return $data;
+    }
+
+    /**
+     * Récupérer TOUS les classements via engagements
+     *
+     * @return array Tableau de tous les classements disponibles
+     */
+    public function getAllClassements(): array
+    {
+        $all_classements = [];
+        $max_iterations = 50;
+        $counter = 0;
+        
+        $engagements = $this->getEngagements();
+        
+        if ($engagements === null || !isset($engagements['hydra:member'])) {
+            $this->logger->error('Failed to fetch engagements for classements');
+            return [];
+        }
+        
+        foreach ($engagements['hydra:member'] as $engagement) {
+            if ($counter >= $max_iterations) {
+                break;
+            }
+            
+            if (!isset($engagement['competition']['cp_no'])) {
+                continue;
+            }
+            
+            $cp_no = $engagement['competition']['cp_no'];
+            $phase_no = $engagement['phase']['number'] ?? 1;
+            $poule_no = $engagement['poule']['stage_number'] ?? 1;
+            $competition_type = $engagement['competition']['type'] ?? 'CH';
+            
+            if ($competition_type === 'CH') {
+                $classement = $this->getClassement($cp_no, $phase_no, $poule_no);
+                
+                if ($classement !== null && isset($classement['hydra:member']) && !empty($classement['hydra:member'])) {
+                    foreach ($classement['hydra:member'] as $entry) {
+                        $entry['competition'] = $engagement['competition'];
+                        $all_classements[] = $entry;
+                    }
+                }
+            }
+            
+            $counter++;
+        }
+        
+        $this->logger->info('Fetched all classements via engagements', [
+            'engagements_processed' => $counter,
+            'classements_count' => count($all_classements)
+        ]);
+        
+        return $all_classements;
+    }
     
     /**
      * Récupérer matchs d'une compétition/phase/poule spécifique

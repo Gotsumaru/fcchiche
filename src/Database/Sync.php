@@ -40,6 +40,7 @@ class Sync
             'calendrier' => 0,
             'resultats' => 0,
             'clubs_cache' => 0,
+            'classements' => 0,  // ⭐ NOUVEAU
             'errors' => []
         ];
         
@@ -53,6 +54,9 @@ class Sync
             $stats['calendrier'] = $matchs_data['calendrier'];
             $stats['resultats'] = $matchs_data['resultats'];
             $stats['clubs_cache'] = $matchs_data['clubs_cache'];
+            
+            // ⭐ NOUVEAU - Synchroniser classements
+            $stats['classements'] = $this->syncClassements();
             
             $this->pdo->commit();
             $this->logger->info('Synchronisation complète réussie', $stats);
@@ -394,6 +398,112 @@ class Sync
             $count++;
         }
         
+        return $count;
+    }
+
+    /**
+     * Synchroniser classements de toutes les compétitions
+     *
+     * @return int Nombre classements synchronisés
+     * @throws PDOException Si erreur BDD
+     */
+    private function syncClassements(): int
+    {
+        $classements = $this->api->getAllClassements();
+        
+        if (empty($classements)) {
+            $this->logger->warning('No classements data retrieved from API');
+            return 0;
+        }
+        
+        $count = 0;
+        $max_iterations = 500;
+        
+        foreach ($classements as $entry) {
+            if ($count >= $max_iterations) {
+                break;
+            }
+            
+            if (!isset($entry['cj_no'], $entry['equipe']['club']['cl_no'])) {
+                continue;
+            }
+            
+            $competition_id = $this->getOrCreateCompetition($entry['competition']);
+            
+            if ($competition_id === 0) {
+                continue;
+            }
+            
+            $date = $this->parseDate($entry['date']);
+            assert($date !== null, 'Invalid classement date');
+            
+            $sql = "INSERT INTO " . DB_PREFIX . "classements (
+                competition_id, season, date, cj_no, type,
+                cl_no, team_category, team_number, team_short_name,
+                ranking, point_count, penalty_point_count,
+                total_games_count, won_games_count, draw_games_count, 
+                lost_games_count, forfeits_games_count,
+                goals_for_count, goals_against_count, goals_diff,
+                phase_number, poule_stage_number, poule_name,
+                is_forfait, external_updated_at
+            ) VALUES (
+                :competition_id, :season, :date, :cj_no, :type,
+                :cl_no, :team_category, :team_number, :team_short_name,
+                :ranking, :point_count, :penalty_point_count,
+                :total_games_count, :won_games_count, :draw_games_count,
+                :lost_games_count, :forfeits_games_count,
+                :goals_for_count, :goals_against_count, :goals_diff,
+                :phase_number, :poule_stage_number, :poule_name,
+                :is_forfait, :external_updated_at
+            ) ON DUPLICATE KEY UPDATE
+                ranking = VALUES(ranking),
+                point_count = VALUES(point_count),
+                penalty_point_count = VALUES(penalty_point_count),
+                total_games_count = VALUES(total_games_count),
+                won_games_count = VALUES(won_games_count),
+                draw_games_count = VALUES(draw_games_count),
+                lost_games_count = VALUES(lost_games_count),
+                forfeits_games_count = VALUES(forfeits_games_count),
+                goals_for_count = VALUES(goals_for_count),
+                goals_against_count = VALUES(goals_against_count),
+                goals_diff = VALUES(goals_diff),
+                team_short_name = VALUES(team_short_name),
+                is_forfait = VALUES(is_forfait),
+                external_updated_at = VALUES(external_updated_at)";
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'competition_id' => $competition_id,
+                'season' => $entry['season'],
+                'date' => $date,
+                'cj_no' => $entry['cj_no'],
+                'type' => $entry['type'],
+                'cl_no' => $entry['equipe']['club']['cl_no'],
+                'team_category' => $entry['equipe']['category_code'],
+                'team_number' => $entry['equipe']['number'],
+                'team_short_name' => $entry['equipe']['short_name'],
+                'ranking' => $entry['rank'],
+                'point_count' => $entry['point_count'],
+                'penalty_point_count' => $entry['penalty_point_count'] ?? 0,
+                'total_games_count' => $entry['total_games_count'],
+                'won_games_count' => $entry['won_games_count'],
+                'draw_games_count' => $entry['draw_games_count'],
+                'lost_games_count' => $entry['lost_games_count'],
+                'forfeits_games_count' => $entry['forfeits_games_count'] ?? 0,
+                'goals_for_count' => $entry['goals_for_count'],
+                'goals_against_count' => $entry['goals_against_count'],
+                'goals_diff' => $entry['goals_diff'],
+                'phase_number' => $entry['poule']['cdg']['cg_no'] ?? null,
+                'poule_stage_number' => $entry['poule']['stage_number'] ?? null,
+                'poule_name' => $entry['poule']['name'] ?? null,
+                'is_forfait' => ($entry['is_forfait'] ?? false) ? 1 : 0,
+                'external_updated_at' => $this->parseDateTime($entry['external_updated_at'])
+            ]);
+            
+            $count++;
+        }
+        
+        $this->updateConfigValue('last_sync_classements', date('Y-m-d H:i:s'));
         return $count;
     }
     
