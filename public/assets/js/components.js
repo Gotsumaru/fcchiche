@@ -81,7 +81,7 @@ const Components = {
         assert(match && typeof match === 'object', 'Match must be an object');
         
         const isHome = match.lieu === 'DOM';
-        const homeTeam = isHome ? 'CHICHE FC' : match.exterieur;
+        const homeTeam = isHome ? 'CHICHE FC' : match.domicile;
         const awayTeam = isHome ? match.exterieur : 'CHICHE FC';
         const placeholderLogo = this.assetPath('images/placeholder-logo.svg');
         const clubLogo = this.assetPath('images/logo.svg');
@@ -96,8 +96,8 @@ const Components = {
         let resultBadge = '';
         
         if (isResult && match.home_score !== null) {
-            const homeScore = isHome ? match.home_score : match.away_score;
-            const awayScore = isHome ? match.away_score : match.home_score;
+            const homeScore = match.home_score;
+            const awayScore = match.away_score;
             
             scoreHTML = `
                 <div class="match-score">
