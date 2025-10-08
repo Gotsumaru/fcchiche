@@ -3,7 +3,77 @@
  * Builders pour générer le HTML des composants
  */
 
+const assetsBaseFromDom = (() => {
+    const body = document.body;
+    if (!body || !body.dataset) {
+        return '/assets';
+    }
+
+    const configuredBase = body.dataset.assetsBase || '/assets';
+    const trimmedBase = configuredBase.trim();
+    if (trimmedBase.length === 0) {
+        return '/assets';
+    }
+
+    return trimmedBase.replace(/\/+$/u, '');
+})();
+
 const Components = {
+    assetBase: assetsBaseFromDom,
+    failedLogos: new Set(),
+
+    /**
+     * Construire un chemin asset sécurisé
+     */
+    assetPath(relativePath) {
+        assert(typeof relativePath === 'string', 'Relative path must be a string');
+        const trimmed = relativePath.trim();
+        assert(trimmed.length > 0, 'Relative path must not be empty');
+
+        const cleanPath = trimmed.replace(/^\/+/, '');
+        const base = this.assetBase.endsWith('/') ? this.assetBase.slice(0, -1) : this.assetBase;
+        return `${base}/${cleanPath}`;
+    },
+
+    /**
+     * Normaliser l'URL du logo adversaire
+     */
+    normalizeLogoUrl(url) {
+        assert(this.failedLogos instanceof Set, 'failedLogos must be a Set');
+        assert(typeof this.assetBase === 'string', 'assetBase must be initialised');
+
+        if (!url || typeof url !== 'string') {
+            return null;
+        }
+
+        const trimmed = url.trim();
+        if (trimmed.length === 0) {
+            return null;
+        }
+
+        if (this.failedLogos.has(trimmed)) {
+            return null;
+        }
+
+        return trimmed;
+    },
+
+    /**
+     * Gestion centralisée des erreurs de chargement logo
+     */
+    handleImageError(img) {
+        assert(img instanceof HTMLImageElement, 'Image element is required');
+        assert(typeof this.assetBase === 'string', 'assetBase must be initialised');
+
+        const originalSrc = img.dataset.originalSrc;
+        if (originalSrc && originalSrc.length > 0) {
+            this.failedLogos.add(originalSrc);
+        }
+
+        img.onerror = null;
+        img.src = this.assetPath('images/placeholder-logo.svg');
+    },
+
     /**
      * Card de match (résultat ou calendrier)
      */
@@ -13,8 +83,14 @@ const Components = {
         const isHome = match.lieu === 'DOM';
         const homeTeam = isHome ? 'CHICHE FC' : match.exterieur;
         const awayTeam = isHome ? match.exterieur : 'CHICHE FC';
-        const homeLogo = isHome ? '/assets/images/logo.svg' : (match.logo_adversaire || '/assets/images/placeholder-logo.svg');
-        const awayLogo = isHome ? (match.logo_adversaire || '/assets/images/placeholder-logo.svg') : '/assets/images/logo.svg';
+        const placeholderLogo = this.assetPath('images/placeholder-logo.svg');
+        const clubLogo = this.assetPath('images/logo.svg');
+        const opponentLogo = this.normalizeLogoUrl(match.logo_adversaire);
+        const resolvedOpponentLogo = opponentLogo || placeholderLogo;
+        const homeLogo = isHome ? clubLogo : resolvedOpponentLogo;
+        const awayLogo = isHome ? resolvedOpponentLogo : clubLogo;
+        const homeLogoOriginal = isHome ? '' : opponentLogo || '';
+        const awayLogoOriginal = isHome ? opponentLogo || '' : '';
         
         let scoreHTML = '';
         let resultBadge = '';
@@ -57,13 +133,13 @@ const Components = {
                         <span class="match-card-badge">${competitionType}</span>
                         <span>${this.escapeHtml(match.competition)}</span>
                     </div>
-                    <span>${match.date_fr}</span>
+                    <span>${this.escapeHtml(match.date_fr)}</span>
                 </div>
                 <div class="match-card-body">
                     <div class="match-teams">
                         <div class="match-team">
                             <div class="match-team-logo">
-                                <img src="${homeLogo}" alt="${homeTeam}" onerror="this.onerror=null;this.src='/assets/images/placeholder-logo.svg'">
+                                <img src="${this.escapeAttribute(homeLogo)}" alt="${this.escapeAttribute(homeTeam)}" data-original-src="${this.escapeAttribute(homeLogoOriginal)}" onerror="Components.handleImageError(this)">
                             </div>
                             <div class="match-team-name">${this.escapeHtml(homeTeam)}</div>
                             ${isHome ? '<div class="match-team-lieu">Domicile</div>' : ''}
@@ -71,7 +147,7 @@ const Components = {
                         ${scoreHTML}
                         <div class="match-team">
                             <div class="match-team-logo">
-                                <img src="${awayLogo}" alt="${awayTeam}" onerror="this.onerror=null;this.src='/assets/images/placeholder-logo.svg'">
+                                <img src="${this.escapeAttribute(awayLogo)}" alt="${this.escapeAttribute(awayTeam)}" data-original-src="${this.escapeAttribute(awayLogoOriginal)}" onerror="Components.handleImageError(this)">
                             </div>
                             <div class="match-team-name">${this.escapeHtml(awayTeam)}</div>
                             ${!isHome ? '<div class="match-team-lieu">Extérieur</div>' : ''}
@@ -235,9 +311,12 @@ const Components = {
     /**
      * Hero section
      */
-    hero(title, subtitle, backgroundImage = '/assets/images/placeholder-bg.jpg') {
+    hero(title, subtitle, backgroundImage = null) {
+        const hasBackground = typeof backgroundImage === 'string' && backgroundImage.trim().length > 0;
+        const styleAttribute = hasBackground ? ` style="background-image: url('${this.escapeAttribute(backgroundImage)}')"` : '';
+
         return `
-            <div class="page-hero" style="background-image: url('${backgroundImage}')">
+            <div class="page-hero"${styleAttribute}>
                 <div class="page-hero-content">
                     <h1>${this.escapeHtml(title)}</h1>
                     ${subtitle ? `<p>${this.escapeHtml(subtitle)}</p>` : ''}
@@ -245,16 +324,41 @@ const Components = {
             </div>
         `;
     },
-    
+
     /**
      * Escape HTML pour sécurité
      */
     escapeHtml(text) {
         if (text === null || text === undefined) return '';
-        
+
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    },
+
+    /**
+     * Escape pour attribut HTML
+     */
+    escapeAttribute(value) {
+        assert(typeof this.assetBase === 'string', 'assetBase must be initialised');
+        const fallback = '';
+
+        if (value === null || value === undefined) {
+            return fallback;
+        }
+
+        const stringValue = String(value);
+        assert(typeof stringValue === 'string', 'Attribute value must be convertible to string');
+
+        const escaped = stringValue
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        assert(typeof escaped === 'string', 'Escaped attribute must be a string');
+
+        return escaped;
     }
 };
 

@@ -1,3 +1,28 @@
+<?php
+declare(strict_types=1);
+
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+if (!is_string($scriptName)) {
+    $scriptName = '';
+}
+
+$scriptDirectory = str_replace('\\', '/', dirname($scriptName));
+$trimmedDirectory = rtrim($scriptDirectory, '/');
+if ($trimmedDirectory === '.' || $trimmedDirectory === '/') {
+    $trimmedDirectory = '';
+}
+
+$basePath = $trimmedDirectory === '' ? '' : '/' . ltrim($trimmedDirectory, '/');
+$assetsBase = rtrim(($basePath === '' ? '' : $basePath) . '/assets', '/');
+if ($assetsBase === '') {
+    $assetsBase = '/assets';
+}
+
+$apiBase = rtrim(($basePath === '' ? '' : $basePath) . '/api', '/');
+if ($apiBase === '') {
+    $apiBase = '/api';
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,25 +37,27 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="/assets/css/variables.css">
-    <link rel="stylesheet" href="/assets/css/main.css">
-    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/css/variables.css">
+    <link rel="stylesheet" href="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/css/main.css">
+    <link rel="stylesheet" href="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/css/components.css">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo.svg">
+    <link rel="icon" type="image/svg+xml" href="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/images/logo.svg">
     
     <!-- Open Graph -->
     <meta property="og:title" content="FC Chiche - Club de Football">
     <meta property="og:description" content="Suivez les résultats et le calendrier du FC Chiche">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="/assets/images/logo.svg">
+    <meta property="og:image" content="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/images/logo.svg">
 </head>
-<body>
+<body data-base-path="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>"
+      data-assets-base="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>"
+      data-api-base="<?= htmlspecialchars($apiBase, ENT_QUOTES) ?>">
     <!-- Navigation Desktop -->
     <nav class="nav-desktop">
         <div class="container nav-desktop-container">
             <a href="/" class="nav-desktop-logo" data-link>
-                <img src="/assets/images/logo.svg" alt="FC Chiche Logo">
+                <img src="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/images/logo.svg" alt="FC Chiche Logo">
                 <span>FC Chiche</span>
             </a>
             <ul class="nav-desktop-list">
@@ -80,9 +107,9 @@
     </nav>
     
     <!-- JavaScript -->
-    <script src="/assets/js/router.js"></script>
-    <script src="/assets/js/api.js"></script>
-    <script src="/assets/js/components.js"></script>
-    <script src="/assets/js/app.js"></script>
+    <script src="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/js/router.js"></script>
+    <script src="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/js/api.js"></script>
+    <script src="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/js/components.js"></script>
+    <script src="<?= htmlspecialchars($assetsBase, ENT_QUOTES) ?>/js/app.js"></script>
 </body>
 </html>
