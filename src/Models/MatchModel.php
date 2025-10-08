@@ -98,7 +98,12 @@ class MatchModel
         
         $stmt = $this->pdo->prepare($sql);
         foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
+            $paramName = ':' . $key;
+            if (in_array($key, ['club_id', 'number'], true)) {
+                $stmt->bindValue($paramName, (int) $value, PDO::PARAM_INT);
+                continue;
+            }
+            $stmt->bindValue($paramName, (string) $value, PDO::PARAM_STR);
         }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
@@ -176,7 +181,12 @@ class MatchModel
         
         $stmt = $this->pdo->prepare($sql);
         foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
+            $paramName = ':' . $key;
+            if (in_array($key, ['club_id', 'number'], true)) {
+                $stmt->bindValue($paramName, (int) $value, PDO::PARAM_INT);
+                continue;
+            }
+            $stmt->bindValue($paramName, (string) $value, PDO::PARAM_STR);
         }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
