@@ -32,45 +32,51 @@ class Stats
         assert(!empty($category), 'Category cannot be empty');
         assert($number > 0, 'Number must be positive');
         
-        $sql = "SELECT 
+        $sql = "SELECT
             COUNT(*) AS matchs_joues,
-            SUM(CASE 
-                WHEN m.home_club_id = :club_id THEN
+            SUM(CASE
+                WHEN m.home_club_id = constants.club_id_ref THEN
                     CASE WHEN m.home_score > m.away_score THEN 1 ELSE 0 END
                 ELSE
                     CASE WHEN m.away_score > m.home_score THEN 1 ELSE 0 END
             END) AS victoires,
-            SUM(CASE 
-                WHEN m.home_score = m.away_score THEN 1 ELSE 0 
+            SUM(CASE
+                WHEN m.home_score = m.away_score THEN 1 ELSE 0
             END) AS nuls,
-            SUM(CASE 
-                WHEN m.home_club_id = :club_id THEN
+            SUM(CASE
+                WHEN m.home_club_id = constants.club_id_ref THEN
                     CASE WHEN m.home_score < m.away_score THEN 1 ELSE 0 END
                 ELSE
                     CASE WHEN m.away_score < m.home_score THEN 1 ELSE 0 END
             END) AS defaites,
-            SUM(CASE WHEN m.home_club_id = :club_id THEN m.home_score ELSE m.away_score END) AS buts_pour,
-            SUM(CASE WHEN m.home_club_id = :club_id THEN m.away_score ELSE m.home_score END) AS buts_contre,
-            SUM(CASE WHEN m.home_club_id = :club_id THEN m.home_score ELSE m.away_score END) - 
-            SUM(CASE WHEN m.home_club_id = :club_id THEN m.away_score ELSE m.home_score END) AS diff_buts
+            SUM(CASE WHEN m.home_club_id = constants.club_id_ref THEN m.home_score ELSE m.away_score END) AS buts_pour,
+            SUM(CASE WHEN m.home_club_id = constants.club_id_ref THEN m.away_score ELSE m.home_score END) AS buts_contre,
+            SUM(CASE WHEN m.home_club_id = constants.club_id_ref THEN m.home_score ELSE m.away_score END) -
+            SUM(CASE WHEN m.home_club_id = constants.club_id_ref THEN m.away_score ELSE m.home_score END) AS diff_buts
         FROM " . DB_PREFIX . "matchs m
+        JOIN (
+            SELECT
+                :club_id AS club_id_ref,
+                :category AS category_ref,
+                :number AS number_ref
+        ) AS constants
         WHERE m.is_result = 1
           AND (
-            (m.home_club_id = :club_id AND m.home_team_category = :category AND m.home_team_number = :number)
-            OR (m.away_club_id = :club_id AND m.away_team_category = :category AND m.away_team_number = :number)
+            (m.home_club_id = constants.club_id_ref AND m.home_team_category = constants.category_ref AND m.home_team_number = constants.number_ref)
+            OR (m.away_club_id = constants.club_id_ref AND m.away_team_category = constants.category_ref AND m.away_team_number = constants.number_ref)
           )";
-        
+
         $params = [
-            'club_id' => $this->club_id,
-            'category' => $category,
-            'number' => $number
+            ':club_id' => $this->club_id,
+            ':category' => $category,
+            ':number' => $number
         ];
-        
+
         if ($competition_id !== null) {
             $sql .= " AND m.competition_id = :competition_id";
-            $params['competition_id'] = $competition_id;
+            $params[':competition_id'] = $competition_id;
         }
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         
@@ -175,16 +181,16 @@ class Stats
         assert($number > 0, 'Number must be positive');
         assert($limit > 0 && $limit <= 20, 'Limit must be between 1 and 20');
         
-        $sql = "SELECT 
-            CASE 
-                WHEN m.home_club_id = :club_id THEN
-                    CASE 
+        $sql = "SELECT
+            CASE
+                WHEN m.home_club_id = constants.club_id_ref THEN
+                    CASE
                         WHEN m.home_score > m.away_score THEN 'V'
                         WHEN m.home_score < m.away_score THEN 'D'
                         ELSE 'N'
                     END
                 ELSE
-                    CASE 
+                    CASE
                         WHEN m.away_score > m.home_score THEN 'V'
                         WHEN m.away_score < m.home_score THEN 'D'
                         ELSE 'N'
@@ -192,14 +198,20 @@ class Stats
             END AS resultat,
             m.date
         FROM " . DB_PREFIX . "matchs m
+        JOIN (
+            SELECT
+                :club_id AS club_id_ref,
+                :category AS category_ref,
+                :number AS number_ref
+        ) AS constants
         WHERE m.is_result = 1
           AND (
-            (m.home_club_id = :club_id AND m.home_team_category = :category AND m.home_team_number = :number)
-            OR (m.away_club_id = :club_id AND m.away_team_category = :category AND m.away_team_number = :number)
+            (m.home_club_id = constants.club_id_ref AND m.home_team_category = constants.category_ref AND m.home_team_number = constants.number_ref)
+            OR (m.away_club_id = constants.club_id_ref AND m.away_team_category = constants.category_ref AND m.away_team_number = constants.number_ref)
           )
         ORDER BY m.date DESC, m.time DESC
         LIMIT :limit";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':club_id', $this->club_id);
         $stmt->bindValue(':category', $category);
@@ -285,41 +297,47 @@ class Stats
         assert(!empty($category), 'Category cannot be empty');
         assert($number > 0, 'Number must be positive');
         
-        $sql = "SELECT 
-            CASE 
-                WHEN m.home_club_id = :club_id THEN m.away_team_name
+        $sql = "SELECT
+            CASE
+                WHEN m.home_club_id = constants.club_id_ref THEN m.away_team_name
                 ELSE m.home_team_name
             END AS adversaire,
             COUNT(*) AS nb_matchs,
-            SUM(CASE 
-                WHEN m.home_club_id = :club_id THEN
+            SUM(CASE
+                WHEN m.home_club_id = constants.club_id_ref THEN
                     CASE WHEN m.home_score > m.away_score THEN 1 ELSE 0 END
                 ELSE
                     CASE WHEN m.away_score > m.home_score THEN 1 ELSE 0 END
             END) AS victoires,
             SUM(CASE WHEN m.home_score = m.away_score THEN 1 ELSE 0 END) AS nuls,
-            SUM(CASE 
-                WHEN m.home_club_id = :club_id THEN
+            SUM(CASE
+                WHEN m.home_club_id = constants.club_id_ref THEN
                     CASE WHEN m.home_score < m.away_score THEN 1 ELSE 0 END
                 ELSE
                     CASE WHEN m.away_score < m.home_score THEN 1 ELSE 0 END
             END) AS defaites
         FROM " . DB_PREFIX . "matchs m
+        JOIN (
+            SELECT
+                :club_id AS club_id_ref,
+                :category AS category_ref,
+                :number AS number_ref
+        ) AS constants
         WHERE m.is_result = 1
           AND (
-            (m.home_club_id = :club_id AND m.home_team_category = :category AND m.home_team_number = :number)
-            OR (m.away_club_id = :club_id AND m.away_team_category = :category AND m.away_team_number = :number)
+            (m.home_club_id = constants.club_id_ref AND m.home_team_category = constants.category_ref AND m.home_team_number = constants.number_ref)
+            OR (m.away_club_id = constants.club_id_ref AND m.away_team_category = constants.category_ref AND m.away_team_number = constants.number_ref)
           )
         GROUP BY adversaire
         HAVING nb_matchs > 1
         ORDER BY nb_matchs DESC, victoires DESC
         LIMIT 10";
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            'club_id' => $this->club_id,
-            'category' => $category,
-            'number' => $number
+            ':club_id' => $this->club_id,
+            ':category' => $category,
+            ':number' => $number
         ]);
         
         return $stmt->fetchAll();
