@@ -3,8 +3,18 @@
  * Communication avec le backend PHP
  */
 
+const apiBaseFromDom = (() => {
+    const body = document.body;
+    if (!body || !body.dataset) {
+        return '/api';
+    }
+
+    const configuredBase = body.dataset.apiBase || '/api';
+    return configuredBase.trim() === '' ? '/api' : configuredBase;
+})();
+
 class ApiClient {
-    constructor(baseUrl = '/api') {
+    constructor(baseUrl = apiBaseFromDom) {
         this.baseUrl = baseUrl;
         this.timeout = 10000;
         this.maxRetries = 3;
