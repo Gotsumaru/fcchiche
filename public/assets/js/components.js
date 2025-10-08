@@ -63,7 +63,7 @@ const Components = {
                     <div class="match-teams">
                         <div class="match-team">
                             <div class="match-team-logo">
-                                <img src="${homeLogo}" alt="${homeTeam}" onerror="this.src='/assets/images/placeholder-logo.svg'">
+                                <img src="${homeLogo}" alt="${homeTeam}" onerror="this.onerror=null;this.src='/assets/images/placeholder-logo.svg'">
                             </div>
                             <div class="match-team-name">${this.escapeHtml(homeTeam)}</div>
                             ${isHome ? '<div class="match-team-lieu">Domicile</div>' : ''}
@@ -71,7 +71,7 @@ const Components = {
                         ${scoreHTML}
                         <div class="match-team">
                             <div class="match-team-logo">
-                                <img src="${awayLogo}" alt="${awayTeam}" onerror="this.src='/assets/images/placeholder-logo.svg'">
+                                <img src="${awayLogo}" alt="${awayTeam}" onerror="this.onerror=null;this.src='/assets/images/placeholder-logo.svg'">
                             </div>
                             <div class="match-team-name">${this.escapeHtml(awayTeam)}</div>
                             ${!isHome ? '<div class="match-team-lieu">Extérieur</div>' : ''}
