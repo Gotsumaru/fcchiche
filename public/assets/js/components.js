@@ -312,16 +312,22 @@ const Components = {
      * Hero section
      */
     hero(title, subtitle, backgroundImage = null) {
+        assert(typeof title === 'string' && title.trim().length > 0, 'Hero title must be a non-empty string');
+        assert(subtitle === null || subtitle === undefined || typeof subtitle === 'string', 'Hero subtitle must be a string or null');
+
         const hasBackground = typeof backgroundImage === 'string' && backgroundImage.trim().length > 0;
-        const styleAttribute = hasBackground ? ` style="background-image: url('${this.escapeAttribute(backgroundImage)}')"` : '';
+        const heroStyles = hasBackground ? ` style="--hero-background: url('${this.escapeAttribute(backgroundImage)}')"` : '';
+        const heroClass = hasBackground ? 'page-hero page-hero--with-image' : 'page-hero';
+        const subtitleText = typeof subtitle === 'string' ? subtitle.trim() : '';
+        const subtitleHtml = subtitleText.length > 0 ? `<p>${this.escapeHtml(subtitleText)}</p>` : '';
 
         return `
-            <div class="page-hero"${styleAttribute}>
+            <section class="${heroClass}"${heroStyles}>
                 <div class="page-hero-content">
                     <h1>${this.escapeHtml(title)}</h1>
-                    ${subtitle ? `<p>${this.escapeHtml(subtitle)}</p>` : ''}
+                    ${subtitleHtml}
                 </div>
-            </div>
+            </section>
         `;
     },
 
