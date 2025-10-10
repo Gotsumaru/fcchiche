@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 /**
  * Modèle Matchs - Calendrier et Résultats
+ * FIX: Ajout calcul home_name / away_name pour affichage
  */
 class MatchsModel
 {
@@ -18,14 +19,52 @@ class MatchsModel
     }
 
     /**
-     * Récupère tous les matchs avec jointures (compétition, terrain, club adverse)
+     * Enrichit les données d'un match avec les noms d'affichage
      *
-     * @param bool $isResult True = résultats, False = calendrier
+     * @param array $match Données brutes du match
+     * @return array Match enrichi avec home_name, away_name, is_home
+     */
+    private function enrichMatchData(array $match): array
+    {
+        $clubId = API_FFF_CLUB_ID;
+        
+        // Déterminer si FC Chiche joue à domicile
+        $match['is_home'] = ($match['home_club_id'] == $clubId);
+        
+        // Construire les noms d'affichage
+        if ($match['is_home']) {
+            // FC Chiche à domicile
+            $match['home_name'] = 'FC CHICHE';
+            $match['away_name'] = $match['opponent_name'] ?? 'Adversaire à définir';
+        } else {
+            // FC Chiche à l'extérieur
+            $match['home_name'] = $match['opponent_name'] ?? 'Adversaire à définir';
+            $match['away_name'] = 'FC CHICHE';
+        }
+        
+        return $match;
+    }
+
+    /**
+     * Enrichit un tableau de matchs
+     *
+     * @param array $matchs Liste de matchs
+     * @return array Liste enrichie
+     */
+    private function enrichMatchsData(array $matchs): array
+    {
+        return array_map([$this, 'enrichMatchData'], $matchs);
+    }
+
+    /**
+     * Récupère tous les matchs avec jointures
+     *
+     * @param bool|null $isResult null = tous, true = résultats, false = calendrier
      * @param int|null $limit Limite de résultats
      * @return array Liste des matchs enrichis
      * @throws PDOException Si erreur BDD
      */
-    public function getAllMatchs(bool $isResult = false, ?int $limit = null): array
+    public function getAllMatchs(?bool $isResult = null, ?int $limit = null): array
     {
         $sql = "SELECT 
                     m.*,
@@ -45,9 +84,13 @@ class MatchsModel
                     (CASE 
                         WHEN m.home_club_id != :club_id THEN m.home_club_id 
                         ELSE m.away_club_id 
-                    END) = cc.cl_no
-                WHERE m.is_result = :is_result
-                ORDER BY m.date " . ($isResult ? 'DESC' : 'ASC');
+                    END) = cc.cl_no";
+        
+        if ($isResult !== null) {
+            $sql .= " WHERE m.is_result = :is_result";
+        }
+        
+        $sql .= " ORDER BY m.date " . ($isResult === true ? 'DESC' : 'ASC');
         
         if ($limit !== null && $limit > 0) {
             assert($limit <= 1000, 'Limit too high');
@@ -56,14 +99,19 @@ class MatchsModel
         
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':club_id', API_FFF_CLUB_ID, PDO::PARAM_INT);
-        $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
+        
+        if ($isResult !== null) {
+            $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
+        }
         
         if ($limit !== null && $limit > 0) {
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         }
         
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $this->enrichMatchsData($matchs);
     }
 
     /**
@@ -133,14 +181,19 @@ class MatchsModel
         ]);
         
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        
+        if ($result === false) {
+            return null;
+        }
+        
+        return $this->enrichMatchData($result);
     }
 
     /**
-     * Récupère un match par son numéro API (ma_no)
+     * Récupère un match par ma_no (ID API FFF)
      *
      * @param int $maNo Numéro match API
-     * @return array|null Données du match enrichies
+     * @return array|null Données du match
      */
     public function getMatchByMaNo(int $maNo): ?array
     {
@@ -149,7 +202,6 @@ class MatchsModel
         $sql = "SELECT 
                     m.*,
                     c.name as competition_name,
-                    c.type as competition_type,
                     t.name as terrain_name,
                     cc.name as opponent_name,
                     cc.logo_url as opponent_logo
@@ -171,7 +223,12 @@ class MatchsModel
         ]);
         
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        
+        if ($result === false) {
+            return null;
+        }
+        
+        return $this->enrichMatchData($result);
     }
 
     /**
@@ -179,9 +236,10 @@ class MatchsModel
      *
      * @param int $competitionId ID de la compétition
      * @param bool|null $isResult null = tous, true = résultats, false = calendrier
+     * @param int|null $limit Limite de résultats
      * @return array Liste des matchs
      */
-    public function getMatchsByCompetition(int $competitionId, ?bool $isResult = null): array
+    public function getMatchsByCompetition(int $competitionId, ?bool $isResult = null, ?int $limit = null): array
     {
         assert($competitionId > 0, 'Competition ID must be positive');
         
@@ -205,7 +263,12 @@ class MatchsModel
             $sql .= " AND m.is_result = :is_result";
         }
         
-        $sql .= " ORDER BY m.date " . ($isResult ? 'DESC' : 'ASC');
+        $sql .= " ORDER BY m.date " . ($isResult === true ? 'DESC' : 'ASC');
+        
+        if ($limit !== null && $limit > 0) {
+            assert($limit <= 1000, 'Limit too high');
+            $sql .= " LIMIT :limit";
+        }
         
         $stmt = $this->pdo->prepare($sql);
         $params = [
@@ -217,8 +280,18 @@ class MatchsModel
             $params['is_result'] = $isResult ? 1 : 0;
         }
         
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue(':' . $key, $value, PDO::PARAM_INT);
+        }
+        
+        if ($limit !== null && $limit > 0) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        }
+        
+        $stmt->execute();
+        $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $this->enrichMatchsData($matchs);
     }
 
     /**
@@ -226,9 +299,10 @@ class MatchsModel
      *
      * @param string $category Catégorie d'équipe (SEM, U17, etc.)
      * @param bool|null $isResult null = tous, true = résultats, false = calendrier
+     * @param int|null $limit Limite de résultats
      * @return array Liste des matchs
      */
-    public function getMatchsByTeamCategory(string $category, ?bool $isResult = null): array
+    public function getMatchsByTeamCategory(string $category, ?bool $isResult = null, ?int $limit = null): array
     {
         assert(!empty($category), 'Category cannot be empty');
         
@@ -256,20 +330,29 @@ class MatchsModel
             $sql .= " AND m.is_result = :is_result";
         }
         
-        $sql .= " ORDER BY m.date " . ($isResult ? 'DESC' : 'ASC');
+        $sql .= " ORDER BY m.date " . ($isResult === true ? 'DESC' : 'ASC');
         
-        $stmt = $this->pdo->prepare($sql);
-        $params = [
-            'category' => $category,
-            'club_id' => API_FFF_CLUB_ID
-        ];
-        
-        if ($isResult !== null) {
-            $params['is_result'] = $isResult ? 1 : 0;
+        if ($limit !== null && $limit > 0) {
+            assert($limit <= 1000, 'Limit too high');
+            $sql .= " LIMIT :limit";
         }
         
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':category', $category, PDO::PARAM_STR);
+        $stmt->bindValue(':club_id', API_FFF_CLUB_ID, PDO::PARAM_INT);
+        
+        if ($isResult !== null) {
+            $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
+        }
+        
+        if ($limit !== null && $limit > 0) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        }
+        
+        $stmt->execute();
+        $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $this->enrichMatchsData($matchs);
     }
 
     /**
@@ -297,7 +380,7 @@ class MatchsModel
             $sql .= " AND m.is_result = :is_result";
         }
         
-        $sql .= " ORDER BY m.date " . ($isResult ? 'DESC' : 'ASC');
+        $sql .= " ORDER BY m.date " . ($isResult === true ? 'DESC' : 'ASC');
         
         if ($limit !== null && $limit > 0) {
             assert($limit <= 1000, 'Limit too high');
@@ -305,14 +388,10 @@ class MatchsModel
         }
         
         $stmt = $this->pdo->prepare($sql);
-        $params = ['club_id' => API_FFF_CLUB_ID];
+        $stmt->bindValue(':club_id', API_FFF_CLUB_ID, PDO::PARAM_INT);
         
         if ($isResult !== null) {
-            $params['is_result'] = $isResult ? 1 : 0;
-        }
-        
-        foreach ($params as $key => $value) {
-            $stmt->bindValue(':' . $key, $value, PDO::PARAM_INT);
+            $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
         }
         
         if ($limit !== null && $limit > 0) {
@@ -320,7 +399,9 @@ class MatchsModel
         }
         
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $this->enrichMatchsData($matchs);
     }
 
     /**
@@ -348,7 +429,7 @@ class MatchsModel
             $sql .= " AND m.is_result = :is_result";
         }
         
-        $sql .= " ORDER BY m.date " . ($isResult ? 'DESC' : 'ASC');
+        $sql .= " ORDER BY m.date " . ($isResult === true ? 'DESC' : 'ASC');
         
         if ($limit !== null && $limit > 0) {
             assert($limit <= 1000, 'Limit too high');
@@ -356,14 +437,10 @@ class MatchsModel
         }
         
         $stmt = $this->pdo->prepare($sql);
-        $params = ['club_id' => API_FFF_CLUB_ID];
+        $stmt->bindValue(':club_id', API_FFF_CLUB_ID, PDO::PARAM_INT);
         
         if ($isResult !== null) {
-            $params['is_result'] = $isResult ? 1 : 0;
-        }
-        
-        foreach ($params as $key => $value) {
-            $stmt->bindValue(':' . $key, $value, PDO::PARAM_INT);
+            $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
         }
         
         if ($limit !== null && $limit > 0) {
@@ -371,11 +448,70 @@ class MatchsModel
         }
         
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $this->enrichMatchsData($matchs);
     }
 
     /**
-     * Récupère les matchs d'une journée spécifique
+     * Récupère les matchs par équipe ID
+     *
+     * @param int $equipeId ID de l'équipe
+     * @param bool|null $isResult null = tous, true = résultats, false = calendrier
+     * @param int|null $limit Limite de résultats
+     * @return array Liste des matchs de l'équipe
+     */
+    public function getMatchsByEquipeId(int $equipeId, ?bool $isResult = null, ?int $limit = null): array
+    {
+        assert($equipeId > 0, 'Equipe ID must be positive');
+        
+        $sql = "SELECT 
+                    m.*,
+                    c.name as competition_name,
+                    t.name as terrain_name,
+                    cc.name as opponent_name,
+                    cc.logo_url as opponent_logo
+                FROM " . self::TABLE . " m
+                LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
+                LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
+                    (CASE 
+                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
+                        ELSE m.away_club_id 
+                    END) = cc.cl_no
+                WHERE m.equipe_id = :equipe_id";
+        
+        if ($isResult !== null) {
+            $sql .= " AND m.is_result = :is_result";
+        }
+        
+        $sql .= " ORDER BY m.date " . ($isResult === true ? 'DESC' : 'ASC');
+        
+        if ($limit !== null && $limit > 0) {
+            assert($limit <= 1000, 'Limit too high');
+            $sql .= " LIMIT :limit";
+        }
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':equipe_id', $equipeId, PDO::PARAM_INT);
+        $stmt->bindValue(':club_id', API_FFF_CLUB_ID, PDO::PARAM_INT);
+        
+        if ($isResult !== null) {
+            $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
+        }
+        
+        if ($limit !== null && $limit > 0) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        }
+        
+        $stmt->execute();
+        $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $this->enrichMatchsData($matchs);
+    }
+
+    /**
+     * Récupère les matchs par journée
      *
      * @param int $journeeNumber Numéro de journée
      * @param int $competitionId ID de la compétition
@@ -411,7 +547,9 @@ class MatchsModel
             'club_id' => API_FFF_CLUB_ID
         ]);
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $this->enrichMatchsData($matchs);
     }
 
     /**
@@ -420,9 +558,10 @@ class MatchsModel
      * @param string $dateStart Date début (Y-m-d)
      * @param string $dateEnd Date fin (Y-m-d)
      * @param bool|null $isResult null = tous, true = résultats, false = calendrier
+     * @param int|null $limit Limite de résultats
      * @return array Liste des matchs dans la période
      */
-    public function getMatchsByDateRange(string $dateStart, string $dateEnd, ?bool $isResult = null): array
+    public function getMatchsByDateRange(string $dateStart, string $dateEnd, ?bool $isResult = null, ?int $limit = null): array
     {
         assert(!empty($dateStart), 'Start date cannot be empty');
         assert(!empty($dateEnd), 'End date cannot be empty');
@@ -449,6 +588,11 @@ class MatchsModel
         
         $sql .= " ORDER BY m.date ASC";
         
+        if ($limit !== null && $limit > 0) {
+            assert($limit <= 1000, 'Limit too high');
+            $sql .= " LIMIT :limit";
+        }
+        
         $stmt = $this->pdo->prepare($sql);
         $params = [
             'date_start' => $dateStart,
@@ -460,8 +604,19 @@ class MatchsModel
             $params['is_result'] = $isResult ? 1 : 0;
         }
         
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($params as $key => $value) {
+            $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue(':' . $key, $value, $type);
+        }
+        
+        if ($limit !== null && $limit > 0) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        }
+        
+        $stmt->execute();
+        $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $this->enrichMatchsData($matchs);
     }
 
     /**
