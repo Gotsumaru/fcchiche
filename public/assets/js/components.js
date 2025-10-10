@@ -1,110 +1,44 @@
 /**
  * Composants UI - FC Chiche
- * Builders pour générer le HTML des composants
+ * Bibliothèque de composants réutilisables
  */
 
-const assetsBaseFromDom = (() => {
-    const body = document.body;
-    if (!body || !body.dataset) {
-        return '/assets';
-    }
-
-    const configuredBase = body.dataset.assetsBase || '/assets';
-    const trimmedBase = configuredBase.trim();
-    if (trimmedBase.length === 0) {
-        return '/assets';
-    }
-
-    return trimmedBase.replace(/\/+$/u, '');
-})();
-
 const Components = {
-    assetBase: assetsBaseFromDom,
-    failedLogos: new Set(),
-
     /**
-     * Construire un chemin asset sécurisé
+     * Initialiser le chemin des assets
      */
-    assetPath(relativePath) {
-        assert(typeof relativePath === 'string', 'Relative path must be a string');
-        const trimmed = relativePath.trim();
-        assert(trimmed.length > 0, 'Relative path must not be empty');
-
-        const cleanPath = trimmed.replace(/^\/+/, '');
-        const base = this.assetBase.endsWith('/') ? this.assetBase.slice(0, -1) : this.assetBase;
-        return `${base}/${cleanPath}`;
+    init() {
+        const body = document.querySelector('body');
+        this.assetBase = body?.getAttribute('data-assets-base') || '/assets';
+        assert(typeof this.assetBase === 'string', 'assetBase must be a string');
     },
 
     /**
-     * Normaliser l'URL du logo adversaire
-     */
-    normalizeLogoUrl(url) {
-        assert(this.failedLogos instanceof Set, 'failedLogos must be a Set');
-        assert(typeof this.assetBase === 'string', 'assetBase must be initialised');
-
-        if (!url || typeof url !== 'string') {
-            return null;
-        }
-
-        const trimmed = url.trim();
-        if (trimmed.length === 0) {
-            return null;
-        }
-
-        if (this.failedLogos.has(trimmed)) {
-            return null;
-        }
-
-        return trimmed;
-    },
-
-    /**
-     * Gestion centralisée des erreurs de chargement logo
-     */
-    handleImageError(img) {
-        assert(img instanceof HTMLImageElement, 'Image element is required');
-        assert(typeof this.assetBase === 'string', 'assetBase must be initialised');
-
-        const originalSrc = img.dataset.originalSrc;
-        if (originalSrc && originalSrc.length > 0) {
-            this.failedLogos.add(originalSrc);
-        }
-
-        img.onerror = null;
-        img.src = this.assetPath('images/placeholder-logo.svg');
-    },
-
-    /**
-     * Card de match (résultat ou calendrier)
+     * Carte de match
      */
     matchCard(match, isResult = false) {
         assert(match && typeof match === 'object', 'Match must be an object');
         
-        const isHome = match.lieu === 'DOM';
-        const homeTeam = isHome ? 'CHICHE FC' : match.domicile;
-        const awayTeam = isHome ? match.exterieur : 'CHICHE FC';
-        const placeholderLogo = this.assetPath('images/placeholder-logo.svg');
-        const clubLogo = this.assetPath('images/logo.svg');
-        const opponentLogo = this.normalizeLogoUrl(match.logo_adversaire);
-        const resolvedOpponentLogo = opponentLogo || placeholderLogo;
-        const homeLogo = isHome ? clubLogo : resolvedOpponentLogo;
-        const awayLogo = isHome ? resolvedOpponentLogo : clubLogo;
-        const homeLogoOriginal = isHome ? '' : opponentLogo || '';
-        const awayLogoOriginal = isHome ? opponentLogo || '' : '';
+        const isHome = match.is_home;
+        const homeTeam = isHome ? 'CHICHE FC' : match.adversaire;
+        const awayTeam = isHome ? match.adversaire : 'CHICHE FC';
+        
+        const defaultLogo = `${this.assetBase}/images/default-team-logo.svg`;
+        const homeLogo = isHome ? `${this.assetBase}/images/logo.svg` : (match.logo_adversaire || defaultLogo);
+        const awayLogo = isHome ? (match.logo_adversaire || defaultLogo) : `${this.assetBase}/images/logo.svg`;
+        const homeLogoOriginal = homeLogo;
+        const awayLogoOriginal = awayLogo;
         
         let scoreHTML = '';
         let resultBadge = '';
         
-        if (isResult && match.home_score !== null) {
-            const homeScore = match.home_score;
-            const awayScore = match.away_score;
-            
+        if (isResult && match.score_home !== null && match.score_away !== null) {
             scoreHTML = `
                 <div class="match-score">
-                    <div class="match-score-display">
-                        <span>${homeScore}</span>
+                    <div class="match-score-values">
+                        <span>${match.score_home}</span>
                         <span class="match-score-separator">-</span>
-                        <span>${awayScore}</span>
+                        <span>${match.score_away}</span>
                     </div>
                 </div>
             `;
@@ -162,7 +96,17 @@ const Components = {
             </div>
         `;
     },
-    
+
+    /**
+     * Gestion erreur chargement image
+     */
+    handleImageError(img) {
+        const defaultLogo = `${Components.assetBase}/images/default-team-logo.svg`;
+        if (img.src !== defaultLogo) {
+            img.src = defaultLogo;
+        }
+    },
+
     /**
      * Barre de stats
      */
@@ -190,7 +134,7 @@ const Components = {
             </div>
         `;
     },
-    
+
     /**
      * Tableau de classement
      */
@@ -216,7 +160,7 @@ const Components = {
                             <span>${this.escapeHtml(team.equipe)}</span>
                         </div>
                     </td>
-                    <td>${team.pts}</td>
+                    <td><strong>${team.pts}</strong></td>
                     <td>${team.joues}</td>
                     <td>${team.g || 0}</td>
                     <td>${team.n || 0}</td>
@@ -254,7 +198,7 @@ const Components = {
             </div>
         `;
     },
-    
+
     /**
      * Filtre équipes
      */
@@ -283,7 +227,7 @@ const Components = {
             </div>
         `;
     },
-    
+
     /**
      * Loading spinner
      */
@@ -294,7 +238,7 @@ const Components = {
             </div>
         `;
     },
-    
+
     /**
      * Empty state
      */
@@ -307,9 +251,20 @@ const Components = {
             </div>
         `;
     },
-    
+
     /**
-     * Hero section
+     * Générer vague SVG
+     */
+    generateWaveSVG() {
+        return `
+            <svg class="hero-wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path fill="#f3f6fa" fill-opacity="1" d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
+            </svg>
+        `;
+    },
+
+    /**
+     * Hero section avec vague
      */
     hero(title, subtitle, backgroundImage = null) {
         assert(typeof title === 'string' && title.trim().length > 0, 'Hero title must be a non-empty string');
@@ -327,6 +282,7 @@ const Components = {
                     <h1>${this.escapeHtml(title)}</h1>
                     ${subtitleHtml}
                 </div>
+                ${this.generateWaveSVG()}
             </section>
         `;
     },
@@ -374,6 +330,11 @@ function assert(condition, message) {
         throw new Error(`Assertion failed: ${message}`);
     }
 }
+
+// Initialiser au chargement
+document.addEventListener('DOMContentLoaded', () => {
+    Components.init();
+});
 
 // Export
 window.Components = Components;

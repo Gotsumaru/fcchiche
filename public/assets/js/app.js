@@ -8,7 +8,11 @@ class App {
         this.api = new ApiClient();
         this.router = new Router();
         this.equipes = [];
-        this.currentEquipe = 'SEM 1'; // Équipe par défaut
+        this.currentEquipe = 'SEM 1';
+        
+        // Récupérer chemin assets
+        const body = document.querySelector('body');
+        this.assetsBase = body?.getAttribute('data-assets-base') || '/assets';
         
         this.init();
     }
@@ -18,18 +22,10 @@ class App {
      */
     async init() {
         try {
-            // Charger les équipes
             await this.loadEquipes();
-            
-            // Enregistrer les routes
             this.registerRoutes();
-            
-            // Démarrer le router
             this.router.start();
-            
-            // Activer scroll reveal
             this.initScrollReveal();
-            
         } catch (error) {
             console.error('Failed to initialize app:', error);
             this.showError('Erreur de chargement de l\'application');
@@ -63,12 +59,17 @@ class App {
     
     /**
      * PAGE RÉSULTATS
+     * Exemple avec image d'arrière-plan
      */
     async pageResultats() {
         const app = document.getElementById('app');
         
+        // Option : Ajouter image de fond hero
+        // const heroImage = `${this.assetsBase}/images/hero-resultats.jpg`;
+        const heroImage = null; // Pas d'image pour l'instant
+        
         app.innerHTML = `
-            ${Components.hero('Résultats', 'Les derniers matchs du FC Chiche')}
+            ${Components.hero('Résultats', 'Les derniers matchs du FC Chiche', heroImage)}
             <div class="page-content">
                 <div class="container">
                     <div class="filters">
@@ -83,7 +84,6 @@ class App {
             </div>
         `;
         
-        // Event listener filtre
         const filter = document.getElementById('equipe-filter');
         if (filter) {
             filter.addEventListener('change', (e) => {
@@ -92,7 +92,6 @@ class App {
             });
         }
         
-        // Charger les résultats
         await this.loadResultats();
     }
     
@@ -112,30 +111,22 @@ class App {
                 throw new Error(response.error || 'Erreur de chargement');
             }
             
-            const resultats = response.resultats || [];
-            const stats = response.stats || {};
+            const matchs = response.matchs || [];
             
-            if (resultats.length === 0) {
+            if (matchs.length === 0) {
                 container.innerHTML = Components.emptyState(
-                    '⚽',
+                    '🏆',
                     'Aucun résultat',
-                    'Aucun match terminé pour le moment'
+                    'Aucun match joué pour le moment'
                 );
                 return;
             }
             
             let html = '';
-            
-            // Stats bar
-            if (stats.matchs_joues > 0) {
-                html += Components.statsBar(stats);
-            }
-            
-            // Liste des matchs
             let counter = 0;
             const maxIterations = 20;
             
-            resultats.forEach((match) => {
+            matchs.forEach((match) => {
                 if (counter >= maxIterations) return;
                 html += Components.matchCard(match, true);
                 counter++;
@@ -175,7 +166,6 @@ class App {
             </div>
         `;
         
-        // Event listener filtre
         const filter = document.getElementById('equipe-filter');
         if (filter) {
             filter.addEventListener('change', (e) => {
@@ -184,7 +174,6 @@ class App {
             });
         }
         
-        // Charger le calendrier
         await this.loadCalendrier();
     }
     
@@ -259,7 +248,6 @@ class App {
             </div>
         `;
         
-        // Event listener filtre
         const filter = document.getElementById('equipe-filter');
         if (filter) {
             filter.addEventListener('change', (e) => {
@@ -268,7 +256,6 @@ class App {
             });
         }
         
-        // Charger le classement
         await this.loadClassement();
     }
     
@@ -294,7 +281,12 @@ class App {
             const response = await this.api.getClassement(this.currentEquipe);
             
             if (!response.success) {
-                throw new Error(response.error || 'Erreur de chargement');
+                container.innerHTML = Components.emptyState(
+                    '🏆',
+                    'Classement indisponible',
+                    response.message || 'Aucun classement disponible pour cette équipe'
+                );
+                return;
             }
             
             const classement = response.classement || [];
@@ -308,7 +300,20 @@ class App {
                 return;
             }
             
-            container.innerHTML = Components.classementTable(classement, 'CHICHE FC');
+            // Afficher info poule si disponible
+            let pouleInfo = '';
+            if (response.info && response.info.poule) {
+                pouleInfo = `
+                    <div class="card" style="margin-bottom: var(--space-xl);">
+                        <h3 style="margin-bottom: var(--space-sm);">${response.info.poule}</h3>
+                        <p style="color: var(--color-text-light); margin: 0;">
+                            Journée ${response.info.journee} - Mise à jour : ${new Date(response.info.date).toLocaleDateString('fr-FR')}
+                        </p>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = pouleInfo + Components.classementTable(classement, 'CHICHE FC');
             
         } catch (error) {
             console.error('Failed to load classement:', error);
@@ -387,9 +392,23 @@ class App {
             });
         }, { threshold: 0.1 });
         
-        document.addEventListener('DOMContentLoaded', () => {
-            const elements = document.querySelectorAll('.scroll-reveal');
+        // Observer les éléments au chargement et à chaque changement de page
+        const observeElements = () => {
+            const elements = document.querySelectorAll('.fade-in-up');
             elements.forEach(el => observer.observe(el));
+        };
+        
+        // Observer immédiatement
+        observeElements();
+        
+        // Re-observer après changements DOM (mutations)
+        const mutationObserver = new MutationObserver(() => {
+            observeElements();
+        });
+        
+        mutationObserver.observe(document.getElementById('app'), {
+            childList: true,
+            subtree: true
         });
     }
     

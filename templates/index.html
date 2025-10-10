@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FC Chiché - La passion du football</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #FFFFFF;
+            --bg: #FAFAFA;
+            --text: #0F0F0F;
+            --text-muted: #6B6B6B;
+            --border: #E5E5E5;
+            --green: #008800;
+            --green-light: #F0F9F4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Initial Page Loader */
+        .initial-loader {
+            position: fixed;
+            inset: 0;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .initial-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--green);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0 auto 24px;
+            animation: pulse 1.5s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Page Transition Loader */
+        .page-transition {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .page-transition.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .transition-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+        }
+
+        .nav {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--text);
+        }
+
+        .nav-link.active {
+            color: var(--green);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -24px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--green);
+        }
+
+        /* Page Container */
+        .page {
+            min-height: 100vh;
+            padding: 120px 40px 80px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Hero Page */
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 80px 0;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: var(--green-light);
+            color: var(--green);
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(18px, 2vw, 22px);
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 32px;
+            background: var(--green);
+            color: var(--white);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 136, 0, 0.3);
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: var(--green-light);
+            color: var(--green);
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .page-title {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* Team Filters */
+        .team-filters {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .team-filter {
+            padding: 10px 20px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .team-filter:hover {
+            border-color: var(--green);
+        }
+
+        .team-filter.active {
+            background: var(--green);
+            border-color: var(--green);
+            color: var(--white);
+        }
+
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .result-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-date {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .result-status {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .result-status.victory {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        .result-status.defeat {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+
+        .result-status.draw {
+            background: #FFF7ED;
+            color: #EA580C;
+        }
+
+        .result-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .team {
+            flex: 1;
+            text-align: center;
+        }
+
+        .team-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .team-logo {
+            width: 48px;
+            height: 48px;
+            background: var(--bg);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto;
+        }
+
+        .result-score {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .result-competition {
+            font-size: 13px;
+            color: var(--text-muted);
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .calendar-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .calendar-date {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--green);
+            margin-bottom: 16px;
+        }
+
+        .calendar-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .calendar-team {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .calendar-vs {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .calendar-competition {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Ranking */
+        .ranking-container {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .ranking-header {
+            display: grid;
+            grid-template-columns: 60px 1fr 80px 80px 80px;
+            gap: 16px;
+            padding: 20px 28px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .ranking-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 80px 80px 80px;
+            gap: 16px;
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            transition: background 0.2s ease;
+        }
+
+        .ranking-row:last-child {
+            border-bottom: none;
+        }
+
+        .ranking-row:hover {
+            background: var(--bg);
+        }
+
+        .ranking-row.highlight {
+            background: var(--green-light);
+        }
+
+        .ranking-position {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .ranking-team {
+            font-weight: 600;
+        }
+
+        .ranking-stat {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Mobile Nav */
+        .mobile-nav {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 20px;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .page {
+                padding: 100px 20px 100px;
+            }
+
+            .team-filters {
+                gap: 8px;
+            }
+
+            .team-filter {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .results-grid,
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ranking-header,
+            .ranking-row {
+                grid-template-columns: 40px 1fr 60px;
+                gap: 12px;
+                padding: 16px 20px;
+            }
+
+            .ranking-header :nth-child(4),
+            .ranking-header :nth-child(5),
+            .ranking-row :nth-child(4),
+            .ranking-row :nth-child(5) {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: block;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 68px;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(12px);
+                border-top: 1px solid var(--border);
+                z-index: 1000;
+            }
+
+            .mobile-nav-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                height: 100%;
+            }
+
+            .mobile-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                color: var(--text-muted);
+                cursor: pointer;
+                transition: color 0.2s ease;
+            }
+
+            .mobile-nav-item.active {
+                color: var(--green);
+            }
+
+            .mobile-nav-icon {
+                width: 22px;
+                height: 22px;
+            }
+
+            .mobile-nav-label {
+                font-size: 11px;
+                font-weight: 500;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Initial Page Loader -->
+    <div class="initial-loader" id="initialLoader">
+        <div class="loader-content">
+            <div class="loader-logo">FC</div>
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Chargement...</div>
+        </div>
+    </div>
+
+    <!-- Page Transition Loader -->
+    <div class="page-transition" id="pageTransition">
+        <div class="transition-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo" data-page="home">FC Chiché</div>
+            <nav class="nav">
+                <a class="nav-link active" data-page="home">Accueil</a>
+                <a class="nav-link" data-page="results">Résultats</a>
+                <a class="nav-link" data-page="calendar">Calendrier</a>
+                <a class="nav-link" data-page="ranking">Classement</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Home Page -->
+    <div class="page active" id="home">
+        <div class="page-container">
+            <div class="hero-content">
+                <div class="hero-badge">Depuis 1946</div>
+                <h1 class="hero-title">FC Chiché</h1>
+                <p class="hero-subtitle">
+                    La passion du football depuis plus de 75 ans. Suivez les performances 
+                    de nos 4 équipes et vibrez avec nous.
+                </p>
+                <button class="hero-cta" data-page="results">
+                    Voir les résultats
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Page -->
+    <div class="page" id="results">
+        <div class="page-container">
+            <div class="page-header">
+                <div class="page-badge">Derniers matchs</div>
+                <h2 class="page-title">Résultats</h2>
+                <p class="page-subtitle">
+                    Consultez les performances de chaque équipe
+                </p>
+                <div class="team-filters" id="resultsFilters">
+                    <button class="team-filter active" data-team="all">Toutes les équipes</button>
+                    <button class="team-filter" data-team="seniors1">Seniors 1 • D3</button>
+                    <button class="team-filter" data-team="seniors2">Seniors 2 • D5</button>
+                    <button class="team-filter" data-team="u15">U15 • D1</button>
+                    <button class="team-filter" data-team="u13">U13 • D4</button>
+                </div>
+            </div>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <!-- Calendar Page -->
+    <div class="page" id="calendar">
+        <div class="page-container">
+            <div class="page-header">
+                <div class="page-badge">Prochains matchs</div>
+                <h2 class="page-title">Calendrier</h2>
+                <p class="page-subtitle">
+                    Ne manquez aucun match de vos équipes favorites
+                </p>
+                <div class="team-filters" id="calendarFilters">
+                    <button class="team-filter active" data-team="all">Toutes les équipes</button>
+                    <button class="team-filter" data-team="seniors1">Seniors 1 • D3</button>
+                    <button class="team-filter" data-team="seniors2">Seniors 2 • D5</button>
+                    <button class="team-filter" data-team="u15">U15 • D1</button>
+                    <button class="team-filter" data-team="u13">U13 • D4</button>
+                </div>
+            </div>
+            <div id="calendarContent"></div>
+        </div>
+    </div>
+
+    <!-- Ranking Page -->
+    <div class="page" id="ranking">
+        <div class="page-container">
+            <div class="page-header">
+                <div class="page-badge">Saison 2024-2025</div>
+                <h2 class="page-title">Classement</h2>
+                <p class="page-subtitle">
+                    Position de chaque équipe dans son championnat
+                </p>
+                <div class="team-filters" id="rankingFilters">
+                    <button class="team-filter active" data-team="seniors1">Seniors 1 • D3</button>
+                    <button class="team-filter" data-team="seniors2">Seniors 2 • D5</button>
+                    <button class="team-filter" data-team="u15">U15 • D1</button>
+                    <button class="team-filter" data-team="u13">U13 • D4</button>
+                </div>
+            </div>
+            <div id="rankingContent"></div>
+        </div>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-grid">
+            <div class="mobile-nav-item active" data-page="home">
+                <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                </svg>
+                <span class="mobile-nav-label">Accueil</span>
+            </div>
+            <div class="mobile-nav-item" data-page="results">
+                <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                </svg>
+                <span class="mobile-nav-label">Résultats</span>
+            </div>
+            <div class="mobile-nav-item" data-page="calendar">
+                <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                </svg>
+                <span class="mobile-nav-label">Calendrier</span>
+            </div>
+            <div class="mobile-nav-item" data-page="ranking">
+                <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"/>
+                    <line x1="8" y1="12" x2="21" y2="12"/>
+                    <line x1="8" y1="18" x2="21" y2="18"/>
+                </svg>
+                <span class="mobile-nav-label">Classement</span>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // Data
+        const dataByTeam = {
+            all: {
+                results: [
+                    { date: '18 Mai 2025 • 15h00', home: 'FC Chiché', away: 'Inter Bocage FC', score: '3 - 1', status: 'victory', competition: 'Seniors D3 • Phase 1' },
+                    { date: '27 Avril 2025 • 15h00', home: 'F.C.V.G.', away: 'FC Chiché', score: '2 - 2', status: 'draw', competition: 'Seniors D5 • Phase 1' },
+                    { date: '17 Mai 2025 • 14h30', home: 'FC Chiché', away: 'GJ Esp. N-E 79', score: '1 - 4', status: 'defeat', competition: 'U15 D1 • Phase 2' },
+                    { date: '24 Mai 2025 • 15h00', home: 'FC Chiché', away: 'GJ Evsabb', score: '5 - 2', status: 'victory', competition: 'U13 D4 • Phase 2' }
+                ],
+                calendar: [
+                    { date: '25 Mai 2025 • 15h00', home: 'FC Chiché', away: 'Louzy ES', competition: 'Seniors D5 • Phase 1' },
+                    { date: '01 Juin 2025 • 14h30', home: 'Pays Argentonnais', away: 'FC Chiché', competition: 'Seniors D3 • Phase 1' },
+                    { date: '08 Juin 2025 • 15h00', home: 'FC Chiché', away: 'Moncoutant SA', competition: 'U13 D4 • Phase 2' }
+                ]
+            },
+            seniors1: {
+                results: [
+                    { date: '18 Mai 2025 • 15h00', home: 'FC Chiché', away: 'Inter Bocage FC', score: '3 - 1', status: 'victory', competition: 'Seniors D3 • Phase 1' },
+                    { date: '11 Mai 2025 • 15h00', home: 'Pays Argentonnais', away: 'FC Chiché', score: '0 - 1', status: 'victory', competition: 'Seniors D3 • Phase 1' }
+                ],
+                calendar: [
+                    { date: '01 Juin 2025 • 14h30', home: 'Pays Argentonnais', away: 'FC Chiché', competition: 'Seniors D3 • Phase 1' },
+                    { date: '08 Juin 2025 • 15h00', home: 'FC Chiché', away: 'Clazay Bocage FC', competition: 'Seniors D3 • Phase 1' }
+                ],
+                ranking: [
+                    { pos: 1, team: 'Aubinrorthais ES', pts: 40, j: 22, diff: '+18' },
+                    { pos: 2, team: 'L Absie Larg. Mout.', pts: 37, j: 22, diff: '+3' },
+                    { pos: 3, team: 'Fayenoirterre ES', pts: 34, j: 22, diff: '+2' },
+                    { pos: 4, team: 'FC Chiché', pts: 34, j: 22, diff: '+9', highlight: true },
+                    { pos: 5, team: 'Beaulieu Breuil ES', pts: 33, j: 22, diff: '+3' }
+                ]
+            },
+            seniors2: {
+                results: [
+                    { date: '27 Avril 2025 • 15h00', home: 'F.C.V.G.', away: 'FC Chiché', score: '2 - 2', status: 'draw', competition: 'Seniors D5 • Phase 1' }
+                ],
+                calendar: [
+                    { date: '25 Mai 2025 • 15h00', home: 'FC Chiché', away: 'Louzy ES', competition: 'Seniors D5 • Phase 1' }
+                ],
+                ranking: [
+                    { pos: 1, team: 'Airvo St Jouin FC', pts: 26, j: 10, diff: '+18' },
+                    { pos: 2, team: 'F.C.V.G.', pts: 20, j: 10, diff: '+13' },
+                    { pos: 3, team: 'FC Chiché', pts: 18, j: 10, diff: '+11', highlight: true },
+                    { pos: 4, team: 'Louzy ES', pts: 16, j: 10, diff: '+7' }
+                ]
+            },
+            u15: {
+                results: [
+                    { date: '17 Mai 2025 • 14h30', home: 'FC Chiché', away: 'GJ Esp. N-E 79', score: '1 - 4', status: 'defeat', competition: 'U15 D1 • Phase 2' }
+                ],
+                calendar: [
+                    { date: '31 Mai 2025 • 14h30', home: 'Nueillaubiers FC', away: 'FC Chiché', competition: 'U15 D1 • Phase 2' }
+                ],
+                ranking: [
+                    { pos: 1, team: 'Nueillaubiers FC', pts: 27, j: 9, diff: '+23' },
+                    { pos: 10, team: 'FC Chiché', pts: 6, j: 9, diff: '+15', highlight: true }
+                ]
+            },
+            u13: {
+                results: [
+                    { date: '24 Mai 2025 • 15h00', home: 'FC Chiché', away: 'GJ Evsabb', score: '5 - 2', status: 'victory', competition: 'U13 D4 • Phase 2' }
+                ],
+                calendar: [
+                    { date: '08 Juin 2025 • 15h00', home: 'FC Chiché', away: 'Moncoutant SA', competition: 'U13 D4 • Phase 2' }
+                ],
+                ranking: [
+                    { pos: 1, team: 'GJ Evsabb', pts: 27, j: 10, diff: '+58' },
+                    { pos: 14, team: 'FC Chiché', pts: -2, j: 6, diff: '+26', highlight: true }
+                ]
+            }
+        };
+
+        let currentPage = 'home';
+        let currentTeam = { results: 'all', calendar: 'all', ranking: 'seniors1' };
+
+        // Initial load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('initialLoader').classList.add('hidden');
+            }, 1200);
+        });
+
+        // Navigate to page
+        function navigateToPage(pageName) {
+            if (pageName === currentPage) return;
+
+            const transition = document.getElementById('pageTransition');
+            transition.classList.add('active');
+
+            setTimeout(() => {
+                // Hide all pages
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                
+                // Show target page
+                document.getElementById(pageName).classList.add('active');
+                
+                // Update nav
+                document.querySelectorAll('[data-page]').forEach(link => {
+                    link.classList.remove('active');
+                });
+                document.querySelectorAll(`[data-page="${pageName}"]`).forEach(link => {
+                    link.classList.add('active');
+                });
+
+                // Load content if needed
+                if (pageName === 'results' && !document.getElementById('resultsContent').innerHTML) {
+                    loadResults(currentTeam.results);
+                } else if (pageName === 'calendar' && !document.getElementById('calendarContent').innerHTML) {
+                    loadCalendar(currentTeam.calendar);
+                } else if (pageName === 'ranking' && !document.getElementById('rankingContent').innerHTML) {
+                    loadRanking(currentTeam.ranking);
+                }
+
+                currentPage = pageName;
+                window.scrollTo(0, 0);
+
+                setTimeout(() => {
+                    transition.classList.remove('active');
+                }, 300);
+            }, 300);
+        }
+
+        // Load Results
+        function loadResults(team) {
+            const data = dataByTeam[team];
+            const container = document.getElementById('resultsContent');
+            
+            if (!data || !data.results || data.results.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <div class="empty-text">Aucun résultat disponible pour cette équipe</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="results-grid">
+                    ${data.results.map(match => `
+                        <div class="result-card">
+                            <div class="result-header">
+                                <div class="result-date">${match.date}</div>
+                                <div class="result-status ${match.status}">${getStatusLabel(match.status)}</div>
+                            </div>
+                            <div class="result-teams">
+                                <div class="team">
+                                    <div class="team-name">${match.home}</div>
+                                    <div class="team-logo">${match.home.includes('Chiché') ? '🏠' : '🚗'}</div>
+                                </div>
+                                <div class="result-score">${match.score}</div>
+                                <div class="team">
+                                    <div class="team-name">${match.away}</div>
+                                    <div class="team-logo">${match.away.includes('Chiché') ? '🏠' : '🚗'}</div>
+                                </div>
+                            </div>
+                            <div class="result-competition">${match.competition}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Load Calendar
+        function loadCalendar(team) {
+            const data = dataByTeam[team];
+            const container = document.getElementById('calendarContent');
+            
+            if (!data || !data.calendar || data.calendar.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <div class="empty-text">Aucun match à venir pour cette équipe</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="calendar-grid">
+                    ${data.calendar.map(match => `
+                        <div class="calendar-card">
+                            <div class="calendar-date">${match.date}</div>
+                            <div class="calendar-teams">
+                                <div class="calendar-team">${match.home}</div>
+                                <div class="calendar-vs">VS</div>
+                                <div class="calendar-team">${match.away}</div>
+                            </div>
+                            <div class="calendar-competition">${match.competition}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Load Ranking
+        function loadRanking(team) {
+            const data = dataByTeam[team];
+            const container = document.getElementById('rankingContent');
+            
+            if (!data || !data.ranking || data.ranking.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🏆</div>
+                        <div class="empty-text">Classement non disponible</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="ranking-container">
+                    <div class="ranking-header">
+                        <div>Pos</div>
+                        <div>Équipe</div>
+                        <div>Pts</div>
+                        <div>J</div>
+                        <div>Diff</div>
+                    </div>
+                    ${data.ranking.map(row => `
+                        <div class="ranking-row ${row.highlight ? 'highlight' : ''}">
+                            <div class="ranking-position">${row.pos}</div>
+                            <div class="ranking-team">${row.team}</div>
+                            <div class="ranking-stat">${row.pts}</div>
+                            <div class="ranking-stat">${row.j}</div>
+                            <div class="ranking-stat">${row.diff}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getStatusLabel(status) {
+            const labels = { victory: 'Victoire', defeat: 'Défaite', draw: 'Match nul' };
+            return labels[status] || status;
+        }
+
+        // Event listeners
+        document.addEventListener('click', (e) => {
+            // Page navigation
+            if (e.target.closest('[data-page]')) {
+                const page = e.target.closest('[data-page]').dataset.page;
+                navigateToPage(page);
+            }
+
+            // Team filters
+            if (e.target.classList.contains('team-filter')) {
+                const section = e.target.closest('.page').id;
+                const team = e.target.dataset.team;
+                
+                e.target.closest('.team-filters').querySelectorAll('.team-filter').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                
+                currentTeam[section] = team;
+                
+                const transition = document.getElementById('pageTransition');
+                transition.classList.add('active');
+                
+                setTimeout(() => {
+                    if (section === 'results') loadResults(team);
+                    else if (section === 'calendar') loadCalendar(team);
+                    else if (section === 'ranking') loadRanking(team);
+                    
+                    setTimeout(() => {
+                        transition.classList.remove('active');
+                    }, 200);
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>
