@@ -1,66 +1,98 @@
 <?php
 declare(strict_types=1);
 
-// Forcer affichage erreurs
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-
 /**
- * API Club - FC Chiche
- * Endpoint pour récupérer les informations du club
+ * API Club - Informations FC Chiche
+ * 
+ * GET:
+ * - /api/club - Toutes les infos du club
+ * - /api/club?essentials=true - Infos essentielles uniquement
+ * - /api/club?logo=true - Logo uniquement
+ * - /api/club?exists=true - Vérifier existence
  */
 
 $basePath = dirname(__DIR__, 2);
 require_once $basePath . '/config/bootstrap.php';
+require_once $basePath . '/src/Models/ModelsLoader.php';
+require_once $basePath . '/src/Utils/ApiResponse.php';
+require_once $basePath . '/src/Utils/ApiAuth.php';
 
-header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET');
+ApiResponse::setCorsHeaders();
+
+$method = $_SERVER['REQUEST_METHOD'];
+ApiAuth::protectWrite($method);
 
 try {
     $pdo = Database::getInstance();
+    $models = ModelsLoader::loadAll($pdo);
+    $clubModel = $models['club'];
     
-    // Récupérer infos du club
-    $sql = "SELECT 
-        cl_no,
-        affiliation_number,
-        name,
-        short_name,
-        location,
-        colors,
-        address1,
-        address2,
-        address3,
-        postal_code,
-        distributor_office,
-        latitude,
-        longitude,
-        logo_url,
-        district_name,
-        district_cg_no
-    FROM " . DB_PREFIX . "club
-    WHERE cl_no = :cl_no
-    LIMIT 1";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['cl_no' => API_FFF_CLUB_ID]);
-    $club = $stmt->fetch();
-    
-    if (!$club) {
-        throw new Exception('Club non trouvé');
+    switch ($method) {
+        case 'GET':
+            handleGet($clubModel);
+            break;
+            
+        case 'PUT':
+            handlePut($clubModel);
+            break;
+            
+        default:
+            ApiResponse::error('Method not allowed', 405);
     }
     
-    // Réponse JSON
-    echo json_encode([
-        'success' => true,
-        'club' => $club
-    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-    
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'error' => DEBUG_MODE ? $e->getMessage() : 'Erreur serveur',
-        'trace' => DEBUG_MODE ? $e->getTraceAsString() : null
-    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    ApiResponse::error(
+        DEBUG_MODE ? $e->getMessage() : 'Internal server error',
+        500,
+        DEBUG_MODE ? ['trace' => $e->getTraceAsString()] : []
+    );
+}
+
+/**
+ * Gérer requêtes GET
+ */
+function handleGet($model): void
+{
+    $params = ApiResponse::getParams([
+        'essentials' => null,
+        'logo' => null,
+        'exists' => null
+    ]);
+    
+    // Logo uniquement
+    if ($params['logo'] !== null) {
+        $logo = $model->getClubLogo();
+        ApiResponse::success(['logo_url' => $logo]);
+    }
+    
+    // Vérifier existence
+    if ($params['exists'] !== null) {
+        $exists = $model->exists();
+        ApiResponse::success(['exists' => $exists]);
+    }
+    
+    // Infos essentielles
+    if ($params['essentials'] !== null) {
+        $club = $model->getClubEssentials();
+        ApiResponse::success($club);
+    }
+    
+    // Toutes les infos (par défaut)
+    $club = $model->getClub();
+    ApiResponse::success($club);
+}
+
+/**
+ * Gérer requêtes PUT (mise à jour)
+ */
+function handlePut($model): void
+{
+    $data = ApiResponse::getBody();
+    
+    if ($data === null) {
+        ApiResponse::error('Invalid JSON body', 400);
+    }
+    
+    // TODO: Implémenter mise à jour infos club (si nécessaire)
+    ApiResponse::error('Not implemented', 501);
 }
