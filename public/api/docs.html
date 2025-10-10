@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FC Chiche API - Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .topbar {
+            background: linear-gradient(135deg, #006837 0%, #13a463 100%) !important;
+        }
+        
+        .topbar-wrapper img {
+            content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50"><text x="10" y="35" font-family="Arial" font-size="24" fill="white" font-weight="bold">⚽ FC CHICHE</text></svg>');
+        }
+        
+        .swagger-ui .info .title {
+            color: #006837;
+        }
+        
+        .swagger-ui .opblock.opblock-get {
+            border-color: #13a463;
+            background: rgba(19, 164, 99, 0.1);
+        }
+        
+        .swagger-ui .opblock.opblock-get .opblock-summary-method {
+            background: #13a463;
+        }
+        
+        .swagger-ui .opblock.opblock-post {
+            border-color: #006837;
+            background: rgba(0, 104, 55, 0.1);
+        }
+        
+        .swagger-ui .opblock.opblock-post .opblock-summary-method {
+            background: #006837;
+        }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = () => {
+            window.ui = SwaggerUIBundle({
+                url: './openapi.yaml',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                defaultModelsExpandDepth: 1,
+                defaultModelExpandDepth: 1,
+                docExpansion: 'list',
+                filter: true,
+                showRequestHeaders: true,
+                supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
+                validatorUrl: null,
+                tryItOutEnabled: true
+            });
+        };
+    </script>
+</body>
+</html>

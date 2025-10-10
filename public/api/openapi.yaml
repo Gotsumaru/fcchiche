@@ -1,0 +1,1049 @@
+openapi: 3.0.3
+info:
+  title: FC Chiche API
+  description: |
+    API REST complète pour le site du FC Chiche.
+    
+    ## Authentification
+    - Endpoints GET : Publics (sauf `/config` et `/sync-logs`)
+    - Endpoints POST/PUT/DELETE : Authentification admin requise
+    
+    ## CORS
+    - Origine autorisée : `fcchiche.fr`
+    - En développement : `localhost` autorisé
+    
+    ## Format de réponse
+    Toutes les réponses suivent le format standardisé avec `success`, `data`, et `meta`.
+    
+  version: 1.0.0
+  contact:
+    name: FC Chiche Dev Team
+    url: https://fcchiche.fr
+  license:
+    name: Propriétaire
+    
+servers:
+  - url: https://fcchiche.fr/api
+    description: Production
+  - url: http://localhost/api
+    description: Développement local
+
+tags:
+  - name: Authentication
+    description: Gestion de l'authentification admin
+  - name: Club
+    description: Informations du FC Chiche
+  - name: Équipes
+    description: Équipes du club
+  - name: Matchs
+    description: Calendrier et résultats (endpoint principal)
+  - name: Classements
+    description: Classements historisés par journée
+  - name: Compétitions
+    description: Toutes les compétitions
+  - name: Terrains
+    description: Terrains du club
+  - name: Membres
+    description: Membres du bureau
+  - name: Clubs Cache
+    description: Cache des clubs adverses
+  - name: Engagements
+    description: Pivot équipes-compétitions
+  - name: Config
+    description: Configuration système (admin uniquement)
+  - name: Sync Logs
+    description: Logs de synchronisation (admin uniquement)
+
+paths:
+  /auth:
+    post:
+      tags:
+        - Authentication
+      summary: Authentification / Déconnexion
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [login, logout]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: Administrateur
+                password:
+                  type: string
+                  example: MonMotDePasse123
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Identifiants invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    get:
+      tags:
+        - Authentication
+      summary: Vérifier statut / Obtenir token CSRF
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [status, csrf]
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /club:
+    get:
+      tags:
+        - Club
+      summary: Informations du club FC Chiche
+      parameters:
+        - name: essentials
+          in: query
+          schema:
+            type: boolean
+          description: Infos essentielles uniquement
+        - name: logo
+          in: query
+          schema:
+            type: boolean
+          description: Logo uniquement
+        - name: exists
+          in: query
+          schema:
+            type: boolean
+          description: Vérifier existence
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Club'
+
+  /equipes:
+    get:
+      tags:
+        - Équipes
+      summary: Liste des équipes
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          description: Équipe par ID
+        - name: category
+          in: query
+          schema:
+            type: string
+            example: SEM
+          description: Filtrer par catégorie
+        - name: short_name
+          in: query
+          schema:
+            type: string
+            example: SEM 1
+          description: Équipe par nom court
+        - name: seniors
+          in: query
+          schema:
+            type: boolean
+          description: Équipes seniors uniquement
+        - name: jeunes
+          in: query
+          schema:
+            type: boolean
+          description: Équipes jeunes uniquement
+        - name: categories
+          in: query
+          schema:
+            type: boolean
+          description: Liste des catégories
+        - name: include_hidden
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Inclure équipes non-diffusables
+        - name: season
+          in: query
+          schema:
+            type: integer
+            example: 2025
+          description: Saison spécifique
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Equipe'
+
+  /matchs:
+    get:
+      tags:
+        - Matchs
+      summary: Calendrier et résultats
+      description: Endpoint principal pour tous les matchs avec de nombreux filtres combinables
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          description: Match par ID
+        - name: ma_no
+          in: query
+          schema:
+            type: integer
+          description: Match par numéro API
+        - name: upcoming
+          in: query
+          schema:
+            type: integer
+            example: 10
+          description: Prochains matchs (nombre)
+        - name: last_results
+          in: query
+          schema:
+            type: integer
+            example: 10
+          description: Derniers résultats (nombre)
+        - name: competition_id
+          in: query
+          schema:
+            type: integer
+          description: Filtrer par compétition
+        - name: category
+          in: query
+          schema:
+            type: string
+            example: SEM
+          description: Filtrer par catégorie d'équipe
+        - name: is_result
+          in: query
+          schema:
+            type: boolean
+          description: true=résultats, false=calendrier, null=tous
+        - name: home
+          in: query
+          schema:
+            type: boolean
+          description: Matchs à domicile uniquement
+        - name: away
+          in: query
+          schema:
+            type: boolean
+          description: Matchs à l'extérieur uniquement
+        - name: journee
+          in: query
+          schema:
+            type: integer
+          description: Numéro de journée (+ competition_id requis)
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2025-11-01"
+          description: Date de début (+ date_to requis)
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2025-11-30"
+          description: Date de fin (+ date_from requis)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+          description: Limite de résultats
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Match'
+
+  /classements:
+    get:
+      tags:
+        - Classements
+      summary: Classements historisés
+      parameters:
+        - name: competitions
+          in: query
+          schema:
+            type: boolean
+          description: Liste des compétitions avec classement
+        - name: competition_id
+          in: query
+          schema:
+            type: integer
+          description: ID de la compétition
+        - name: journee
+          in: query
+          schema:
+            type: integer
+          description: Journée spécifique
+        - name: position
+          in: query
+          schema:
+            type: boolean
+          description: Position FC Chiche
+        - name: history
+          in: query
+          schema:
+            type: boolean
+          description: Évolution de la position
+        - name: stats
+          in: query
+          schema:
+            type: boolean
+          description: Statistiques du club
+        - name: compare
+          in: query
+          schema:
+            type: string
+            example: "5,10"
+          description: Comparer deux journées (format "J1,J2")
+        - name: journees_count
+          in: query
+          schema:
+            type: boolean
+          description: Nombre de journées
+        - name: season
+          in: query
+          schema:
+            type: integer
+          description: Saison spécifique
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Classement'
+
+  /competitions:
+    get:
+      tags:
+        - Compétitions
+      summary: Liste des compétitions
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          description: Compétition par ID
+        - name: cp_no
+          in: query
+          schema:
+            type: integer
+          description: Compétition par numéro API
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [CH, CO]
+          description: Type (CH=Championnat, CO=Coupe)
+        - name: championnats
+          in: query
+          schema:
+            type: boolean
+          description: Championnats uniquement
+        - name: coupes
+          in: query
+          schema:
+            type: boolean
+          description: Coupes uniquement
+        - name: season
+          in: query
+          schema:
+            type: integer
+          description: Saison spécifique
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Competition'
+
+  /terrains:
+    get:
+      tags:
+        - Terrains
+      summary: Liste des terrains
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          description: Terrain par ID
+        - name: te_no
+          in: query
+          schema:
+            type: integer
+          description: Terrain par numéro API
+        - name: gps
+          in: query
+          schema:
+            type: boolean
+          description: Terrains avec coordonnées GPS uniquement
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Terrain'
+
+  /membres:
+    get:
+      tags:
+        - Membres
+      summary: Membres du bureau
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          description: Membre par ID
+        - name: titre
+          in: query
+          schema:
+            type: string
+            example: Président
+          description: Membres par titre/fonction
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Recherche par nom
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Membre'
+
+  /clubs-cache:
+    get:
+      tags:
+        - Clubs Cache
+      summary: Cache des clubs adverses
+      parameters:
+        - name: cl_no
+          in: query
+          schema:
+            type: integer
+          description: Club par numéro API
+        - name: logo
+          in: query
+          schema:
+            type: integer
+          description: Logo d'un club (cl_no)
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Recherche par nom
+        - name: recent
+          in: query
+          schema:
+            type: integer
+          description: Clubs récents (nombre)
+        - name: exists
+          in: query
+          schema:
+            type: integer
+          description: Vérifier existence (cl_no)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+          description: Limite de résultats
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ClubCache'
+
+  /engagements:
+    get:
+      tags:
+        - Engagements
+      summary: Pivot équipes-compétitions
+      parameters:
+        - name: equipe_id
+          in: query
+          schema:
+            type: integer
+          description: Engagements d'une équipe
+        - name: competition_id
+          in: query
+          schema:
+            type: integer
+          description: Équipes dans une compétition
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Engagements par catégorie
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [CH, CO]
+          description: Type de compétition
+        - name: championnats
+          in: query
+          schema:
+            type: boolean
+          description: Engagements championnats
+        - name: coupes
+          in: query
+          schema:
+            type: boolean
+          description: Engagements coupes
+        - name: season
+          in: query
+          schema:
+            type: integer
+          description: Saison spécifique
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Engagement'
+
+  /config:
+    get:
+      tags:
+        - Config
+      summary: Configuration système
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: key
+          in: query
+          schema:
+            type: string
+          description: Config spécifique
+        - name: keys
+          in: query
+          schema:
+            type: string
+          description: Plusieurs configs (séparées par virgule)
+        - name: prefix
+          in: query
+          schema:
+            type: string
+          description: Configs par préfixe
+        - name: current_season
+          in: query
+          schema:
+            type: boolean
+          description: Saison actuelle
+        - name: last_sync
+          in: query
+          schema:
+            type: string
+          description: Dernière sync d'un endpoint
+        - name: all_last_sync
+          in: query
+          schema:
+            type: boolean
+          description: Toutes les dernières sync
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /sync-logs:
+    get:
+      tags:
+        - Sync Logs
+      summary: Logs de synchronisation
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: endpoint
+          in: query
+          schema:
+            type: string
+          description: Logs d'un endpoint
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [success, error, warning]
+          description: Logs par statut
+        - name: errors
+          in: query
+          schema:
+            type: boolean
+          description: Erreurs uniquement
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Date de début
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Date de fin
+        - name: today
+          in: query
+          schema:
+            type: boolean
+          description: Logs du jour
+        - name: stats
+          in: query
+          schema:
+            type: string
+          description: Statistiques (true=global, endpoint=spécifique)
+        - name: all_stats
+          in: query
+          schema:
+            type: boolean
+          description: Stats de tous les endpoints
+        - name: last
+          in: query
+          schema:
+            type: string
+          description: Dernier log (true=global, endpoint=spécifique)
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Recherche dans les logs
+        - name: slowest
+          in: query
+          schema:
+            type: integer
+          description: Logs les plus lents (nombre)
+        - name: fastest
+          in: query
+          schema:
+            type: integer
+          description: Logs les plus rapides (nombre)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+            maximum: 500
+          description: Limite de résultats
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SyncLog'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+      description: Authentification par session PHP
+
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          description: Données demandées (variable selon endpoint)
+        meta:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+              example: "2025-10-10T14:30:00+02:00"
+            count:
+              type: integer
+              example: 10
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Description de l'erreur"
+            code:
+              type: integer
+              example: 400
+            details:
+              type: object
+              description: Détails additionnels (uniquement en mode DEBUG)
+        meta:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+
+    Club:
+      type: object
+      properties:
+        id:
+          type: integer
+        cl_no:
+          type: integer
+          example: 5403
+        name:
+          type: string
+          example: "FC Chiche"
+        short_name:
+          type: string
+          example: "FC CHICHE"
+        logo_url:
+          type: string
+          format: uri
+        address1:
+          type: string
+        postal_code:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        district_name:
+          type: string
+
+    Equipe:
+      type: object
+      properties:
+        id:
+          type: integer
+        eq_no:
+          type: integer
+        category:
+          type: string
+          example: "SEM"
+        number:
+          type: integer
+          example: 1
+        short_name:
+          type: string
+          example: "SEM 1"
+        is_diffusable:
+          type: boolean
+        season:
+          type: integer
+
+    Match:
+      type: object
+      properties:
+        id:
+          type: integer
+        ma_no:
+          type: integer
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+          example: "15H00"
+        home_team_name:
+          type: string
+        away_team_name:
+          type: string
+        home_score:
+          type: integer
+          nullable: true
+        away_score:
+          type: integer
+          nullable: true
+        is_result:
+          type: boolean
+        competition_name:
+          type: string
+        competition_type:
+          type: string
+          enum: [CH, CO]
+        terrain_name:
+          type: string
+        opponent_name:
+          type: string
+        opponent_logo:
+          type: string
+          format: uri
+
+    Classement:
+      type: object
+      properties:
+        ranking:
+          type: integer
+        points:
+          type: integer
+        games_played:
+          type: integer
+        wins:
+          type: integer
+        draws:
+          type: integer
+        losses:
+          type: integer
+        goals_for:
+          type: integer
+        goals_against:
+          type: integer
+        goal_difference:
+          type: integer
+        club_name:
+          type: string
+        club_logo:
+          type: string
+          format: uri
+
+    Competition:
+      type: object
+      properties:
+        id:
+          type: integer
+        cp_no:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          enum: [CH, CO]
+        level:
+          type: string
+        season:
+          type: integer
+
+    Terrain:
+      type: object
+      properties:
+        id:
+          type: integer
+        te_no:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        postal_code:
+          type: string
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+
+    Membre:
+      type: object
+      properties:
+        id:
+          type: integer
+        pe_no:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        titre:
+          type: string
+          example: "Président"
+
+    ClubCache:
+      type: object
+      properties:
+        id:
+          type: integer
+        cl_no:
+          type: integer
+        name:
+          type: string
+        short_name:
+          type: string
+        logo_url:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Engagement:
+      type: object
+      properties:
+        id:
+          type: integer
+        equipe_id:
+          type: integer
+        competition_id:
+          type: integer
+        season:
+          type: integer
+        equipe_name:
+          type: string
+        competition_name:
+          type: string
+        competition_type:
+          type: string
+          enum: [CH, CO]
+
+    SyncLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        endpoint:
+          type: string
+        status:
+          type: string
+          enum: [success, error, warning]
+        message:
+          type: string
+        records_processed:
+          type: integer
+        execution_time_ms:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
