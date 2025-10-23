@@ -165,6 +165,7 @@
       }
     }
     
+
     /* LIQUID GLASS DOCK STYLES */
     .liquidGlass-wrapper {
       position: relative;
@@ -236,7 +237,6 @@
       align-items: center;
       justify-content: center;
       gap: 16px;
-      padding: 1rem 1.5rem;
     }
     .dock .nav-item {
       display: flex;
@@ -246,7 +246,7 @@
       will-change: transform;
     }
     .dock .nav-item:hover {
-      transform: scale(1.2) translateY(-8px);
+      transform: scale(1.1) translateY(0px);
     }
     .dock .nav-item svg {
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
@@ -264,46 +264,19 @@
 <div class="liquidGlass-text">
 <div class="dock">
 <a href="#" class="nav-item" title="Home">
-<svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="24" cy="24" r="20" fill="#008a00"/>
-<path d="M24 14L16 22H20V32H28V22H32L24 14Z" fill="white"/>
-</svg>
+<img src="../home.png" width="80" height="80" alt="Home"/>
 </a>
 <a href="#" class="nav-item" title="The Team">
-<svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="24" cy="24" r="20" fill="#008a00"/>
-<circle cx="24" cy="20" r="5" fill="white"/>
-<path d="M16 34C16 29 19 27 24 27C29 27 32 29 32 34" stroke="white" stroke-width="3" stroke-linecap="round"/>
-</svg>
+<img src="../Classement.png" width="80" height="80" alt="The Team"/>
 </a>
 <a href="#" class="nav-item" title="Fixtures & Results">
-<svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="24" cy="24" r="20" fill="#008a00"/>
-<rect x="16" y="16" width="16" height="16" rx="2" stroke="white" stroke-width="2" fill="none"/>
-<path d="M20 14V18M28 14V18M16 22H32" stroke="white" stroke-width="2" stroke-linecap="round"/>
-</svg>
+<img src="../resultat.png" width="80" height="80" alt="Fixtures & Results"/>
 </a>
 <a href="#" class="nav-item" title="News">
-<svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="24" cy="24" r="20" fill="#008a00"/>
-<rect x="16" y="18" width="16" height="14" rx="1" stroke="white" stroke-width="2" fill="none"/>
-<line x1="19" y1="22" x2="29" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
-<line x1="19" y1="26" x2="29" y2="26" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-<line x1="19" y1="29" x2="25" y2="29" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-</svg>
+<img src="../Agenda.svg" width="80" height="80" alt="News"/>
 </a>
 <a href="#" class="nav-item" title="Contact Us">
-<svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="24" cy="24" r="20" fill="#008a00"/>
-<path d="M16 20L24 26L32 20V30H16V20Z" fill="white"/>
-<path d="M16 20L24 16L32 20" stroke="white" stroke-width="2" stroke-linejoin="round" fill="none"/>
-</svg>
-</a>
-<a href="#" class="nav-item" title="FCChiche Logo">
-<svg width="60" height="60" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="24" cy="24" r="20" fill="#008a00"/>
-<path clip-rule="evenodd" d="M35.475 21.6262C36.358 21.4363 36.6863 21.5589 36.7581 21.5934C36.7876 21.655 36.8547 21.857 36.8082 22.3336C36.7408 23.0255 36.4502 24.0046 35.8572 25.2301C34.6799 27.6631 32.5085 30.6631 29.5858 33.5858C26.6631 36.5085 23.6632 38.6799 21.2301 39.8572C20.0046 40.4502 19.0255 40.7407 18.3336 40.8082C17.8571 40.8547 17.6551 40.7875 17.5934 40.7581C17.5589 40.6863 17.4363 40.358 17.6262 39.475C17.8562 38.4054 18.4689 36.9657 19.5038 35.2817C20.7575 33.2417 22.5497 30.9744 24.7621 28.762C26.9744 26.5497 29.2417 24.7574 31.2817 23.5037C32.9657 22.4689 34.4054 21.8562 35.475 21.6262ZM12.4119 29.2403L18.7597 35.5881C19.8813 36.7097 21.4027 36.9179 22.7217 36.7893C24.0585 36.659 25.5148 36.1631 26.9723 35.4579C29.9052 34.0387 33.2618 31.5667 36.4142 28.4142C39.5667 25.2618 42.0387 21.9052 43.4579 18.9723C44.1631 17.5148 44.659 16.0585 44.7893 14.7217C44.9179 13.4027 44.7097 11.8813 43.5881 10.7597L37.2403 12.4119C35.8527 11.0243 33.8765 11.0257 32.2861 11.3678C30.6081 11.7286 28.7334 12.5842 26.8396 13.748C24.4978 15.1872 21.9881 17.1835 19.5858 19.5858C17.1835 21.988 15.1872 24.4978 13.748 26.8396C12.5842 28.7334 11.7286 30.6081 11.3678 32.2861C11.0257 33.8765 11.0243 35.8527 12.4119 29.2403Z" fill="white" fill-rule="evenodd"/>
-</svg>
+<img src="../Contact.png" width="80" height="80" alt="Contact Us"/>
 </a>
 </div>
 </div>
@@ -337,45 +310,52 @@
 <div class="w-full bg-off-white relative z-10">
 <section class="py-16 relative min-h-screen flex items-center overflow-hidden">
   <!-- Trou avec image -->
-  <div class="absolute left-0 w-[80%] h-[80vh] rounded-r-[3rem] overflow-hidden" style="">
+  <div class="absolute left-0 w-[70%] h-[80vh] rounded-r-[3rem] overflow-hidden">
     <div class="parallax-image w-full h-full bg-center bg-no-repeat bg-cover rounded-r-[3rem]" style='box-shadow: inset 0px 0px 15px 8px rgba(0,0,0,0.46);background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAFRxw_8I30mPdxMXVSskeM8CGqAEtNlv78bXPEw3jbH0mXBr72BUJU3oVj3fLDIQqpf0ZsOY7jqly2w3gi4Yy3_uxpT_Qb0TlXyxjCwHRvj68dBOEfxD2zJWLh-9_Hvf7HJX2_d24aHUw-0hqRQ5Nf03_FGK_1-4Po3bmM3pOCvvHOkvuzqmGPtREIzcZLRfGvXdEN60oBhn_KgD8JA17wc8Zje2sPc3ULUUdlXv6l5ldyId0jzgnS8PY6KuvgKVQzeH8XJAXJFMw");'></div>
   </div>
   
-  <!-- Carte événement flottante (dans un conteneur) -->
+  <!-- Contenu à droite de l'image -->
   <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-    <div class="ml-auto mr-0 w-full md:w-[45%]">
-      <div class="glass-card-event-dark rounded-2xl p-8 shadow-2xl">
-        <div class="flex flex-col gap-4">
-          <p class="text-primary text-sm font-bold uppercase tracking-wider">Upcoming Match</p>
-          <h3 class="text-white text-3xl font-bold leading-tight">FCChiche vs. Town United</h3>
-          <div class="flex flex-col gap-3 mt-2">
-            <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-              <p class="text-gray-200 text-base font-medium">October 29th, 2024</p>
+    <div class="ml-auto mr-0 w-full">
+      <div class="flex flex-col lg:flex-row gap-8 items-start">
+        
+        <!-- Carte événement flottante -->
+        <div class="w-full lg:w-[48%]">
+          <div class="glass-card-event-dark rounded-2xl p-8 shadow-2xl">
+            <div class="flex flex-col gap-4">
+              <p class="text-primary text-sm font-bold uppercase tracking-wider">Upcoming Match</p>
+              <h3 class="text-white text-3xl font-bold leading-tight">FCChiche vs. Town United</h3>
+              <div class="flex flex-col gap-3 mt-2">
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  <p class="text-gray-200 text-base font-medium">October 29th, 2024</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <p class="text-gray-200 text-base font-medium">15:00</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  <p class="text-gray-200 text-base font-medium">The Community Stadium</p>
+                </div>
+              </div>
+              <p class="text-gray-300 text-base leading-relaxed mt-2">The biggest game of the season is here. Join us and cheer on the team!</p>
+              <div class="mt-4">
+                <button class="w-full flex items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-primary text-white text-base font-bold leading-normal hover:bg-primary/90 transition-all transform hover:scale-[1.02]">
+                  <span>Get Tickets</span>
+                </button>
+              </div>
             </div>
-            <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <p class="text-gray-200 text-base font-medium">15:00</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-              <p class="text-gray-200 text-base font-medium">The Community Stadium</p>
-            </div>
-          </div>
-          <p class="text-gray-300 text-base leading-relaxed mt-2">The biggest game of the season is here. Join us and cheer on the team!</p>
-          <div class="mt-4">
-            <button class="w-full flex items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-primary text-white text-base font-bold leading-normal hover:bg-primary/90 transition-all transform hover:scale-[1.02]">
-              <span>Get Tickets</span>
-            </button>
           </div>
         </div>
+        
       </div>
     </div>
   </div>
