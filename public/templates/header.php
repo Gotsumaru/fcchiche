@@ -70,7 +70,7 @@ $currentPage = basename($_SERVER['SCRIPT_FILENAME'], '.php');
   <!-- ====================================================================
        CONTENEUR PRINCIPAL
        ==================================================================== -->
-  <div class="relative flex w-full flex-col group/design-root overflow-x-hidden">
+  <div class="relative flex w-full flex-col group/design-root overflow-x-hidden pb-32 lg:pb-0">
 
     <!-- ==================================================================
          HEADER - MENU DOCK LIQUID GLASS
