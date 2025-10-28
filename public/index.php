@@ -22,195 +22,142 @@ $apiBase = rtrim(($basePath === '' ? '' : $basePath) . '/api', '/');
 // Valeurs par défaut si vides
 $assetsBase = $assetsBase === '' ? '/assets' : $assetsBase;
 $apiBase = $apiBase === '' ? '/api' : $apiBase;
+
+// Inclure le header
+require_once __DIR__ . '/templates/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="description" content="FC Chiche - Suivez les résultats, le calendrier et les classements de nos équipes de football">
-    <meta name="theme-color" content="#006837">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <title>FC Chiche - Club de Football</title>
-    
-    <!-- PWA -->
-    <link rel="manifest" href="<?= htmlspecialchars($basePath . '/manifest.json', ENT_QUOTES) ?>">
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="<?= htmlspecialchars($assetsBase . '/css/variables.css', ENT_QUOTES) ?>">
-    <link rel="stylesheet" href="<?= htmlspecialchars($assetsBase . '/css/main.css', ENT_QUOTES) ?>">
-    <link rel="stylesheet" href="<?= htmlspecialchars($assetsBase . '/css/components.css', ENT_QUOTES) ?>">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="<?= htmlspecialchars($assetsBase . '/images/logo.svg', ENT_QUOTES) ?>">
-    <link rel="apple-touch-icon" href="<?= htmlspecialchars($assetsBase . '/images/icon-192.png', ENT_QUOTES) ?>">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="FC Chiche - Club de Football">
-    <meta property="og:description" content="Suivez les résultats et le calendrier du FC Chiche">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="<?= htmlspecialchars($assetsBase . '/images/og-image.jpg', ENT_QUOTES) ?>">
-</head>
-<body data-base-path="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>" data-api-base="<?= htmlspecialchars($apiBase, ENT_QUOTES) ?>">
-    
-    <!-- Loader initial -->
-    <div id="initialLoader" class="initial-loader">
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <p class="loader-text">Chargement...</p>
-        </div>
-    </div>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content container">
-            <div class="header-logo" data-page="home">
-                <span class="logo-text">FC Chiche</span>
-            </div>
-            <nav class="nav-desktop">
-                <a class="nav-desktop-link active" data-page="home">Accueil</a>
-                <a class="nav-desktop-link" data-page="results">Résultats</a>
-                <a class="nav-desktop-link" data-page="calendar">Calendrier</a>
-                <a class="nav-desktop-link" data-page="ranking">Classement</a>
-            </nav>
-        </div>
-    </header>
+    <!-- ==================================================================
+         SECTION HERO - VITRE LIQUIDE TRANSPARENTE
+         ================================================================== -->
+    <main class="liquid-glass-hero">
+      <!-- Overlay de vitre liquide transparent au-dessus du fond -->
+      <div class="liquid-glass-overlay">
+        <!-- Blobs liquides animés automatiquement -->
+        <div class="liquid-blob-1"></div>
+        <div class="liquid-blob-2"></div>
+        <div class="liquid-blob-3"></div>
+      </div>
 
-    <!-- Pages -->
-    <div id="app">
-        
-        <!-- Page Accueil -->
-        <div class="page active" id="home">
-            <div class="page-hero page-hero--with-image" style="background-image: url('<?= htmlspecialchars($assetsBase . '/images/hero-terrain.jpg', ENT_QUOTES) ?>');">
-                <div class="page-hero-content container">
-                    <div class="page-hero-badge">Saison 2024-2025</div>
-                    <h1 class="page-hero-title">Bienvenue au FC Chiche</h1>
-                    <p class="page-hero-text">
-                        Suivez les performances de nos 4 équipes et vibrez avec nous.
+      <!-- Contenu principal (logo, titre, description, CTA) -->
+      <div class="hero-content flex flex-col gap-12 items-center text-center max-w-4xl px-4">
+        <!-- Logo et titre -->
+        <div class="flex flex-col lg:flex-row items-center gap-8 mb-6">
+          <img
+            src="<?= $assetsBase ?>/images/logo.svg"
+            width="120"
+            height="120"
+            alt="Logo FCChiche"
+            class="drop-shadow-2xl"
+            style="filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 4px 15px rgba(0, 0, 0, 0.6));"
+          />
+          <div class="flex flex-col gap-4 text-center lg:text-left">
+            <h1 class="text-white text-5xl md:text-8xl font-black leading-tight tracking-[-0.033em] drop-shadow-lg" style="text-shadow: 2px 2px 2px #222222;">
+              FC Chiché
+            </h1>
+            <p class="text-primary text-xl md:text-2xl font-bold uppercase tracking-wider" style="text-shadow: 2px 2px 2px #ffffff;">
+              Pour l'amour du maillot.
+            </p>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <h2 class="text-slate-200 text-lg md:text-xl font-normal leading-relaxed max-w-2xl mx-auto" style="text-shadow: 2px 2px 2px #444444;">
+          Le Football Club de Chiché, fondé en 1960, est un club des Deux-Sèvres qui fait vivre la passion du football depuis plus de soixante ans dont il porte fièrement les couleurs vert et blanc
+        </h2>
+
+        <!-- Call-to-action -->
+        <button class="flex min-w-[120px] max-w-[520px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-8 bg-primary text-white text-lg font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-all transform hover:scale-105 shadow-lg">
+          <span class="truncate">Voir les prochains matchs</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- ==================================================================
+         SECTION ÉVÉNEMENTS
+         ================================================================== -->
+    <div class="w-full bg-off-white relative z-10">
+      <section class="py-16 pb-32 lg:pb-16 relative min-h-screen flex items-center overflow-hidden">
+
+        <!-- Image en arrière-plan avec effet parallaxe -->
+        <!-- Desktop: Image à gauche avec 70% de largeur et bords arrondis -->
+        <!-- Mobile: Image pleine largeur sans bords arrondis -->
+        <div class="absolute left-0 w-full lg:w-[70%] h-[50vh] lg:h-[80vh] lg:rounded-r-[3rem] overflow-hidden">
+          <div
+            class="parallax-image w-full h-full bg-center bg-no-repeat bg-cover lg:rounded-r-[3rem]"
+            style='box-shadow: inset 0px 0px 15px 8px rgba(0,0,0,0.46); background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAFRxw_8I30mPdxMXVSskeM8CGqAEtNlv78bXPEw3jbH0mXBr72BUJU3oVj3fLDIQqpf0ZsOY7jqly2w3gi4Yy3_uxpT_Qb0TlXyxjCwHRvj68dBOEfxD2zJWLh-9_Hvf7HJX2_d24aHUw-0hqRQ5Nf03_FGK_1-4Po3bmM3pOCvvHOkvuzqmGPtREIzcZLRfGvXdEN60oBhn_KgD8JA17wc8Zje2sPc3ULUUdlXv6l5ldyId0jzgnS8PY6KuvgKVQzeH8XJAXJFMw");'
+          ></div>
+        </div>
+
+        <!-- Carte événement flottante -->
+        <!-- Desktop: Positionnée à droite de l'image et centrée verticalement -->
+        <!-- Mobile: Centrée et en dessous de l'image -->
+        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex items-center min-h-[80vh]">
+          <div class="ml-auto mr-0 w-full lg:w-auto">
+            <div class="flex flex-col lg:flex-row gap-8 items-center justify-end">
+              <div
+                class="w-full lg:w-[480px] mt-[30vh] lg:mt-0"
+              >
+                <article class="glass-card-event-dark rounded-2xl p-8 shadow-2xl">
+                  <div class="flex flex-col gap-4">
+                    <!-- Badge -->
+                    <p class="text-primary text-sm font-bold uppercase tracking-wider">
+                      Prochain match
                     </p>
-                    <button class="hero-cta" data-page="results">
-                        Voir les résultats
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+
+                    <!-- Titre -->
+                    <h3 class="text-white text-3xl font-bold leading-tight">
+                      FCChiche vs. Town United
+                    </h3>
+
+                    <!-- Informations du match -->
+                    <div class="flex flex-col gap-3 mt-2">
+                      <!-- Date -->
+                      <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="page-content container">
-                <div id="homeContent">
-                    <div class="home-loading">Chargement des données...</div>
-                </div>
-            </div>
-        </div>
+                        <p class="text-gray-200 text-base font-medium">29 octobre 2024</p>
+                      </div>
 
-        <!-- Page Résultats -->
-        <div class="page" id="results">
-            <div class="page-hero">
-                <div class="page-hero-content container">
-                    <div class="page-hero-badge">Derniers matchs</div>
-                    <h2 class="page-hero-title">Résultats</h2>
-                    <p class="page-hero-text">
-                        Consultez les performances de chaque équipe
-                    </p>
-                </div>
-            </div>
-            
-            <div class="page-content container">
-                <div class="filters-section">
-                    <div class="filters-group" id="resultsFilters">
-                        <button class="filter-item active" data-team="all">Toutes les équipes</button>
+                      <!-- Heure -->
+                      <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-gray-200 text-base font-medium">15:00</p>
+                      </div>
+
+                      <!-- Lieu -->
+                      <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <p class="text-gray-200 text-base font-medium">The Community Stadium</p>
+                      </div>
                     </div>
-                </div>
-                <div id="resultsContent">
-                    <div class="results-loading">Chargement des résultats...</div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Page Calendrier -->
-        <div class="page" id="calendar">
-            <div class="page-hero">
-                <div class="page-hero-content container">
-                    <div class="page-hero-badge">Prochains matchs</div>
-                    <h2 class="page-hero-title">Calendrier</h2>
-                    <p class="page-hero-text">
-                        Ne manquez aucun match de vos équipes favorites
+                    <!-- Description -->
+                    <p class="text-gray-300 text-base leading-relaxed mt-2">
+                      Le plus grand match de la saison est là. Rejoignez-nous et encouragez l'équipe !
                     </p>
-                </div>
-            </div>
-            
-            <div class="page-content container">
-                <div class="filters-section">
-                    <div class="filters-group" id="calendarFilters">
-                        <button class="filter-item active" data-team="all">Toutes les équipes</button>
+
+                    <!-- Bouton CTA -->
+                    <div class="mt-4">
+                      <button class="w-full flex items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-primary text-white text-base font-bold leading-normal hover:bg-primary/90 transition-all transform hover:scale-[1.02]">
+                        <span>Acheter des billets</span>
+                      </button>
                     </div>
-                </div>
-                <div id="calendarContent">
-                    <div class="calendar-loading">Chargement du calendrier...</div>
-                </div>
+                  </div>
+                </article>
+              </div>
             </div>
+          </div>
         </div>
+      </section>
 
-        <!-- Page Classement -->
-        <div class="page" id="ranking">
-            <div class="page-hero">
-                <div class="page-hero-content container">
-                    <div class="page-hero-badge">Saison 2024-2025</div>
-                    <h2 class="page-hero-title">Classement</h2>
-                    <p class="page-hero-text">
-                        Position de chaque équipe dans son championnat
-                    </p>
-                </div>
-            </div>
-            
-            <div class="page-content container">
-                <div class="filters-section">
-                    <div class="filters-group" id="rankingFilters">
-                        <!-- Chargé dynamiquement -->
-                    </div>
-                </div>
-                <div id="rankingContent">
-                    <div class="ranking-loading">Chargement des classements...</div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Navigation Mobile -->
-    <nav class="nav-mobile">
-        <ul class="nav-mobile-list">
-            <li class="nav-mobile-item">
-                <a class="nav-mobile-link active" data-page="home">
-                    <span class="nav-mobile-icon">🏠</span>
-                    <span class="nav-mobile-text">Accueil</span>
-                </a>
-            </li>
-            <li class="nav-mobile-item">
-                <a class="nav-mobile-link" data-page="results">
-                    <span class="nav-mobile-icon">📊</span>
-                    <span class="nav-mobile-text">Résultats</span>
-                </a>
-            </li>
-            <li class="nav-mobile-item">
-                <a class="nav-mobile-link" data-page="calendar">
-                    <span class="nav-mobile-icon">📅</span>
-                    <span class="nav-mobile-text">Calendrier</span>
-                </a>
-            </li>
-            <li class="nav-mobile-item">
-                <a class="nav-mobile-link" data-page="ranking">
-                    <span class="nav-mobile-icon">🏆</span>
-                    <span class="nav-mobile-text">Classement</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- Scripts -->
-    <script src="<?= htmlspecialchars($assetsBase . '/js/app.js', ENT_QUOTES) ?>"></script>
-</body>
-</html>
+<?php
+// Inclure le footer
+require_once __DIR__ . '/templates/footer.php';
+?>

@@ -586,18 +586,15 @@ const Pages = {
                     </div>
                     ${classement.map(row => {
                         const isOurTeam = row.cl_no === 5403;
-                        const goalDiff = row.goals_diff || 0;
-                        const diffDisplay = goalDiff >= 0 ? `+${goalDiff}` : `${goalDiff}`;
-                        
                         return `
                             <div class="ranking-row ${isOurTeam ? 'ranking-row--highlight' : ''}">
                                 <div class="ranking-col ranking-col--pos">${row.ranking}</div>
                                 <div class="ranking-col ranking-col--team">
-                                    ${row.club_name || row.team_short_name || 'Club'}
+                                    ${row.club_name || 'Club'}
                                 </div>
-                                <div class="ranking-col ranking-col--pts">${row.point_count || 0}</div>
-                                <div class="ranking-col ranking-col--played">${row.total_games_count || 0}</div>
-                                <div class="ranking-col ranking-col--diff">${diffDisplay}</div>
+                                <div class="ranking-col ranking-col--pts">${row.points}</div>
+                                <div class="ranking-col ranking-col--played">${row.games_played}</div>
+                                <div class="ranking-col ranking-col--diff">${row.goal_difference >= 0 ? '+' : ''}${row.goal_difference}</div>
                             </div>
                         `;
                     }).join('')}
