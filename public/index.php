@@ -6,22 +6,7 @@ declare(strict_types=1);
  * SPA (Single Page Application) avec navigation côté client
  */
 
-// Déterminer les chemins de base
-$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-$scriptDirectory = str_replace('\\', '/', dirname($scriptName));
-$trimmedDirectory = rtrim($scriptDirectory, '/');
-
-if ($trimmedDirectory === '.' || $trimmedDirectory === '/') {
-    $trimmedDirectory = '';
-}
-
-$basePath = $trimmedDirectory === '' ? '' : '/' . ltrim($trimmedDirectory, '/');
-$assetsBase = rtrim(($basePath === '' ? '' : $basePath) . '/assets', '/');
-$apiBase = rtrim(($basePath === '' ? '' : $basePath) . '/api', '/');
-
-// Valeurs par défaut si vides
-$assetsBase = $assetsBase === '' ? '/assets' : $assetsBase;
-$apiBase = $apiBase === '' ? '/api' : $apiBase;
+require_once __DIR__ . '/bootstrap.php';
 
 // Inclure le header
 require_once __DIR__ . '/templates/header.php';

@@ -16,11 +16,14 @@
     # Fichiers existants - Laisser passer
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
-    
+
     # Dossiers existants - Laisser passer
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
-    
+
+    # Routes PHP sans extension
+    RewriteRule ^(classement|resultats|calendrier|contact)/?$ $1.php [L]
+
     # Tout le reste vers index.php (SPA routing)
     RewriteRule ^ index.php [L]
 </IfModule>
