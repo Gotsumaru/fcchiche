@@ -1,51 +1,61 @@
       </main>
 
-      <footer class="site-footer">
-        <div class="site-footer__inner">
-          <div class="site-footer__grid">
-            <div class="site-footer__block">
-              <div class="site-footer__brand">
-                <img
-                  src="<?= $assetsBase ?>/images/logo.svg"
-                  width="48"
-                  height="48"
-                  alt="Logo FC Chiché"
-                />
-                <div>
-                  <p class="site-footer__title">FC Chiché</p>
-                  <p class="site-footer__subtitle">Club des Deux-Sèvres depuis 1960</p>
-                </div>
+      <footer class="app-footer">
+        <div class="app-footer__inner">
+          <div class="app-footer__top">
+            <div class="app-footer__brand">
+              <img
+                src="<?= $assetsBase ?>/images/logo.svg"
+                width="52"
+                height="52"
+                alt="Logo FC Chiché"
+                loading="lazy"
+              />
+              <div class="app-footer__brand-text">
+                <p class="app-footer__title">FC Chiché</p>
+                <p class="app-footer__subtitle">Club de football amateur du bocage bressuirais</p>
               </div>
-              <p class="site-footer__text">
-                Le FC Chiché anime la vie footballistique locale avec un engagement fort pour la formation, la convivialité et le
-                respect des valeurs du sport.
-              </p>
             </div>
-
-            <div class="site-footer__block">
-              <h2 class="site-footer__heading">Club</h2>
-              <ul class="site-footer__links">
-                <li><a href="<?= $basePath ?>/calendrier">Calendrier des matchs</a></li>
-                <li><a href="<?= $basePath ?>/resultats">Résultats officiels</a></li>
-                <li><a href="<?= $basePath ?>/classement">Classements</a></li>
-                <li><a href="<?= $basePath ?>/contact">Nous contacter</a></li>
-              </ul>
-            </div>
-
-            <div class="site-footer__block">
-              <h2 class="site-footer__heading">Nous suivre</h2>
-              <ul class="site-footer__links">
-                <li><a href="#" rel="noreferrer">Instagram</a></li>
-                <li><a href="#" rel="noreferrer">Facebook</a></li>
-                <li><a href="#" rel="noreferrer">YouTube</a></li>
-              </ul>
-              <a class="site-footer__cta" href="mailto:contact@fcchiche.fr">contact@fcchiche.fr</a>
+            <div class="app-footer__actions">
+              <a class="btn btn--secondary" href="<?= $basePath ?>/partenaires">Devenir partenaire</a>
+              <a class="btn btn--ghost" href="<?= $basePath ?>/contact">Contact</a>
             </div>
           </div>
 
-          <div class="site-footer__bottom">
-            <p>© <?= date('Y') ?> FC Chiché — Tous droits réservés.</p>
-            <div class="site-footer__legal">
+          <div class="app-footer__grid">
+            <div class="app-footer__column">
+              <h2>Le club</h2>
+              <ul>
+                <li><a href="<?= $basePath ?>/equipes">Nos équipes</a></li>
+                <li><a href="<?= $basePath ?>/matchs">Matchs à venir</a></li>
+                <li><a href="<?= $basePath ?>/resultats">Résultats</a></li>
+                <li><a href="<?= $basePath ?>/classements">Classements</a></li>
+              </ul>
+            </div>
+            <div class="app-footer__column">
+              <h2>Vie du club</h2>
+              <ul>
+                <li><a href="<?= $basePath ?>/galerie">Galerie photos</a></li>
+                <li><a href="<?= $basePath ?>/partenaires">Partenaires</a></li>
+                <li><a href="<?= $basePath ?>/contact">Nous contacter</a></li>
+                <li><a href="#">Espace licenciés</a></li>
+              </ul>
+            </div>
+            <div class="app-footer__column">
+              <h2>Nous suivre</h2>
+              <ul class="app-footer__socials">
+                <li><a href="#" aria-label="Instagram">Instagram</a></li>
+                <li><a href="#" aria-label="Facebook">Facebook</a></li>
+                <li><a href="#" aria-label="YouTube">YouTube</a></li>
+              </ul>
+              <a class="app-footer__contact" href="mailto:contact@fcchiche.fr">contact@fcchiche.fr</a>
+              <p class="app-footer__schedule">Accueil : Lundi - Vendredi 18h-20h · Week-end selon matchs</p>
+            </div>
+          </div>
+
+          <div class="app-footer__bottom">
+            <p>© FC Chiché 2025 – Tous droits réservés</p>
+            <div class="app-footer__legal">
               <a href="#">Mentions légales</a>
               <span aria-hidden="true">•</span>
               <a href="#">Politique de confidentialité</a>
@@ -55,14 +65,8 @@
       </footer>
     </div>
 
-  <!-- ====================================================================
-       SCRIPTS
-       ==================================================================== -->
-  <!-- Common JavaScript -->
   <script src="<?= $assetsBase ?>/js/api.js"></script>
   <script src="<?= $assetsBase ?>/js/common.js"></script>
-
-  <!-- Page-specific JavaScript -->
   <?php
   $pageJS = __DIR__ . '/../assets/js/' . $currentPage . '.js';
   if (file_exists($pageJS)) {
