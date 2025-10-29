@@ -8,6 +8,7 @@
     teams: [],
     elements: {
       teamSelect: null,
+      competitionSelect: null,
       list: null
     }
   };
@@ -21,12 +22,15 @@
     state.api = new ApiClient(document.body.dataset.apiBase || '/api');
 
     state.elements.teamSelect = document.querySelector('[data-component="results-team-select"]');
+    state.elements.competitionSelect = document.querySelector('[data-component="results-competition-select"]');
     state.elements.list = document.querySelector('[data-component="results-list"]');
 
     assert(state.elements.teamSelect instanceof HTMLSelectElement, 'Results team select missing');
+    assert(state.elements.competitionSelect instanceof HTMLSelectElement, 'Results competition select missing');
     assert(state.elements.list instanceof HTMLElement, 'Results list container missing');
 
     state.elements.teamSelect.addEventListener('change', handleTeamChange);
+    state.elements.competitionSelect.addEventListener('change', handleCompetitionChange);
 
     void loadTeams();
   }
@@ -50,6 +54,10 @@
 
       state.teams = teams;
       populateTeamSelect(teams);
+
+      if (state.elements.competitionSelect instanceof HTMLSelectElement) {
+        state.elements.competitionSelect.value = '';
+      }
 
       const defaultId = safeParseInt(teams[0]?.id ?? 0);
       if (defaultId > 0) {
@@ -101,6 +109,23 @@
     await loadResultsForTeam(teamId);
   }
 
+  async function handleCompetitionChange(event) {
+    assert(event instanceof Event, 'Competition change handler requires event');
+    const select = event.currentTarget;
+    assert(select instanceof HTMLSelectElement, 'Competition change target must be select');
+
+    const teamSelect = state.elements.teamSelect;
+    assert(teamSelect instanceof HTMLSelectElement, 'Team select must exist for competition filtering');
+
+    const teamId = safeParseInt(teamSelect.value);
+    if (teamId <= 0) {
+      setListMessage('Sélectionnez une équipe avant de filtrer par compétition.');
+      return;
+    }
+
+    await loadResultsForTeam(teamId);
+  }
+
   async function loadResultsForTeam(teamId) {
     assert(state.api !== null, 'API client must be available');
     assert(Number.isInteger(teamId) && teamId > 0, 'Team identifier must be positive integer');
@@ -108,13 +133,22 @@
     setListMessage('Chargement des résultats…');
 
     try {
-      const response = await state.api.getMatchsByEquipe(teamId, { isResult: true, limit: MAX_RESULTS });
+      const competitionType = getSelectedCompetitionType();
+      const options = { isResult: true, limit: MAX_RESULTS };
+      if (competitionType !== null) {
+        options.competitionType = competitionType;
+      }
+
+      const response = await state.api.getMatchsByEquipe(teamId, options);
       assert(typeof response === 'object' && response !== null, 'Invalid response for results');
       const matchs = Array.isArray(response.data) ? response.data : [];
       assert(Array.isArray(matchs), 'Results payload must be an array');
 
       if (matchs.length === 0) {
-        setListMessage('Aucun résultat enregistré pour cette équipe pour le moment.');
+        const emptyMessage = competitionType === null
+          ? 'Aucun résultat enregistré pour cette équipe pour le moment.'
+          : 'Aucun résultat enregistré pour cette équipe dans cette compétition.';
+        setListMessage(emptyMessage);
         return;
       }
 
@@ -224,6 +258,21 @@
       parts.push('Équipe');
     }
     return parts.join(' • ');
+  }
+
+  function getSelectedCompetitionType() {
+    const select = state.elements.competitionSelect;
+    assert(select instanceof HTMLSelectElement, 'Competition select must exist');
+
+    const rawValue = select.value.trim().toUpperCase();
+    assert(rawValue.length <= 2, 'Competition type cannot exceed two characters');
+
+    if (rawValue === '') {
+      return null;
+    }
+
+    assert(rawValue === 'CH' || rawValue === 'CP', 'Competition type must be CH or CP');
+    return rawValue;
   }
 
   function formatDate(dateValue, timeValue) {

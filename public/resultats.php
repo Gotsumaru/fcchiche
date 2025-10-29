@@ -36,16 +36,30 @@ require_once __DIR__ . '/templates/header.php';
                   Le dernier match apparaît toujours en haut de la liste.
                 </p>
               </div>
-              <label class="flex w-full flex-col gap-2 text-left md:w-72">
-                <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Équipe</span>
-                <select
-                  class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
-                  data-component="results-team-select"
-                  aria-label="Filtrer les résultats par équipe"
-                >
-                  <option value="">Chargement…</option>
-                </select>
-              </label>
+              <div class="flex w-full flex-col gap-4 md:w-auto md:flex-row md:items-end">
+                <label class="flex w-full flex-col gap-2 text-left md:w-72">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Équipe</span>
+                  <select
+                    class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+                    data-component="results-team-select"
+                    aria-label="Filtrer les résultats par équipe"
+                  >
+                    <option value="">Chargement…</option>
+                  </select>
+                </label>
+                <label class="flex w-full flex-col gap-2 text-left md:w-64">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Type de compétition</span>
+                  <select
+                    class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+                    data-component="results-competition-select"
+                    aria-label="Filtrer les résultats par type de compétition"
+                  >
+                    <option value="">Toutes compétitions</option>
+                    <option value="CH">Championnat</option>
+                    <option value="CP">Coupe</option>
+                  </select>
+                </label>
+              </div>
             </div>
           </form>
 

@@ -160,6 +160,17 @@ class ApiClient {
             params.journee = options.journee;
         }
 
+        if (options.competitionType !== undefined && options.competitionType !== null) {
+            assert(typeof options.competitionType === 'string', 'Competition type must be string');
+            const normalizedType = options.competitionType.trim().toUpperCase();
+            assert(normalizedType.length <= 2, 'Competition type cannot exceed two characters');
+
+            if (normalizedType !== '') {
+                assert(['CH', 'CP'].includes(normalizedType), 'Competition type must be CH or CP');
+                params.competition_type = normalizedType;
+            }
+        }
+
         return this.get('/matchs.php', params);
     }
 

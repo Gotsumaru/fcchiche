@@ -83,19 +83,40 @@ function handleGet($model): void
         'date_from' => null,
         'date_to' => null,
         'limit' => 20,
-        'equipe_id' => null
+        'equipe_id' => null,
+        'competition_type' => null
     ]);
 
     $limit = (int)$params['limit'];
     assert($limit > 0 && $limit <= 100, 'Limit must be between 1 and 100');
+
+    $competitionType = null;
+    if ($params['competition_type'] !== null) {
+        $candidate = strtoupper(trim((string)$params['competition_type']));
+        assert(strlen($candidate) <= 2, 'Competition type length invalid');
+
+        if ($candidate === '') {
+            $competitionType = null;
+        } elseif (!in_array($candidate, ['CH', 'CP'], true)) {
+            ApiResponse::error('Invalid competition type', 400);
+        } else {
+            $competitionType = $candidate;
+        }
+    }
+
+    assert($competitionType === null || strlen($competitionType) === 2, 'Competition type must be two characters');
+    assert($competitionType === null || in_array($competitionType, ['CH', 'CP'], true), 'Competition type must be normalized');
 
     // Par équipe spécifique
     if ($params['equipe_id'] !== null) {
         $equipeId = (int)$params['equipe_id'];
         assert($equipeId > 0, 'Equipe ID must be positive');
         $isResult = $params['is_result'] !== null ? filter_var($params['is_result'], FILTER_VALIDATE_BOOLEAN) : null;
-        $matchs = $model->getMatchsByEquipeId($equipeId, $isResult, $limit);
-        ApiResponse::success($matchs, ['equipe_id' => $equipeId]);
+        $matchs = $model->getMatchsByEquipeId($equipeId, $isResult, $limit, $competitionType);
+        ApiResponse::success($matchs, [
+            'equipe_id' => $equipeId,
+            'competition_type' => $competitionType
+        ]);
     }
 
     // Match par ID
