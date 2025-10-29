@@ -28,84 +28,57 @@ require_once __DIR__ . '/templates/header.php';
     <section class="relative z-10 bg-off-white/90 py-20">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="glass-card-event-dark rounded-2xl p-8 shadow-2xl">
-          <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
-            <div>
-              <h2 class="text-white text-3xl font-bold">Classement de la poule</h2>
-              <p class="text-gray-300 text-sm">Mise à jour hebdomadaire après chaque journée de championnat.</p>
+          <header class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+            <div class="space-y-2">
+              <h2 class="text-white text-3xl font-bold">Classements par équipe</h2>
+              <p class="text-gray-300 text-sm">
+                Sélectionnez l'équipe du FC Chiché pour afficher son classement de championnat en temps réel.
+              </p>
             </div>
-            <span class="inline-flex items-center justify-center rounded-full bg-primary/20 text-primary text-sm font-semibold px-4 py-2">
-              Dernière mise à jour : 24 octobre 2024
+            <span
+              class="inline-flex min-h-[42px] items-center justify-center rounded-full bg-primary/20 px-4 py-2 text-sm font-semibold text-primary"
+              data-component="classement-meta"
+            >
+              Chargement des classements…
             </span>
           </header>
 
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-white/10">
-              <thead>
-                <tr class="text-left text-gray-200 text-xs uppercase tracking-wide">
-                  <th class="py-3 pr-4">Rang</th>
-                  <th class="py-3 pr-4">Club</th>
-                  <th class="py-3 pr-4 text-center">J</th>
-                  <th class="py-3 pr-4 text-center">G</th>
-                  <th class="py-3 pr-4 text-center">N</th>
-                  <th class="py-3 pr-4 text-center">P</th>
-                  <th class="py-3 pr-4 text-center">Diff</th>
-                  <th class="py-3 text-center">Pts</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-white/10 text-gray-100">
-                <tr class="bg-white/5">
-                  <td class="py-3 pr-4 font-semibold text-primary">1</td>
-                  <td class="py-3 pr-4 font-semibold">FC Chiché</td>
-                  <td class="py-3 pr-4 text-center">8</td>
-                  <td class="py-3 pr-4 text-center">6</td>
-                  <td class="py-3 pr-4 text-center">1</td>
-                  <td class="py-3 pr-4 text-center">1</td>
-                  <td class="py-3 pr-4 text-center">+14</td>
-                  <td class="py-3 text-center text-lg font-bold">19</td>
-                </tr>
-                <tr>
-                  <td class="py-3 pr-4">2</td>
-                  <td class="py-3 pr-4">AS Bressuire</td>
-                  <td class="py-3 pr-4 text-center">8</td>
-                  <td class="py-3 pr-4 text-center">5</td>
-                  <td class="py-3 pr-4 text-center">2</td>
-                  <td class="py-3 pr-4 text-center">1</td>
-                  <td class="py-3 pr-4 text-center">+9</td>
-                  <td class="py-3 text-center font-semibold">17</td>
-                </tr>
-                <tr class="bg-white/5">
-                  <td class="py-3 pr-4">3</td>
-                  <td class="py-3 pr-4">Parthenay FC</td>
-                  <td class="py-3 pr-4 text-center">8</td>
-                  <td class="py-3 pr-4 text-center">4</td>
-                  <td class="py-3 pr-4 text-center">2</td>
-                  <td class="py-3 pr-4 text-center">2</td>
-                  <td class="py-3 pr-4 text-center">+5</td>
-                  <td class="py-3 text-center font-semibold">14</td>
-                </tr>
-                <tr>
-                  <td class="py-3 pr-4">4</td>
-                  <td class="py-3 pr-4">US Thouars</td>
-                  <td class="py-3 pr-4 text-center">8</td>
-                  <td class="py-3 pr-4 text-center">3</td>
-                  <td class="py-3 pr-4 text-center">2</td>
-                  <td class="py-3 pr-4 text-center">3</td>
-                  <td class="py-3 pr-4 text-center">+1</td>
-                  <td class="py-3 text-center font-semibold">11</td>
-                </tr>
-                <tr class="bg-white/5">
-                  <td class="py-3 pr-4">5</td>
-                  <td class="py-3 pr-4">SC Niort</td>
-                  <td class="py-3 pr-4 text-center">8</td>
-                  <td class="py-3 pr-4 text-center">2</td>
-                  <td class="py-3 pr-4 text-center">3</td>
-                  <td class="py-3 pr-4 text-center">3</td>
-                  <td class="py-3 pr-4 text-center">-2</td>
-                  <td class="py-3 text-center font-semibold">9</td>
-                </tr>
-              </tbody>
-            </table>
+          <form class="mt-8 grid gap-4 md:grid-cols-2" data-component="classement-filters" novalidate>
+            <label class="flex flex-col gap-2 text-left">
+              <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Équipe</span>
+              <select
+                class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+                data-component="classement-team-select"
+                aria-label="Sélectionner une équipe"
+              >
+                <option value="">Chargement…</option>
+              </select>
+            </label>
+
+            <label
+              class="hidden flex-col gap-2 text-left"
+              data-component="classement-competition-wrapper"
+            >
+              <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Compétition</span>
+              <select
+                class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+                data-component="classement-competition-select"
+                aria-label="Sélectionner une compétition"
+              ></select>
+            </label>
+          </form>
+
+          <div class="mt-10 overflow-x-auto" data-component="classement-table" aria-live="polite">
+            <p class="text-sm text-gray-300">
+              Choisissez une équipe pour afficher son classement.
+            </p>
           </div>
+
+          <noscript>
+            <p class="mt-6 rounded-xl bg-white/10 p-4 text-sm text-amber-200">
+              Activez JavaScript pour consulter les classements dynamiques du club.
+            </p>
+          </noscript>
         </div>
       </div>
     </section>

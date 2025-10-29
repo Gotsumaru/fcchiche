@@ -27,66 +27,43 @@ require_once __DIR__ . '/templates/header.php';
 
     <section class="relative z-10 bg-off-white/90 py-20">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid gap-8 md:grid-cols-2">
-          <?php
-          $matches = [
-            [
-              'date' => '20 octobre 2024',
-              'competition' => 'Championnat - Journée 8',
-              'opponent' => 'AS Bressuire',
-              'score' => '2 - 1',
-              'summary' => "Victoire dans les dernières minutes grâce à un but de Martin sur coup franc."
-            ],
-            [
-              'date' => '13 octobre 2024',
-              'competition' => 'Championnat - Journée 7',
-              'opponent' => 'US Thouars',
-              'score' => '3 - 0',
-              'summary' => "Solide prestation défensive et doublé de Le Gall dans le dernier quart d'heure."
-            ],
-            [
-              'date' => '06 octobre 2024',
-              'competition' => 'Coupe des Deux-Sèvres - 16e',
-              'opponent' => 'SC Niort',
-              'score' => '1 - 1 (4-3 TAB)',
-              'summary' => "Qualification aux tirs au but après une rencontre très disputée."
-            ],
-            [
-              'date' => '29 septembre 2024',
-              'competition' => 'Championnat - Journée 6',
-              'opponent' => 'Parthenay FC',
-              'score' => '0 - 0',
-              'summary' => "Match fermé mais un point précieux à l'extérieur."
-            ],
-          ];
-
-          foreach ($matches as $match) :
-            ?>
-            <article class="glass-card-event-dark rounded-2xl p-6 shadow-xl">
-              <header class="flex flex-col gap-2">
-                <p class="text-primary text-sm font-semibold uppercase tracking-wider">
-                  <?= htmlspecialchars($match['competition'], ENT_QUOTES, 'UTF-8') ?>
-                </p>
-                <h2 class="text-white text-2xl font-bold">
-                  FC Chiché vs <?= htmlspecialchars($match['opponent'], ENT_QUOTES, 'UTF-8') ?>
-                </h2>
-              </header>
-              <div class="mt-4 flex flex-col gap-3 text-gray-200">
-                <p class="text-sm flex items-center gap-2">
-                  <span class="material-symbols-outlined text-primary">event</span>
-                  <?= htmlspecialchars($match['date'], ENT_QUOTES, 'UTF-8') ?>
-                </p>
-                <p class="text-4xl font-black text-white drop-shadow">
-                  <?= htmlspecialchars($match['score'], ENT_QUOTES, 'UTF-8') ?>
-                </p>
-                <p class="text-sm leading-relaxed text-gray-300">
-                  <?= htmlspecialchars($match['summary'], ENT_QUOTES, 'UTF-8') ?>
+        <div class="flex flex-col gap-8">
+          <form class="glass-card-event-dark rounded-2xl p-6 shadow-xl" data-component="results-filters" novalidate>
+            <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div class="space-y-2">
+                <h2 class="text-white text-2xl font-bold">Derniers résultats par équipe</h2>
+                <p class="text-sm text-gray-300">
+                  Le dernier match apparaît toujours en haut de la liste.
                 </p>
               </div>
-            </article>
-            <?php
-          endforeach;
-          ?>
+              <label class="flex w-full flex-col gap-2 text-left md:w-72">
+                <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Équipe</span>
+                <select
+                  class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+                  data-component="results-team-select"
+                  aria-label="Filtrer les résultats par équipe"
+                >
+                  <option value="">Chargement…</option>
+                </select>
+              </label>
+            </div>
+          </form>
+
+          <div
+            class="grid gap-8 md:grid-cols-2"
+            data-component="results-list"
+            aria-live="polite"
+          >
+            <p class="glass-card-event-dark rounded-2xl p-6 text-sm text-gray-300">
+              Choisissez une équipe pour afficher ses derniers résultats officiels.
+            </p>
+          </div>
+
+          <noscript>
+            <p class="rounded-2xl bg-white/10 p-4 text-sm text-amber-200">
+              Activez JavaScript pour consulter les résultats dynamiques du FC Chiché.
+            </p>
+          </noscript>
         </div>
       </div>
     </section>

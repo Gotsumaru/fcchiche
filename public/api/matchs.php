@@ -82,12 +82,22 @@ function handleGet($model): void
         'journee' => null,
         'date_from' => null,
         'date_to' => null,
-        'limit' => 20
+        'limit' => 20,
+        'equipe_id' => null
     ]);
-    
+
     $limit = (int)$params['limit'];
     assert($limit > 0 && $limit <= 100, 'Limit must be between 1 and 100');
-    
+
+    // Par équipe spécifique
+    if ($params['equipe_id'] !== null) {
+        $equipeId = (int)$params['equipe_id'];
+        assert($equipeId > 0, 'Equipe ID must be positive');
+        $isResult = $params['is_result'] !== null ? filter_var($params['is_result'], FILTER_VALIDATE_BOOLEAN) : null;
+        $matchs = $model->getMatchsByEquipeId($equipeId, $isResult, $limit);
+        ApiResponse::success($matchs, ['equipe_id' => $equipeId]);
+    }
+
     // Match par ID
     if ($params['id'] !== null) {
         $match = $model->getMatchById((int)$params['id']);

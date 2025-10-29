@@ -162,6 +162,11 @@ curl https://fcchiche.fr/api/matchs?last_results=10
 curl https://fcchiche.fr/api/matchs?competition_id=123
 ```
 
+**GET /api/matchs?equipe_id=12&is_result=true** - Résultats d'une équipe
+```bash
+curl https://fcchiche.fr/api/matchs?equipe_id=12&is_result=true&limit=5
+```
+
 **GET /api/matchs?category=SEM&is_result=false** - Calendrier d'une équipe
 ```bash
 curl https://fcchiche.fr/api/matchs?category=SEM&is_result=false
