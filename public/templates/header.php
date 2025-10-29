@@ -75,15 +75,15 @@ $currentPage = basename($_SERVER['SCRIPT_FILENAME'], '.php');
   <!-- ====================================================================
        CONTENEUR PRINCIPAL
        ==================================================================== -->
-  <div class="relative flex w-full flex-col group/design-root overflow-x-hidden pb-32 lg:pb-0">
+    <div class="page-shell relative flex w-full flex-col group/design-root overflow-x-hidden">
 
     <!-- ==================================================================
          HEADER - MENU DOCK LIQUID GLASS
          Desktop: Top center with max-width
          Mobile: Bottom full-width like iPhone
          ================================================================== -->
-    <header class="fixed lg:top-3 bottom-0 lg:bottom-auto z-50 flex justify-center w-full lg:px-4 lg:px-6 lg:px-8">
-      <div class="liquidGlass-wrapper dock w-full lg:max-w-6xl lg:rounded-xl rounded-none">
+    <header class="site-dock fixed inset-x-0 z-50 flex justify-center px-4 sm:px-6 lg:px-8">
+      <div class="liquidGlass-wrapper dock w-full rounded-none lg:max-w-6xl lg:rounded-xl">
         <!-- Couches d'effet du menu -->
         <div class="liquidGlass-effect"></div>
         <div class="liquidGlass-tint"></div>
@@ -118,3 +118,5 @@ $currentPage = basename($_SERVER['SCRIPT_FILENAME'], '.php');
     <div class="scroll-indicator" aria-hidden="true">
       <div class="mouse"></div>
     </div>
+
+    <main class="page-shell__content flex flex-col flex-1" id="page-content">
