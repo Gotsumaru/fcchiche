@@ -1,29 +1,61 @@
-/**
- * COMMON JAVASCRIPT - SHARED ACROSS ALL PAGES
- */
+(function () {
+  'use strict';
 
-// Masquer l'indicateur de scroll après le début du défilement
-window.addEventListener('scroll', () => {
-  const scrollIndicator = document.querySelector('.scroll-indicator');
-  if (scrollIndicator) {
-    if (window.scrollY > 100) {
-      scrollIndicator.style.opacity = '0';
-      scrollIndicator.style.transition = 'opacity 0.5s ease';
-    } else if (window.scrollY === 0) {
-      scrollIndicator.style.opacity = '1';
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.querySelector('[data-nav-toggle]');
+    const menu = document.querySelector('[data-nav-menu]');
+
+    if (!(toggle instanceof HTMLElement) || !(menu instanceof HTMLElement)) {
+      return;
     }
-  }
-});
 
-// Effet parallaxe sur l'image de la section événement
-window.addEventListener('scroll', () => {
-  const parallaxImage = document.querySelector('.parallax-image');
-  if (parallaxImage) {
-    const rect = parallaxImage.getBoundingClientRect();
+    const label = toggle.querySelector('.sr-only');
+    const icon = toggle.querySelector('.material-symbols-outlined');
+    const links = menu.querySelectorAll('a');
+    const desktopQuery = window.matchMedia('(min-width: 1024px)');
 
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      const offset = (window.innerHeight - rect.top) * 0.1;
-      parallaxImage.style.transform = `translateY(${offset}px)`;
+    const setMenuState = (isOpen) => {
+      console.assert(toggle instanceof HTMLElement, 'Toggle element must exist');
+      console.assert(menu instanceof HTMLElement, 'Navigation element must exist');
+
+      menu.classList.toggle('is-open', isOpen);
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      toggle.setAttribute('aria-label', isOpen ? 'Fermer la navigation' : 'Ouvrir la navigation');
+
+      if (label instanceof HTMLElement) {
+        label.textContent = isOpen ? 'Fermer la navigation' : 'Ouvrir la navigation';
+      }
+
+      if (icon instanceof HTMLElement) {
+        icon.textContent = isOpen ? 'close' : 'menu';
+      }
+    };
+
+    const handleToggle = () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      setMenuState(!expanded);
+    };
+
+    toggle.addEventListener('click', handleToggle);
+
+    links.forEach((link) => {
+      link.addEventListener('click', () => {
+        setMenuState(false);
+      });
+    });
+
+    if (typeof desktopQuery.addEventListener === 'function') {
+      desktopQuery.addEventListener('change', (event) => {
+        if (event.matches) {
+          setMenuState(false);
+        }
+      });
+    } else if (typeof desktopQuery.addListener === 'function') {
+      desktopQuery.addListener((event) => {
+        if (event.matches) {
+          setMenuState(false);
+        }
+      });
     }
-  }
-});
+  });
+})();
