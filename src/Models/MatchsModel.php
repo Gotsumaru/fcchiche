@@ -504,12 +504,12 @@ class MatchsModel
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
                 LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON
                     (CASE
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id
+                        WHEN m.home_club_id != :club_id_case THEN m.home_club_id
                         ELSE m.away_club_id
                     END) = cc.cl_no
                 WHERE (
-                    (m.home_club_id = :club_id AND m.home_team_category = :category AND m.home_team_number = :team_number)
-                    OR (m.away_club_id = :club_id AND m.away_team_category = :category AND m.away_team_number = :team_number)
+                    (m.home_club_id = :club_id_home AND m.home_team_category = :category AND m.home_team_number = :team_number)
+                    OR (m.away_club_id = :club_id_away AND m.away_team_category = :category AND m.away_team_number = :team_number)
                 )";
 
         if ($isResult !== null) {
@@ -528,22 +528,32 @@ class MatchsModel
         }
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':club_id', API_FFF_CLUB_ID, PDO::PARAM_INT);
-        $stmt->bindValue(':category', $team['category_code'], PDO::PARAM_STR);
-        $stmt->bindValue(':team_number', (int)$team['number'], PDO::PARAM_INT);
+
+        $params = [
+            'club_id_case' => API_FFF_CLUB_ID,
+            'club_id_home' => API_FFF_CLUB_ID,
+            'club_id_away' => API_FFF_CLUB_ID,
+            'category' => $team['category_code'],
+            'team_number' => (int)$team['number'],
+        ];
 
         if ($isResult !== null) {
-            $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
+            $params['is_result'] = $isResult ? 1 : 0;
         }
 
         if ($competitionType !== null) {
-            $stmt->bindValue(':competition_type', $competitionType, PDO::PARAM_STR);
+            $params['competition_type'] = $competitionType;
+        }
+
+        foreach ($params as $name => $value) {
+            $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue(':' . $name, $value, $type);
         }
 
         if ($limit !== null && $limit > 0) {
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         }
-        
+
         $stmt->execute();
         $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
