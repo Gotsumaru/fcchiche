@@ -508,8 +508,8 @@ class MatchsModel
                         ELSE m.away_club_id
                     END) = cc.cl_no
                 WHERE (
-                    (m.home_club_id = :club_id_home AND m.home_team_category = :category AND m.home_team_number = :team_number)
-                    OR (m.away_club_id = :club_id_away AND m.away_team_category = :category AND m.away_team_number = :team_number)
+                    (m.home_club_id = :club_id_home AND m.home_team_category = :home_category AND m.home_team_number = :home_team_number)
+                    OR (m.away_club_id = :club_id_away AND m.away_team_category = :away_category AND m.away_team_number = :away_team_number)
                 )";
 
         if ($isResult !== null) {
@@ -533,8 +533,10 @@ class MatchsModel
             'club_id_case' => API_FFF_CLUB_ID,
             'club_id_home' => API_FFF_CLUB_ID,
             'club_id_away' => API_FFF_CLUB_ID,
-            'category' => $team['category_code'],
-            'team_number' => (int)$team['number'],
+            'home_category' => $team['category_code'],
+            'home_team_number' => (int)$team['number'],
+            'away_category' => $team['category_code'],
+            'away_team_number' => (int)$team['number'],
         ];
 
         if ($isResult !== null) {
