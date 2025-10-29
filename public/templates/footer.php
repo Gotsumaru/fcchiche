@@ -1,7 +1,9 @@
+      </main><!-- /#page-content -->
+
       <!-- ==================================================================
            FOOTER - LIQUID GLASS DESIGN
            ================================================================== -->
-      <footer class="w-full mt-24 pt-16 pb-24 lg:pb-12 relative min-h-[400px]">
+      <footer class="footer-shell relative mt-auto w-full pt-16 pb-24 lg:mt-24 lg:pb-12 min-h-[400px]">
         <!-- Image de fond pour le footer -->
         <div class="absolute inset-0 overflow-hidden">
           <div
@@ -78,7 +80,6 @@
         </div>
       </footer>
     </div>
-  </div>
 
   <!-- ====================================================================
        SCRIPTS

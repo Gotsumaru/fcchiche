@@ -20,6 +20,65 @@
 }
 
 /* ======================================================================
+   LAYOUT STRUCTURE - GLOBAL PAGE SHELL
+   ====================================================================== */
+:root {
+  --dock-safe-area: env(safe-area-inset-bottom, 0px);
+  --dock-mobile-height: 6.5rem;
+}
+
+.page-shell {
+  min-height: 100dvh;
+}
+
+@supports not (min-height: 100dvh) {
+  .page-shell {
+    min-height: 100vh;
+  }
+}
+
+.page-shell__content {
+  display: flex;
+  flex-direction: column;
+  padding-top: 1.5rem;
+  padding-bottom: calc(var(--dock-mobile-height) + var(--dock-safe-area));
+}
+
+.footer-shell {
+  margin-top: auto;
+  padding-bottom: calc(4rem + var(--dock-safe-area));
+}
+
+.site-dock {
+  left: 0;
+  right: 0;
+  bottom: var(--dock-safe-area);
+  top: auto;
+  padding-bottom: var(--dock-safe-area);
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --dock-mobile-height: 0px;
+  }
+
+  .page-shell__content {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .footer-shell {
+    padding-bottom: 3rem;
+  }
+
+  .site-dock {
+    top: 0.75rem;
+    bottom: auto;
+    padding-bottom: 0;
+  }
+}
+
+/* ======================================================================
    SECTION HERO - EFFET VITRE LIQUIDE
    Partagé entre l'accueil et les pages internes
    ====================================================================== */
@@ -301,11 +360,6 @@
 @media (max-width: 1023px) {
   .scroll-indicator {
     display: none;
-  }
-
-  .glass-card-event-dark{
-    position: absolute;
-    bottom: 5px;
   }
 }
 
