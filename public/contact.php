@@ -1,113 +1,56 @@
 <?php
 declare(strict_types=1);
 
+$pageTitle = 'Contact | FC Chiché';
+
 require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/templates/header.php';
 ?>
-      <section class="page-hero">
-        <div class="page-hero__inner">
-          <div class="page-hero__content">
-            <span class="page-hero__eyebrow">Restons connectés</span>
-            <h1 class="page-hero__title">Contactez le FC Chiché</h1>
-            <p class="page-hero__subtitle">
-              Licences, partenariats, presse ou bénévolat : notre équipe vous accompagne et répond rapidement à vos demandes.
-            </p>
-            <div class="chip-list">
-              <span class="chip">Réponse sous 48h</span>
-              <span class="chip">Partenaires &amp; bénévoles</span>
-              <span class="chip">Support licences</span>
-            </div>
-          </div>
-          <div class="page-hero__media">
-            <img
-              src="https://images.unsplash.com/photo-1521412644187-c49fa049e84d?q=80&amp;auto=format&amp;fit=crop&amp;w=1200"
-              alt="Supporters rassemblés autour du stade"
-              loading="lazy"
-            />
-          </div>
-        </div>
-      </section>
-
       <section class="section">
         <div class="container">
-          <div class="contact-grid">
-            <article class="panel-card contact-card">
-              <header class="panel-card__header">
-                <div>
-                  <h2 class="panel-card__title">Écrivez-nous</h2>
-                  <p class="panel-card__subtitle">Complétez le formulaire, nous revenons vers vous au plus vite.</p>
+          <div class="section__header">
+            <span class="section__eyebrow">Nous contacter</span>
+            <h1 class="section__title">Contactez-nous</h1>
+            <p class="section__subtitle">Le secrétariat répond à toutes vos questions sur les inscriptions, partenariats et matchs.</p>
+          </div>
+
+          <div class="grid" style="gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+            <div class="contact-card">
+              <div class="contact-card__info">
+                <strong>Adresse</strong>
+                <p>Stade de Chiché, 79350 Chiché</p>
+                <strong>Email</strong>
+                <p><a href="mailto:contact@fcchiche.fr">contact@fcchiche.fr</a></p>
+                <strong>Téléphone</strong>
+                <p><a href="tel:0600000000">06 00 00 00 00</a></p>
+                <strong>Horaires</strong>
+                <p>Lundi – Vendredi : 18h–20h<br />Samedi – Dimanche : selon matchs</p>
+              </div>
+              <form class="form-shell" method="post" action="#" novalidate>
+                <div class="form-row">
+                  <label class="label" for="lastname">Nom</label>
+                  <input class="input" id="lastname" name="lastname" type="text" required />
+                  <label class="label" for="firstname">Prénom</label>
+                  <input class="input" id="firstname" name="firstname" type="text" required />
                 </div>
-              </header>
-              <form class="contact-card__form" method="post" action="#" autocomplete="off" novalidate>
-                <label class="panel-card__field">
-                  <span>Nom complet</span>
-                  <input id="name" name="name" type="text" placeholder="Jean Dupont" required />
-                </label>
-                <label class="panel-card__field">
-                  <span>Adresse e-mail</span>
-                  <input id="email" name="email" type="email" placeholder="vous@exemple.com" autocomplete="email" required />
-                </label>
-                <label class="panel-card__field">
-                  <span>Téléphone</span>
-                  <input id="phone" name="phone" type="tel" placeholder="06 00 00 00 00" autocomplete="tel" />
-                </label>
-                <label class="panel-card__field">
-                  <span>Objet</span>
-                  <input id="subject" name="subject" type="text" placeholder="Objet de votre message" required />
-                </label>
-                <label class="panel-card__field">
-                  <span>Message</span>
-                  <textarea id="message" name="message" rows="5" placeholder="Détaillez votre demande…" required></textarea>
-                </label>
+                <label class="label" for="email">Email</label>
+                <input class="input" id="email" name="email" type="email" required />
+                <label class="label" for="subject">Sujet</label>
+                <input class="input" id="subject" name="subject" type="text" required />
+                <label class="label" for="message">Message</label>
+                <textarea class="textarea" id="message" name="message" required></textarea>
                 <button class="btn btn--primary" type="submit">Envoyer</button>
               </form>
-            </article>
-
-            <aside class="panel-card contact-card">
-              <div class="panel-card__header">
-                <h2 class="panel-card__title">Coordonnées</h2>
-                <p class="panel-card__subtitle">Stade municipal — Rue du Stade, 79350 Chiché</p>
-              </div>
-              <div class="contact-card__info">
-                <div class="contact-list">
-                  <span>Standard : 05&nbsp;49&nbsp;00&nbsp;00&nbsp;00 (mercredi 18h-20h)</span>
-                  <span>Administratif : <a href="mailto:contact@fcchiche.fr">contact@fcchiche.fr</a></span>
-                  <span>Partenariats : <a href="mailto:partenaires@fcchiche.fr">partenaires@fcchiche.fr</a></span>
-                </div>
-                <div class="pill-list">
-                  <span>Instagram</span>
-                  <span>Facebook</span>
-                  <span>YouTube</span>
-                </div>
-                <p class="section__subtitle">
-                  Permanence au club-house les soirs de match à domicile et le samedi matin (licences jeunes).
-                </p>
-              </div>
-            </aside>
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--tint">
-        <div class="container">
-          <div class="highlight-grid">
-            <article class="highlight-card">
-              <h3 class="highlight-card__title">Venir au stade</h3>
-              <p>Parkings gratuits, accès PMR dédié et navette centre-bourg les jours de grosses affluences.</p>
-              <div class="pill-list">
-                <span>Parking Nord</span>
-                <span>Navette supporters</span>
-                <span>Accueil PMR</span>
-              </div>
-            </article>
-            <article class="highlight-card">
-              <h3 class="highlight-card__title">Rejoindre l'équipe bénévole</h3>
-              <p>
-                Buvette, accueil, logistique ou communication : toutes les compétences sont les bienvenues pour faire grandir le
-                club.
-              </p>
-              <a class="feature-card__link" href="mailto:benevoles@fcchiche.fr">Écrire à la cellule bénévoles</a>
-            </article>
+            </div>
+            <div class="map-shell">
+              <iframe
+                title="Localisation du FC Chiché"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2706.655193924687!2d-0.543!3d46.783!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x480799b0517d8623%3A0x5d6587b9e90b8e0!2sChich%C3%A9!5e0!3m2!1sfr!2sfr!4v1700000000000"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+              ></iframe>
+            </div>
           </div>
         </div>
       </section>

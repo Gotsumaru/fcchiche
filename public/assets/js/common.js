@@ -9,10 +9,8 @@
       return;
     }
 
-    const label = toggle.querySelector('.sr-only');
-    const icon = toggle.querySelector('.material-symbols-outlined');
-    const links = menu.querySelectorAll('a');
-    const desktopQuery = window.matchMedia('(min-width: 1024px)');
+    const srLabel = toggle.querySelector('.sr-only');
+    const desktopQuery = window.matchMedia('(min-width: 1025px)');
 
     const setMenuState = (isOpen) => {
       console.assert(toggle instanceof HTMLElement, 'Toggle element must exist');
@@ -22,40 +20,34 @@
       toggle.setAttribute('aria-expanded', String(isOpen));
       toggle.setAttribute('aria-label', isOpen ? 'Fermer la navigation' : 'Ouvrir la navigation');
 
-      if (label instanceof HTMLElement) {
-        label.textContent = isOpen ? 'Fermer la navigation' : 'Ouvrir la navigation';
+      if (srLabel instanceof HTMLElement) {
+        srLabel.textContent = isOpen ? 'Fermer la navigation' : 'Ouvrir la navigation';
       }
 
-      if (icon instanceof HTMLElement) {
-        icon.textContent = isOpen ? 'close' : 'menu';
-      }
+      document.body.classList.toggle('nav-is-open', isOpen);
     };
 
-    const handleToggle = () => {
+    toggle.addEventListener('click', () => {
       const expanded = toggle.getAttribute('aria-expanded') === 'true';
       setMenuState(!expanded);
-    };
+    });
 
-    toggle.addEventListener('click', handleToggle);
-
-    links.forEach((link) => {
+    menu.querySelectorAll('a').forEach((link) => {
       link.addEventListener('click', () => {
         setMenuState(false);
       });
     });
 
+    const syncWithViewport = (event) => {
+      if (event.matches) {
+        setMenuState(false);
+      }
+    };
+
     if (typeof desktopQuery.addEventListener === 'function') {
-      desktopQuery.addEventListener('change', (event) => {
-        if (event.matches) {
-          setMenuState(false);
-        }
-      });
+      desktopQuery.addEventListener('change', syncWithViewport);
     } else if (typeof desktopQuery.addListener === 'function') {
-      desktopQuery.addListener((event) => {
-        if (event.matches) {
-          setMenuState(false);
-        }
-      });
+      desktopQuery.addListener(syncWithViewport);
     }
   });
 })();

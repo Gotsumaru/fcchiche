@@ -2,51 +2,34 @@
 declare(strict_types=1);
 
 /**
- * Page d'accueil - FC Chiché
+ * Page d'accueil — FC Chiché
  */
 
-require_once __DIR__ . '/bootstrap.php';
+$pageTitle = 'Accueil | FC Chiché';
 
+require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/templates/header.php';
 ?>
-      <section class="landing-hero">
-        <div class="landing-hero__inner">
-          <div>
-            <span class="landing-hero__badge">FC Chiché 1960</span>
-            <h1 class="landing-hero__title">Le vert et blanc dans une nouvelle dynamique</h1>
-            <p class="landing-hero__subtitle">
-              FC Chiché modernise son expérience supporters : un suivi temps réel des équipes, une identité affirmée et des
-              rendez-vous qui rassemblent toute la commune.
-            </p>
-            <div class="landing-hero__actions">
-              <a class="btn btn--primary" href="<?= $basePath ?>/calendrier">Découvrir le calendrier</a>
-              <a class="btn btn--ghost" href="<?= $basePath ?>/resultats">Derniers résultats</a>
-            </div>
-            <aside class="score-panel">
-              <div class="score-panel__label">Prochain rendez-vous</div>
-              <div class="score-panel__match">
-                <div class="score-panel__team">
-                  <span>FC Chiché</span>
-                  <span class="score-panel__hint">Stade de La Broche</span>
-                </div>
-                <div class="score-panel__score">18h00</div>
-                <div class="score-panel__team">
-                  <span>US Parthenay</span>
-                  <span class="score-panel__hint">Samedi 9 novembre</span>
-                </div>
-              </div>
-              <div class="score-panel__details">
-                <span>Championnat Départemental 1</span>
-                <span>Ouverture des portes : 16h30 — Restauration locale</span>
-              </div>
-            </aside>
-          </div>
-          <div class="landing-hero__media">
-            <img
-              src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?q=80&amp;auto=format&amp;fit=crop&amp;w=1200"
-              alt="Joueur du FC Chiché célébrant un but"
-              loading="lazy"
-            />
+      <section class="hero">
+        <div
+          class="hero__background"
+          style="background-image: url('https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1800&q=80');"
+          aria-hidden="true"
+        ></div>
+        <div class="hero__overlay" aria-hidden="true"></div>
+        <div class="hero__content">
+          <img
+            class="hero__logo"
+            src="<?= $assetsBase ?>/images/logo.svg"
+            width="120"
+            height="120"
+            alt="Emblème FC Chiché"
+          />
+          <h1 class="hero__title">La passion du football depuis 1946</h1>
+          <p class="hero__subtitle">Club de football amateur du bocage bressuirais.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="<?= $basePath ?>/resultats">Résultats</a>
+            <a class="btn btn--secondary" href="<?= $basePath ?>/matchs">Matchs à venir</a>
           </div>
         </div>
       </section>
@@ -54,139 +37,78 @@ require_once __DIR__ . '/templates/header.php';
       <section class="section">
         <div class="container">
           <div class="section__header">
-            <span class="section__eyebrow">Identité club</span>
-            <h2 class="section__title">Une vision ambitieuse ancrée dans les Deux-Sèvres</h2>
+            <span class="section__eyebrow">Le club</span>
+            <h2 class="section__title">Un club, une famille, une histoire</h2>
             <p class="section__subtitle">
-              L'équipe dirigeante, les bénévoles et les supporters travaillent de concert pour faire rayonner FC Chiché des U6
-              aux seniors. Chaque rencontre est pensée pour offrir un moment de partage.
+              Fondé en 1946, le FC Chiché fait vibrer le bocage depuis plusieurs générations. Le club regroupe aujourd'hui des
+              équipes séniors, U17, U15 et U13, animées par la passion, le respect et la convivialité.
             </p>
-          </div>
-          <div class="feature-grid">
-            <article class="feature-card">
-              <div class="feature-card__icon" aria-hidden="true">⚽</div>
-              <h3>Formation exigeante</h3>
-              <p>
-                Éducateurs diplômés, suivi scolaire renforcé, séances vidéo : le parcours vert et blanc accompagne chaque joueur
-                dans sa progression.
-              </p>
-              <a class="feature-card__link" href="<?= $basePath ?>/contact">Rejoindre l'école de foot</a>
-            </article>
-            <article class="feature-card">
-              <div class="feature-card__icon" aria-hidden="true">🎟️</div>
-              <h3>Expérience supporters</h3>
-              <p>
-                Billetterie en ligne, espaces familles et animations partenaires assurent une ambiance chaleureuse à La
-                Broche.
-              </p>
-              <a class="feature-card__link" href="<?= $basePath ?>/calendrier">Préparer ma venue</a>
-            </article>
-            <article class="feature-card">
-              <div class="feature-card__icon" aria-hidden="true">🤝</div>
-              <h3>Communauté solidaire</h3>
-              <p>
-                70 bénévoles, un réseau de partenaires fidèles et des initiatives solidaires toute l'année au service du
-                territoire.
-              </p>
-              <a class="feature-card__link" href="<?= $basePath ?>/contact">Devenir bénévole</a>
-            </article>
-          </div>
-          <div class="stat-ribbon">
-            <div class="stat-ribbon__item">
-              <div class="stat-ribbon__value">180+</div>
-              <div class="stat-ribbon__label">Licenciés engagés</div>
-            </div>
-            <div class="stat-ribbon__item">
-              <div class="stat-ribbon__value">9 équipes</div>
-              <div class="stat-ribbon__label">Des U6 aux seniors</div>
-            </div>
-            <div class="stat-ribbon__item">
-              <div class="stat-ribbon__value">1 200</div>
-              <div class="stat-ribbon__label">Supporters chaque saison</div>
-            </div>
-            <div class="stat-ribbon__item">
-              <div class="stat-ribbon__value">60 ans</div>
-              <div class="stat-ribbon__label">De passion partagée</div>
+            <div class="hero__actions" style="margin-top: 2.5rem;">
+              <a class="btn btn--primary" href="<?= $basePath ?>/equipes">Découvrir nos équipes</a>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="section section--tint">
+      <section class="section section--alt">
         <div class="container">
-          <div class="story-split">
-            <div class="story-split__media">
-              <img
-                src="https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?q=80&amp;auto=format&amp;fit=crop&amp;w=1200"
-                alt="Coup d'envoi dans le stade de La Broche"
-                loading="lazy"
-              />
-              <span class="story-split__badge">Matchday FC Chiché</span>
-            </div>
-            <div class="story-split__content">
-              <span class="section__eyebrow">Au cœur du jeu</span>
-              <h2 class="section__title">Suivez nos équipes sur toutes les compétitions</h2>
-              <p class="section__subtitle">
-                Calendrier interactif, fiches matchs, classements détaillés : les données officielles sont consolidées dans une
-                interface fluide pensée pour le mobile comme pour le desktop.
-              </p>
-              <ul class="bullet-list">
-                <li>Classements mis à jour automatiquement après validation fédérale</li>
-                <li>Résumés de matchs avec buteurs et faits marquants</li>
-                <li>Filtres multi-équipes pour naviguer rapidement</li>
-              </ul>
-              <div class="landing-hero__actions">
-                <a class="btn btn--primary" href="<?= $basePath ?>/resultats">Consulter les résultats</a>
-                <a class="btn btn--ghost" href="<?= $basePath ?>/classement">Voir les classements</a>
+          <div class="section__header">
+            <span class="section__eyebrow">Actualités</span>
+            <h2 class="section__title">Actualités récentes</h2>
+          </div>
+          <div class="news-grid">
+            <article class="news-card">
+              <div class="news-card__image">
+                <img src="https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=1600&q=80" alt="Victoire des séniors" />
               </div>
-            </div>
+              <div class="news-card__content">
+                <span class="card-meta">Équipe Séniors</span>
+                <h3 class="news-card__title">Victoire des séniors face à L'Absie — 2–0 !</h3>
+                <p class="news-card__excerpt">Un match maîtrisé et un doublé décisif pour offrir trois points précieux au FC Chiché.</p>
+              </div>
+            </article>
+            <article class="news-card">
+              <div class="news-card__image">
+                <img src="https://images.unsplash.com/photo-1505672678657-cc7037095e2c?auto=format&fit=crop&w=1600&q=80" alt="Tournoi jeunes" />
+              </div>
+              <div class="news-card__content">
+                <span class="card-meta">Jeunes</span>
+                <h3 class="news-card__title">Tournoi jeunes : une journée sous le soleil du bocage</h3>
+                <p class="news-card__excerpt">Des sourires, des buts et une ambiance conviviale pour toutes les catégories U13 à U17.</p>
+              </div>
+            </article>
+            <article class="news-card">
+              <div class="news-card__image">
+                <img src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80" alt="Soirée partenaires" />
+              </div>
+              <div class="news-card__content">
+                <span class="card-meta">Partenaires</span>
+                <h3 class="news-card__title">Retour sur la soirée partenaires 2025</h3>
+                <p class="news-card__excerpt">Le club a dévoilé sa feuille de route 2025 devant plus de 40 entreprises locales réunies.</p>
+              </div>
+            </article>
           </div>
         </div>
       </section>
 
       <section class="section">
         <div class="container">
-          <div class="highlight-grid">
-            <article class="highlight-card">
-              <h3 class="highlight-card__title">Projets infrastructures</h3>
-              <p>
-                Le terrain d'honneur sera équipé d'une nouvelle éclairage LED et d'une tribune couverte pour améliorer le
-                confort supporters.
-              </p>
-              <p class="section__subtitle">Mise en service prévue pour mars 2025.</p>
-            </article>
-            <article class="highlight-card">
-              <h3 class="highlight-card__title">Académie féminine</h3>
-              <p>
-                Un pôle dédié accompagne la section féminine du FC Chiché avec deux créneaux hebdomadaires et un suivi
-                individualisé.
-              </p>
-              <div class="pill-list">
-                <span>U13F</span>
-                <span>U16F</span>
-                <span>Senior F</span>
-              </div>
-            </article>
+          <div class="section__header">
+            <span class="section__eyebrow">Soutiens</span>
+            <h2 class="section__title">Nos partenaires</h2>
+            <p class="section__subtitle">Merci à toutes les entreprises qui soutiennent le FC Chiché.</p>
           </div>
-          <div class="cta-panel">
-            <div>
-              <h2 class="section__title">Newsletter FC Chiché Inside</h2>
-              <p>
-                Matchs, événements partenaires, actions solidaires : recevez une fois par mois l'essentiel de l'actualité du
-                club.
-              </p>
-            </div>
-            <form class="cta-panel__form" method="post" action="#" novalidate>
-              <label class="sr-only" for="newsletter-email">Adresse e-mail</label>
-              <input
-                id="newsletter-email"
-                name="email"
-                type="email"
-                placeholder="prenom.nom@email.com"
-                autocomplete="email"
-                required
-              />
-              <button class="btn btn--accent" type="submit">Je m'inscris</button>
-            </form>
+          <div class="partner-marquee" role="list">
+            <span class="partner-marquee__item" role="listitem">BCZ</span>
+            <span class="partner-marquee__item" role="listitem">Boche Chaussure</span>
+            <span class="partner-marquee__item" role="listitem">Cholet Traiteur</span>
+            <span class="partner-marquee__item" role="listitem">CR7</span>
+            <span class="partner-marquee__item" role="listitem">Clochard Dolor</span>
+            <span class="partner-marquee__item" role="listitem">Chiché Automobile</span>
+            <span class="partner-marquee__item" role="listitem">Maison Dubois</span>
+          </div>
+          <div class="hero__actions" style="margin-top: 2.5rem;">
+            <a class="btn btn--primary" href="<?= $basePath ?>/partenaires">Devenir partenaire</a>
           </div>
         </div>
       </section>
