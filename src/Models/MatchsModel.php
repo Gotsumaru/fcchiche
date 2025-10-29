@@ -461,45 +461,85 @@ class MatchsModel
      * @param int|null $limit Limite de résultats
      * @return array Liste des matchs de l'équipe
      */
-    public function getMatchsByEquipeId(int $equipeId, ?bool $isResult = null, ?int $limit = null): array
+    public function getMatchsByEquipeId(
+        int $equipeId,
+        ?bool $isResult = null,
+        ?int $limit = null,
+        ?string $competitionType = null
+    ): array
     {
         assert($equipeId > 0, 'Equipe ID must be positive');
-        
-        $sql = "SELECT 
+
+        if ($competitionType !== null) {
+            $competitionType = strtoupper(trim($competitionType));
+            assert($competitionType !== '', 'Competition type cannot be empty string');
+            assert(in_array($competitionType, ['CH', 'CP'], true), 'Invalid competition type');
+        }
+
+        $teamStmt = $this->pdo->prepare(
+            'SELECT category_code, number
+            FROM pprod_equipes
+            WHERE id = :id
+            LIMIT 1'
+        );
+        $teamStmt->execute(['id' => $equipeId]);
+        $team = $teamStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($team === false) {
+            return [];
+        }
+
+        assert(isset($team['category_code']), 'Equipe must provide category_code');
+        assert(isset($team['number']), 'Equipe must provide number');
+
+        $sql = "SELECT
                     m.*,
                     c.name as competition_name,
+                    c.type as competition_type,
                     t.name as terrain_name,
                     cc.name as opponent_name,
                     cc.logo_url as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON
+                    (CASE
+                        WHEN m.home_club_id != :club_id THEN m.home_club_id
+                        ELSE m.away_club_id
                     END) = cc.cl_no
-                WHERE m.equipe_id = :equipe_id";
-        
+                WHERE (
+                    (m.home_club_id = :club_id AND m.home_team_category = :category AND m.home_team_number = :team_number)
+                    OR (m.away_club_id = :club_id AND m.away_team_category = :category AND m.away_team_number = :team_number)
+                )";
+
         if ($isResult !== null) {
             $sql .= " AND m.is_result = :is_result";
         }
-        
+
+        if ($competitionType !== null) {
+            $sql .= " AND c.type = :competition_type";
+        }
+
         $sql .= " ORDER BY m.date " . ($isResult === true ? 'DESC' : 'ASC');
-        
+
         if ($limit !== null && $limit > 0) {
             assert($limit <= 1000, 'Limit too high');
             $sql .= " LIMIT :limit";
         }
-        
+
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':equipe_id', $equipeId, PDO::PARAM_INT);
         $stmt->bindValue(':club_id', API_FFF_CLUB_ID, PDO::PARAM_INT);
-        
+        $stmt->bindValue(':category', $team['category_code'], PDO::PARAM_STR);
+        $stmt->bindValue(':team_number', (int)$team['number'], PDO::PARAM_INT);
+
         if ($isResult !== null) {
             $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
         }
-        
+
+        if ($competitionType !== null) {
+            $stmt->bindValue(':competition_type', $competitionType, PDO::PARAM_STR);
+        }
+
         if ($limit !== null && $limit > 0) {
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         }

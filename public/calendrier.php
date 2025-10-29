@@ -28,23 +28,37 @@ require_once __DIR__ . '/templates/header.php';
     <section class="relative z-10 bg-off-white/90 py-20">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="glass-card-event-dark rounded-2xl p-8 shadow-2xl">
-          <header class="mb-8 space-y-4">
+          <header class="mb-8 space-y-6">
             <div>
               <h2 class="text-white text-3xl font-bold">Matchs à venir par équipe</h2>
               <p class="mt-2 text-sm text-gray-300">
                 Les informations sont synchronisées directement depuis l'API fédérale.
               </p>
             </div>
-            <label class="flex flex-col gap-2 text-left md:w-80">
-              <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Équipe</span>
-              <select
-                class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
-                data-component="calendar-team-select"
-                aria-label="Filtrer le calendrier par équipe"
-              >
-                <option value="">Chargement…</option>
-              </select>
-            </label>
+            <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <label class="flex flex-col gap-2 text-left md:w-72">
+                <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Équipe</span>
+                <select
+                  class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+                  data-component="calendar-team-select"
+                  aria-label="Filtrer le calendrier par équipe"
+                >
+                  <option value="">Chargement…</option>
+                </select>
+              </label>
+              <label class="flex flex-col gap-2 text-left md:w-64">
+                <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Type de compétition</span>
+                <select
+                  class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+                  data-component="calendar-competition-select"
+                  aria-label="Filtrer le calendrier par type de compétition"
+                >
+                  <option value="">Toutes compétitions</option>
+                  <option value="CH">Championnat</option>
+                  <option value="CP">Coupe</option>
+                </select>
+              </label>
+            </div>
           </header>
 
           <div class="space-y-6" data-component="calendar-list" aria-live="polite">
