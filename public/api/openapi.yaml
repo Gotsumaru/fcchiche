@@ -252,6 +252,12 @@ paths:
             type: string
             example: SEM
           description: Filtrer par catégorie d'équipe
+        - name: equipe_id
+          in: query
+          schema:
+            type: integer
+            example: 12
+          description: Filtrer par ID d'équipe FC Chiché
         - name: is_result
           in: query
           schema:

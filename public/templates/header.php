@@ -61,7 +61,12 @@ $currentPage = basename($_SERVER['SCRIPT_FILENAME'], '.php');
   ?>
 </head>
 
-<body class="font-display bg-white text-gray-800">
+<body
+  class="font-display bg-white text-gray-800"
+  data-api-base="<?= htmlspecialchars($apiBase, ENT_QUOTES, 'UTF-8') ?>"
+  data-base-path="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>"
+  data-assets-base="<?= htmlspecialchars($assetsBase, ENT_QUOTES, 'UTF-8') ?>"
+>
   <!-- ====================================================================
        BACKGROUND PARALLAXE FIXE
        ==================================================================== -->

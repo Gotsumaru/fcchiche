@@ -28,74 +28,36 @@ require_once __DIR__ . '/templates/header.php';
     <section class="relative z-10 bg-off-white/90 py-20">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="glass-card-event-dark rounded-2xl p-8 shadow-2xl">
-          <header class="mb-8">
-            <h2 class="text-white text-3xl font-bold">Matchs à venir</h2>
-            <p class="text-gray-300 text-sm mt-2">Les horaires peuvent être amenés à évoluer selon les décisions de la ligue.</p>
+          <header class="mb-8 space-y-4">
+            <div>
+              <h2 class="text-white text-3xl font-bold">Matchs à venir par équipe</h2>
+              <p class="mt-2 text-sm text-gray-300">
+                Les informations sont synchronisées directement depuis l'API fédérale.
+              </p>
+            </div>
+            <label class="flex flex-col gap-2 text-left md:w-80">
+              <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Équipe</span>
+              <select
+                class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+                data-component="calendar-team-select"
+                aria-label="Filtrer le calendrier par équipe"
+              >
+                <option value="">Chargement…</option>
+              </select>
+            </label>
           </header>
 
-          <div class="space-y-6">
-            <?php
-            $upcomingMatches = [
-              [
-                'date' => '27 octobre 2024',
-                'time' => '17:30',
-                'opponent' => 'FC Nantes (B)',
-                'location' => 'Stade Municipal de Chiché',
-                'type' => 'Championnat - Journée 9'
-              ],
-              [
-                'date' => '03 novembre 2024',
-                'time' => '15:00',
-                'opponent' => 'AS Cholet',
-                'location' => 'Stade Auguste Bonal',
-                'type' => 'Championnat - Journée 10'
-              ],
-              [
-                'date' => '10 novembre 2024',
-                'time' => '18:00',
-                'opponent' => 'US Saint-Varent',
-                'location' => 'Complexe Sportif Saint-Varent',
-                'type' => 'Coupe des Deux-Sèvres - 8e'
-              ],
-              [
-                'date' => '17 novembre 2024',
-                'time' => '16:00',
-                'opponent' => 'AS Bressuire',
-                'location' => 'Stade Municipal de Chiché',
-                'type' => 'Championnat - Journée 11'
-              ],
-            ];
-
-            foreach ($upcomingMatches as $match) :
-              ?>
-              <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-white/5 rounded-xl px-6 py-5">
-                <div class="flex flex-col gap-2">
-                  <p class="text-primary text-sm font-semibold uppercase tracking-wider">
-                    <?= htmlspecialchars($match['type'], ENT_QUOTES, 'UTF-8') ?>
-                  </p>
-                  <h3 class="text-white text-2xl font-bold">
-                    FC Chiché vs <?= htmlspecialchars($match['opponent'], ENT_QUOTES, 'UTF-8') ?>
-                  </h3>
-                  <p class="text-gray-300 text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">location_on</span>
-                    <?= htmlspecialchars($match['location'], ENT_QUOTES, 'UTF-8') ?>
-                  </p>
-                </div>
-                <div class="flex flex-col items-start lg:items-end gap-2 text-gray-200">
-                  <p class="flex items-center gap-2 text-base font-semibold">
-                    <span class="material-symbols-outlined text-primary">event</span>
-                    <?= htmlspecialchars($match['date'], ENT_QUOTES, 'UTF-8') ?>
-                  </p>
-                  <p class="flex items-center gap-2 text-sm">
-                    <span class="material-symbols-outlined text-primary">schedule</span>
-                    Coup d'envoi à <?= htmlspecialchars($match['time'], ENT_QUOTES, 'UTF-8') ?>
-                  </p>
-                </div>
-              </div>
-              <?php
-            endforeach;
-            ?>
+          <div class="space-y-6" data-component="calendar-list" aria-live="polite">
+            <p class="rounded-xl bg-white/10 p-4 text-sm text-gray-300">
+              Sélectionnez une équipe pour afficher son calendrier des prochains matchs.
+            </p>
           </div>
+
+          <noscript>
+            <p class="mt-6 rounded-xl bg-white/10 p-4 text-sm text-amber-200">
+              Activez JavaScript pour consulter le calendrier dynamique du FC Chiché.
+            </p>
+          </noscript>
         </div>
       </div>
     </section>

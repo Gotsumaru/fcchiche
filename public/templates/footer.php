@@ -84,6 +84,7 @@
        SCRIPTS
        ==================================================================== -->
   <!-- Common JavaScript -->
+  <script src="<?= $assetsBase ?>/js/api.js"></script>
   <script src="<?= $assetsBase ?>/js/common.js"></script>
 
   <!-- Page-specific JavaScript -->
