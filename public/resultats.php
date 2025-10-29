@@ -4,55 +4,58 @@ declare(strict_types=1);
 require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/templates/header.php';
 ?>
+      <section class="page-hero">
+        <div class="page-hero__inner">
+          <div class="page-hero__content">
+            <span class="page-hero__eyebrow">Performances en temps réel</span>
+            <h1 class="page-hero__title">Tous les résultats du FC Chiché</h1>
+            <p class="page-hero__subtitle">
+              Découvrez les feuilles de match complètes, les buteurs et la dynamique de chaque équipe. Les données sont mises à
+              jour après chaque validation officielle.
+            </p>
+            <div class="chip-list">
+              <span class="chip">Scores live</span>
+              <span class="chip">Analyse par équipe</span>
+              <span class="chip">Historique complet</span>
+            </div>
+          </div>
+          <div class="page-hero__media">
+            <img
+              src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&amp;auto=format&amp;fit=crop&amp;w=1200"
+              alt="Joueurs au duel"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </section>
 
-    <main class="liquid-glass-hero">
-      <div class="liquid-glass-overlay">
-        <div class="liquid-blob-1"></div>
-        <div class="liquid-blob-2"></div>
-        <div class="liquid-blob-3"></div>
-      </div>
-
-      <div class="hero-content flex flex-col items-center gap-6 px-4 text-center max-w-3xl">
-        <p class="text-primary text-lg font-semibold uppercase tracking-wider drop-shadow-lg">
-          Résultats officiels
-        </p>
-        <h1 class="text-white text-4xl md:text-6xl font-black leading-tight drop-shadow-xl">
-          Les dernières rencontres
-        </h1>
-        <p class="text-slate-200 text-base md:text-lg drop-shadow">
-          Résumé des performances du club toutes compétitions confondues.
-        </p>
-      </div>
-    </main>
-
-    <section class="relative z-10 bg-off-white/90 py-20">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col gap-8">
-          <form class="glass-card-event-dark rounded-2xl p-6 shadow-xl" data-component="results-filters" novalidate>
-            <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div class="space-y-2">
-                <h2 class="text-white text-2xl font-bold">Derniers résultats par équipe</h2>
-                <p class="text-sm text-gray-300">
-                  Le dernier match apparaît toujours en haut de la liste.
-                </p>
-              </div>
-              <div class="flex w-full flex-col gap-4 md:w-auto md:flex-row md:items-end">
-                <label class="flex w-full flex-col gap-2 text-left md:w-72">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Équipe</span>
+      <section class="section">
+        <div class="container">
+          <div class="panel-stack">
+            <form class="panel-card" data-component="results-filters" novalidate>
+              <header class="panel-card__header">
+                <div>
+                  <h2 class="panel-card__title">Filtrer les rencontres</h2>
+                  <p class="panel-card__subtitle">
+                    Choisissez votre équipe, affinez par compétition puis explorez les feuilles de match détaillées.
+                  </p>
+                </div>
+              </header>
+              <div class="panel-card__filters panel-card__filters--inline">
+                <label class="panel-card__field">
+                  <span>Équipe</span>
                   <select
-                    class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
                     data-component="results-team-select"
                     aria-label="Filtrer les résultats par équipe"
                   >
                     <option value="">Chargement…</option>
                   </select>
                 </label>
-                <label class="flex w-full flex-col gap-2 text-left md:w-64">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-300">Type de compétition</span>
+                <label class="panel-card__field">
+                  <span>Compétition</span>
                   <select
-                    class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
                     data-component="results-competition-select"
-                    aria-label="Filtrer les résultats par type de compétition"
+                    aria-label="Filtrer les résultats par compétition"
                   >
                     <option value="">Toutes compétitions</option>
                     <option value="CH">Championnat</option>
@@ -60,27 +63,56 @@ require_once __DIR__ . '/templates/header.php';
                   </select>
                 </label>
               </div>
-            </div>
-          </form>
+            </form>
 
-          <div
-            class="grid gap-8 md:grid-cols-2"
-            data-component="results-list"
-            aria-live="polite"
-          >
-            <p class="glass-card-event-dark rounded-2xl p-6 text-sm text-gray-300">
-              Choisissez une équipe pour afficher ses derniers résultats officiels.
-            </p>
+            <section class="panel-card panel-card--listing" aria-live="polite">
+              <header class="panel-card__header">
+                <div>
+                  <h2 class="panel-card__title">Derniers matchs</h2>
+                  <p class="panel-card__subtitle">Résumés officiels avec buteurs, cartons et statistiques clés.</p>
+                </div>
+              </header>
+              <div class="panel-card__body panel-card__body--grid" data-component="results-list">
+                <p class="panel-card__placeholder">Choisissez une équipe pour afficher ses dernières rencontres.</p>
+              </div>
+              <noscript>
+                <p class="panel-card__notice">Activez JavaScript pour consulter les résultats dynamiques du club.</p>
+              </noscript>
+            </section>
           </div>
-
-          <noscript>
-            <p class="rounded-2xl bg-white/10 p-4 text-sm text-amber-200">
-              Activez JavaScript pour consulter les résultats dynamiques du FC Chiché.
-            </p>
-          </noscript>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section class="section section--tint">
+        <div class="container">
+          <div class="highlight-grid">
+            <article class="highlight-card">
+              <h3 class="highlight-card__title">Statistiques clés</h3>
+              <p>
+                Chaque feuille de match propose les buteurs, passes décisives et la dynamique des cinq derniers matchs pour mieux
+                préparer les rencontres.
+              </p>
+              <ul class="bullet-list">
+                <li>Séries de victoires et forme du moment</li>
+                <li>Comparaison directe avec l'adversaire</li>
+                <li>Accès rapide aux feuilles PDF officielles</li>
+              </ul>
+            </article>
+            <article class="highlight-card">
+              <h3 class="highlight-card__title">Focus équipe fanion</h3>
+              <p>
+                Les seniors A restent invaincus à domicile depuis le début de saison. Retrouvez les temps forts et interviews
+                d'après-match chaque semaine.
+              </p>
+              <div class="pill-list">
+                <span>Interviews vidéo</span>
+                <span>Analyse tactique</span>
+                <span>Moments forts</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
 
 <?php
 require_once __DIR__ . '/templates/footer.php';

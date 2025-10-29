@@ -2,147 +2,194 @@
 declare(strict_types=1);
 
 /**
- * Page principale - FC Chiche
- * SPA (Single Page Application) avec navigation côté client
+ * Page d'accueil - FC Chiché
  */
 
 require_once __DIR__ . '/bootstrap.php';
 
-// Inclure le header
 require_once __DIR__ . '/templates/header.php';
 ?>
-
-    <!-- ==================================================================
-         SECTION HERO - VITRE LIQUIDE TRANSPARENTE
-         ================================================================== -->
-    <main class="liquid-glass-hero">
-      <!-- Overlay de vitre liquide transparent au-dessus du fond -->
-      <div class="liquid-glass-overlay">
-        <!-- Blobs liquides animés automatiquement -->
-        <div class="liquid-blob-1"></div>
-        <div class="liquid-blob-2"></div>
-        <div class="liquid-blob-3"></div>
-      </div>
-
-      <!-- Contenu principal (logo, titre, description, CTA) -->
-      <div class="hero-content flex flex-col gap-12 items-center text-center max-w-4xl px-4">
-        <!-- Logo et titre -->
-        <div class="flex flex-col lg:flex-row items-center gap-8 mb-6">
-          <img
-            src="<?= $assetsBase ?>/images/logo.svg"
-            width="120"
-            height="120"
-            alt="Logo FCChiche"
-            class="drop-shadow-2xl"
-            style="filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 4px 15px rgba(0, 0, 0, 0.6));"
-          />
-          <div class="flex flex-col gap-4 text-center lg:text-left">
-            <h1 class="text-white text-5xl md:text-8xl font-black leading-tight tracking-[-0.033em] drop-shadow-lg" style="text-shadow: 2px 2px 2px #222222;">
-              FC Chiché
-            </h1>
-            <p class="text-primary text-xl md:text-2xl font-bold uppercase tracking-wider" style="text-shadow: 2px 2px 2px #ffffff;">
-              Pour l'amour du maillot.
+      <section class="landing-hero">
+        <div class="landing-hero__inner">
+          <div>
+            <span class="landing-hero__badge">FC Chiché 1960</span>
+            <h1 class="landing-hero__title">Le vert et blanc dans une nouvelle dynamique</h1>
+            <p class="landing-hero__subtitle">
+              FC Chiché modernise son expérience supporters : un suivi temps réel des équipes, une identité affirmée et des
+              rendez-vous qui rassemblent toute la commune.
             </p>
+            <div class="landing-hero__actions">
+              <a class="btn btn--primary" href="<?= $basePath ?>/calendrier">Découvrir le calendrier</a>
+              <a class="btn btn--ghost" href="<?= $basePath ?>/resultats">Derniers résultats</a>
+            </div>
+            <aside class="score-panel">
+              <div class="score-panel__label">Prochain rendez-vous</div>
+              <div class="score-panel__match">
+                <div class="score-panel__team">
+                  <span>FC Chiché</span>
+                  <span class="score-panel__hint">Stade de La Broche</span>
+                </div>
+                <div class="score-panel__score">18h00</div>
+                <div class="score-panel__team">
+                  <span>US Parthenay</span>
+                  <span class="score-panel__hint">Samedi 9 novembre</span>
+                </div>
+              </div>
+              <div class="score-panel__details">
+                <span>Championnat Départemental 1</span>
+                <span>Ouverture des portes : 16h30 — Restauration locale</span>
+              </div>
+            </aside>
+          </div>
+          <div class="landing-hero__media">
+            <img
+              src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?q=80&amp;auto=format&amp;fit=crop&amp;w=1200"
+              alt="Joueur du FC Chiché célébrant un but"
+              loading="lazy"
+            />
           </div>
         </div>
+      </section>
 
-        <!-- Description -->
-        <h2 class="text-slate-200 text-lg md:text-xl font-normal leading-relaxed max-w-2xl mx-auto" style="text-shadow: 2px 2px 2px #444444;">
-          Le Football Club de Chiché, fondé en 1960, est un club des Deux-Sèvres qui fait vivre la passion du football depuis plus de soixante ans dont il porte fièrement les couleurs vert et blanc
-        </h2>
-
-        <!-- Call-to-action -->
-        <button class="flex min-w-[120px] max-w-[520px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-8 bg-primary text-white text-lg font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-all transform hover:scale-105 shadow-lg">
-          <span class="truncate">Voir les prochains matchs</span>
-        </button>
-      </div>
-    </main>
-
-    <!-- ==================================================================
-         SECTION ÉVÉNEMENTS
-         ================================================================== -->
-    <div class="w-full bg-off-white relative z-10">
-      <section class="py-16 pb-32 lg:pb-16 relative min-h-screen flex items-center overflow-hidden">
-
-        <!-- Image en arrière-plan avec effet parallaxe -->
-        <!-- Desktop: Image à gauche avec 70% de largeur et bords arrondis -->
-        <!-- Mobile: Image pleine largeur sans bords arrondis -->
-        <div class="absolute left-0 w-full lg:w-[70%] h-[50vh] lg:h-[80vh] lg:rounded-r-[3rem] overflow-hidden">
-          <div
-            class="parallax-image w-full h-full bg-center bg-no-repeat bg-cover lg:rounded-r-[3rem]"
-            style='box-shadow: inset 0px 0px 15px 8px rgba(0,0,0,0.46); background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAFRxw_8I30mPdxMXVSskeM8CGqAEtNlv78bXPEw3jbH0mXBr72BUJU3oVj3fLDIQqpf0ZsOY7jqly2w3gi4Yy3_uxpT_Qb0TlXyxjCwHRvj68dBOEfxD2zJWLh-9_Hvf7HJX2_d24aHUw-0hqRQ5Nf03_FGK_1-4Po3bmM3pOCvvHOkvuzqmGPtREIzcZLRfGvXdEN60oBhn_KgD8JA17wc8Zje2sPc3ULUUdlXv6l5ldyId0jzgnS8PY6KuvgKVQzeH8XJAXJFMw");'
-          ></div>
+      <section class="section">
+        <div class="container">
+          <div class="section__header">
+            <span class="section__eyebrow">Identité club</span>
+            <h2 class="section__title">Une vision ambitieuse ancrée dans les Deux-Sèvres</h2>
+            <p class="section__subtitle">
+              L'équipe dirigeante, les bénévoles et les supporters travaillent de concert pour faire rayonner FC Chiché des U6
+              aux seniors. Chaque rencontre est pensée pour offrir un moment de partage.
+            </p>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <div class="feature-card__icon" aria-hidden="true">⚽</div>
+              <h3>Formation exigeante</h3>
+              <p>
+                Éducateurs diplômés, suivi scolaire renforcé, séances vidéo : le parcours vert et blanc accompagne chaque joueur
+                dans sa progression.
+              </p>
+              <a class="feature-card__link" href="<?= $basePath ?>/contact">Rejoindre l'école de foot</a>
+            </article>
+            <article class="feature-card">
+              <div class="feature-card__icon" aria-hidden="true">🎟️</div>
+              <h3>Expérience supporters</h3>
+              <p>
+                Billetterie en ligne, espaces familles et animations partenaires assurent une ambiance chaleureuse à La
+                Broche.
+              </p>
+              <a class="feature-card__link" href="<?= $basePath ?>/calendrier">Préparer ma venue</a>
+            </article>
+            <article class="feature-card">
+              <div class="feature-card__icon" aria-hidden="true">🤝</div>
+              <h3>Communauté solidaire</h3>
+              <p>
+                70 bénévoles, un réseau de partenaires fidèles et des initiatives solidaires toute l'année au service du
+                territoire.
+              </p>
+              <a class="feature-card__link" href="<?= $basePath ?>/contact">Devenir bénévole</a>
+            </article>
+          </div>
+          <div class="stat-ribbon">
+            <div class="stat-ribbon__item">
+              <div class="stat-ribbon__value">180+</div>
+              <div class="stat-ribbon__label">Licenciés engagés</div>
+            </div>
+            <div class="stat-ribbon__item">
+              <div class="stat-ribbon__value">9 équipes</div>
+              <div class="stat-ribbon__label">Des U6 aux seniors</div>
+            </div>
+            <div class="stat-ribbon__item">
+              <div class="stat-ribbon__value">1 200</div>
+              <div class="stat-ribbon__label">Supporters chaque saison</div>
+            </div>
+            <div class="stat-ribbon__item">
+              <div class="stat-ribbon__value">60 ans</div>
+              <div class="stat-ribbon__label">De passion partagée</div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <!-- Carte événement flottante -->
-        <!-- Desktop: Positionnée à droite de l'image et centrée verticalement -->
-        <!-- Mobile: Centrée et en dessous de l'image -->
-        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex items-center min-h-[80vh]">
-          <div class="ml-auto mr-0 w-full lg:w-auto">
-            <div class="flex flex-col lg:flex-row gap-8 items-center justify-end">
-              <div
-                class="w-full lg:w-[480px] mt-[30vh] lg:mt-0"
-              >
-                <article class="glass-card-event-dark rounded-2xl p-8 shadow-2xl">
-                  <div class="flex flex-col gap-4">
-                    <!-- Badge -->
-                    <p class="text-primary text-sm font-bold uppercase tracking-wider">
-                      Prochain match
-                    </p>
-
-                    <!-- Titre -->
-                    <h3 class="text-white text-3xl font-bold leading-tight">
-                      FCChiche vs. Town United
-                    </h3>
-
-                    <!-- Informations du match -->
-                    <div class="flex flex-col gap-3 mt-2">
-                      <!-- Date -->
-                      <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p class="text-gray-200 text-base font-medium">29 octobre 2024</p>
-                      </div>
-
-                      <!-- Heure -->
-                      <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p class="text-gray-200 text-base font-medium">15:00</p>
-                      </div>
-
-                      <!-- Lieu -->
-                      <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <p class="text-gray-200 text-base font-medium">The Community Stadium</p>
-                      </div>
-                    </div>
-
-                    <!-- Description -->
-                    <p class="text-gray-300 text-base leading-relaxed mt-2">
-                      Le plus grand match de la saison est là. Rejoignez-nous et encouragez l'équipe !
-                    </p>
-
-                    <!-- Bouton CTA -->
-                    <div class="mt-4">
-                      <button class="w-full flex items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-primary text-white text-base font-bold leading-normal hover:bg-primary/90 transition-all transform hover:scale-[1.02]">
-                        <span>Acheter des billets</span>
-                      </button>
-                    </div>
-                  </div>
-                </article>
+      <section class="section section--tint">
+        <div class="container">
+          <div class="story-split">
+            <div class="story-split__media">
+              <img
+                src="https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?q=80&amp;auto=format&amp;fit=crop&amp;w=1200"
+                alt="Coup d'envoi dans le stade de La Broche"
+                loading="lazy"
+              />
+              <span class="story-split__badge">Matchday FC Chiché</span>
+            </div>
+            <div class="story-split__content">
+              <span class="section__eyebrow">Au cœur du jeu</span>
+              <h2 class="section__title">Suivez nos équipes sur toutes les compétitions</h2>
+              <p class="section__subtitle">
+                Calendrier interactif, fiches matchs, classements détaillés : les données officielles sont consolidées dans une
+                interface fluide pensée pour le mobile comme pour le desktop.
+              </p>
+              <ul class="bullet-list">
+                <li>Classements mis à jour automatiquement après validation fédérale</li>
+                <li>Résumés de matchs avec buteurs et faits marquants</li>
+                <li>Filtres multi-équipes pour naviguer rapidement</li>
+              </ul>
+              <div class="landing-hero__actions">
+                <a class="btn btn--primary" href="<?= $basePath ?>/resultats">Consulter les résultats</a>
+                <a class="btn btn--ghost" href="<?= $basePath ?>/classement">Voir les classements</a>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      <section class="section">
+        <div class="container">
+          <div class="highlight-grid">
+            <article class="highlight-card">
+              <h3 class="highlight-card__title">Projets infrastructures</h3>
+              <p>
+                Le terrain d'honneur sera équipé d'une nouvelle éclairage LED et d'une tribune couverte pour améliorer le
+                confort supporters.
+              </p>
+              <p class="section__subtitle">Mise en service prévue pour mars 2025.</p>
+            </article>
+            <article class="highlight-card">
+              <h3 class="highlight-card__title">Académie féminine</h3>
+              <p>
+                Un pôle dédié accompagne la section féminine du FC Chiché avec deux créneaux hebdomadaires et un suivi
+                individualisé.
+              </p>
+              <div class="pill-list">
+                <span>U13F</span>
+                <span>U16F</span>
+                <span>Senior F</span>
+              </div>
+            </article>
+          </div>
+          <div class="cta-panel">
+            <div>
+              <h2 class="section__title">Newsletter FC Chiché Inside</h2>
+              <p>
+                Matchs, événements partenaires, actions solidaires : recevez une fois par mois l'essentiel de l'actualité du
+                club.
+              </p>
+            </div>
+            <form class="cta-panel__form" method="post" action="#" novalidate>
+              <label class="sr-only" for="newsletter-email">Adresse e-mail</label>
+              <input
+                id="newsletter-email"
+                name="email"
+                type="email"
+                placeholder="prenom.nom@email.com"
+                autocomplete="email"
+                required
+              />
+              <button class="btn btn--accent" type="submit">Je m'inscris</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
 <?php
-// Inclure le footer
 require_once __DIR__ . '/templates/footer.php';
-?>

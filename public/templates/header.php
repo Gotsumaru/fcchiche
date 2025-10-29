@@ -1,19 +1,50 @@
 <?php
 /**
  * Template Header - FC Chiche
- * Charge dynamiquement les CSS et JS en fonction de la page actuelle
+ * Met en place l'en-tête commun et charge les ressources
  */
 
 // Déterminer la page actuelle (nom du fichier sans extension)
 $currentPage = basename($_SERVER['SCRIPT_FILENAME'], '.php');
+
+$navItems = [
+    [
+        'id' => 'index',
+        'label' => 'Accueil',
+        'href' => $basePath . '/',
+    ],
+    [
+        'id' => 'calendrier',
+        'label' => 'Calendrier',
+        'href' => $basePath . '/calendrier',
+    ],
+    [
+        'id' => 'resultats',
+        'label' => 'Résultats',
+        'href' => $basePath . '/resultats',
+    ],
+    [
+        'id' => 'classement',
+        'label' => 'Classements',
+        'href' => $basePath . '/classement',
+    ],
+    [
+        'id' => 'contact',
+        'label' => 'Contact',
+        'href' => $basePath . '/contact',
+    ],
+];
 ?>
 <!DOCTYPE html>
-<html class="dark" lang="fr">
+<html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FCChiche - Pride. Passion. Football.</title>
-  <meta name="description" content="Le Football Club de Chiché - Plus de 60 ans de passion footballistique dans les Deux-Sèvres" />
+  <title>FC Chiché - Club officiel</title>
+  <meta
+    name="description"
+    content="Le Football Club de Chiché - 60 ans de passion et de partage autour du football dans les Deux-Sèvres"
+  />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -27,26 +58,28 @@ $currentPage = basename($_SERVER['SCRIPT_FILENAME'], '.php');
   <!-- Configuration Tailwind -->
   <script>
     tailwind.config = {
-      darkMode: "class",
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            "primary": "#008a00",
-            "background-light": "#f5f8f5",
-            "background-dark": "#0f230f",
+            primary: '#008a00',
+            'primary-dark': '#0a3c1d',
+            'primary-light': '#12b012',
+            'surface': '#f7faf5',
+            'ink': '#102016',
           },
           fontFamily: {
-            "display": ["Public Sans", "sans-serif"]
+            display: ['Public Sans', 'sans-serif'],
           },
           borderRadius: {
-            "DEFAULT": "0.5rem",
-            "lg": "1rem",
-            "xl": "1.5rem",
-            "full": "9999px"
+            DEFAULT: '0.75rem',
+            lg: '1.5rem',
+            xl: '2rem',
+            full: '9999px',
           },
         },
       },
-    }
+    };
   </script>
 
   <!-- Common CSS -->
@@ -56,67 +89,68 @@ $currentPage = basename($_SERVER['SCRIPT_FILENAME'], '.php');
   <?php
   $pageCSS = __DIR__ . '/../assets/css/' . $currentPage . '.css';
   if (file_exists($pageCSS)) {
-    echo '<link rel="stylesheet" href="' . $assetsBase . '/css/' . $currentPage . '.css" />';
+      echo '<link rel="stylesheet" href="' . $assetsBase . '/css/' . $currentPage . '.css" />';
   }
   ?>
 </head>
 
 <body
-  class="font-display bg-white text-gray-800"
+  class="font-display bg-surface text-ink"
   data-api-base="<?= htmlspecialchars($apiBase, ENT_QUOTES, 'UTF-8') ?>"
   data-base-path="<?= htmlspecialchars($basePath, ENT_QUOTES, 'UTF-8') ?>"
   data-assets-base="<?= htmlspecialchars($assetsBase, ENT_QUOTES, 'UTF-8') ?>"
 >
-  <!-- ====================================================================
-       BACKGROUND PARALLAXE FIXE
-       ==================================================================== -->
-  <div class="parallax-bg-overlay"></div>
+  <div class="site-background" aria-hidden="true"></div>
+  <div class="page-shell relative flex min-h-dvh flex-col">
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-logo" href="<?= $basePath ?>/">
+          <span class="site-logo__mark">
+            <img
+              src="<?= $assetsBase ?>/images/logo.svg"
+              width="52"
+              height="52"
+              alt="Logo du FC Chiché"
+              loading="lazy"
+            />
+          </span>
+          <span class="site-logo__text">
+            <span class="site-logo__club">FC Chiché</span>
+            <span class="site-logo__tagline">Pour l'amour du maillot</span>
+          </span>
+        </a>
 
-  <!-- ====================================================================
-       CONTENEUR PRINCIPAL
-       ==================================================================== -->
-    <div class="page-shell relative flex w-full flex-col group/design-root overflow-x-hidden">
+        <nav id="site-navigation" class="site-nav" data-nav-menu>
+          <div class="site-nav__links">
+            <?php foreach ($navItems as $item): ?>
+              <?php
+              $isActive = $currentPage === $item['id'] || ($item['id'] === 'index' && $currentPage === '');
+              $linkClasses = 'site-nav__link' . ($isActive ? ' is-active' : '');
+              ?>
+              <a
+                class="<?= $linkClasses ?>"
+                href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>"
+                <?php if ($isActive): ?>aria-current="page"<?php endif; ?>
+              >
+                <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>
+              </a>
+            <?php endforeach; ?>
+          </div>
+          <a class="site-nav__cta" href="<?= $basePath ?>/calendrier">Billetterie</a>
+        </nav>
 
-    <!-- ==================================================================
-         HEADER - MENU DOCK LIQUID GLASS
-         Desktop: Top center with max-width
-         Mobile: Bottom full-width like iPhone
-         ================================================================== -->
-    <header class="site-dock fixed inset-x-0 z-50 flex justify-center px-4 sm:px-6 lg:px-8">
-      <div class="liquidGlass-wrapper dock w-full rounded-none lg:max-w-6xl lg:rounded-xl">
-        <!-- Couches d'effet du menu -->
-        <div class="liquidGlass-effect"></div>
-        <div class="liquidGlass-tint"></div>
-        <div class="liquidGlass-shine"></div>
-
-        <!-- Contenu du menu -->
-        <div class="liquidGlass-text w-full">
-          <nav class="dock py-2 lg:py-0" aria-label="Navigation principale">
-            <a href="<?= $basePath ?>/" class="nav-item" title="Accueil">
-              <img src="<?= $assetsBase ?>/images/home.png" width="60" height="60" alt="Accueil" class="lg:w-24 lg:h-24" />
-            </a>
-            <a href="<?= $basePath ?>/classement" class="nav-item" title="Classement">
-              <img src="<?= $assetsBase ?>/images/Classement.png" width="60" height="60" alt="Classement" class="lg:w-24 lg:h-24" />
-            </a>
-            <a href="<?= $basePath ?>/resultats" class="nav-item" title="Résultats">
-              <img src="<?= $assetsBase ?>/images/resultat.png" width="60" height="60" alt="Résultats" class="lg:w-24 lg:h-24" />
-            </a>
-            <a href="<?= $basePath ?>/calendrier" class="nav-item" title="Calendrier">
-              <img src="<?= $assetsBase ?>/images/Agenda.png" width="60" height="60" alt="Calendrier" class="lg:w-24 lg:h-24" />
-            </a>
-            <a href="<?= $basePath ?>/contact" class="nav-item" title="Contact">
-              <img src="<?= $assetsBase ?>/images/Contact.png" width="60" height="60" alt="Contact" class="lg:w-24 lg:h-24" />
-            </a>
-          </nav>
-        </div>
+        <button
+          type="button"
+          class="site-header__toggle"
+          data-nav-toggle
+          aria-controls="site-navigation"
+          aria-expanded="false"
+          aria-label="Ouvrir la navigation"
+        >
+          <span class="sr-only">Ouvrir la navigation</span>
+          <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+        </button>
       </div>
     </header>
 
-    <!-- ==================================================================
-         SCROLL INDICATOR
-         ================================================================== -->
-    <div class="scroll-indicator" aria-hidden="true">
-      <div class="mouse"></div>
-    </div>
-
-    <main class="page-shell__content flex flex-col flex-1" id="page-content">
+    <main class="page-shell__content flex-1" id="page-content">
