@@ -36,14 +36,21 @@ require_once __DIR__ . '/templates/header.php';
         <div class="container">
           <div class="result-info">
             <div class="result-info__visual" aria-hidden="true">
-              <img
-                src="<?= $assetsBase ?>/images/resultat.png"
-                width="4096"
-                height="4096"
-                alt="Feuille de match officielle du FC Chiché"
-                loading="lazy"
-                decoding="async"
-              />
+              <picture>
+                <source
+                  srcset="<?= $assetsBase ?>/images/galeries/442472329_943464664244206_6857395281966654530_n.jpg 2048w"
+                  type="image/jpeg"
+                  sizes="(min-width: 75rem) 520px, (min-width: 48rem) 65vw, 100vw"
+                />
+                <img
+                  src="<?= $assetsBase ?>/images/galeries/442472329_943464664244206_6857395281966654530_n.jpg"
+                  width="2048"
+                  height="1750"
+                  alt="Instantané des joueurs du FC Chiché saluant les supporters après le match"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
             </div>
             <div class="result-info__content">
               <h2>Lecture des codes compétition</h2>
