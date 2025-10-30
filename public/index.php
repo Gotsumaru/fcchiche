@@ -13,7 +13,7 @@ require_once __DIR__ . '/templates/header.php';
       <section class="hero">
         <div
           class="hero__background"
-          style="background-image: url('https://via.placeholder.com/1800x1000?text=Visuel+principal+1800x1000');"
+          style="background-image: url('https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1800&q=80');"
           aria-hidden="true"
         ></div>
         <div class="hero__overlay" aria-hidden="true"></div>
@@ -29,93 +29,74 @@ require_once __DIR__ . '/templates/header.php';
           <p class="hero__subtitle">Club de football amateur du bocage bressuirais.</p>
           <div class="hero__actions">
             <a class="btn btn--primary" href="<?= $basePath ?>/resultats">Résultats</a>
-            <a class="btn btn--secondary" href="<?= $basePath ?>/matchs">Calendrier</a>
+            <a class="btn btn--secondary" href="<?= $basePath ?>/matchs">Matchs à venir</a>
           </div>
         </div>
       </section>
 
-      <section class="section section--alt">
+      <section class="section">
         <div class="container">
           <div class="section__header">
             <span class="section__eyebrow">Le club</span>
-            <h2 class="section__title">Un club familial, exigeant et ouvert</h2>
+            <h2 class="section__title">Un club, une famille, une histoire</h2>
             <p class="section__subtitle">
-              De l'école de foot aux séniors, plus de 250 licenciés font vivre le FC Chiché chaque semaine. Notre projet sportif
-              repose sur la formation, l'inclusion et le partage d'une passion commune.
+              Fondé en 1946, le FC Chiché fait vibrer le bocage depuis plusieurs générations. Le club regroupe aujourd'hui des
+              équipes séniors, U17, U15 et U13, animées par la passion, le respect et la convivialité.
             </p>
+            <div class="hero__actions" style="margin-top: 2.5rem;">
+              <a class="btn btn--primary" href="<?= $basePath ?>/equipes">Découvrir nos équipes</a>
+            </div>
           </div>
-          <div class="info-grid">
-            <article class="info-card">
-              <span class="icon-placeholder" aria-hidden="true">i</span>
-              <h3>Équipes engagées</h3>
-              <p>4 collectifs séniors et 6 équipes de jeunes. Toutes évoluent dans les championnats départementaux.</p>
-            </article>
-            <article class="info-card">
-              <span class="icon-placeholder" aria-hidden="true">i</span>
-              <h3>Équipements</h3>
-              <p>Deux terrains en herbe, un terrain synthétique et un club-house modernisé en 2024.</p>
-            </article>
-            <article class="info-card">
-              <span class="icon-placeholder" aria-hidden="true">i</span>
-              <h3>Vie associative</h3>
-              <p>Des événements toute l'année : tournois, stages vacances, soirées partenaires et actions solidaires.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="container">
-          <div class="section__header">
-            <span class="section__eyebrow">Évènements</span>
-            <h2 class="section__title">Les prochains rendez-vous</h2>
-            <p class="section__subtitle">Matches, plateaux jeunes et animations organisés par le club.</p>
-          </div>
-          <div class="events-grid" data-component="home-events-list" aria-live="polite"></div>
         </div>
       </section>
 
       <section class="section section--alt">
         <div class="container">
           <div class="section__header">
-            <span class="section__eyebrow">Performances</span>
-            <h2 class="section__title">Derniers résultats du club</h2>
-            <p class="section__subtitle" data-component="home-results-header">
-              Chargement des dernières rencontres…
-            </p>
+            <span class="section__eyebrow">Actualités</span>
+            <h2 class="section__title">Actualités récentes</h2>
           </div>
-          <div class="results-grid" data-component="home-results-list" aria-live="polite"></div>
+          <div class="news-grid">
+            <article class="news-card">
+              <div class="news-card__image">
+                <img src="https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=1600&q=80" alt="Victoire des séniors" />
+              </div>
+              <div class="news-card__content">
+                <span class="card-meta">Équipe Séniors</span>
+                <h3 class="news-card__title">Victoire des séniors face à L'Absie — 2–0 !</h3>
+                <p class="news-card__excerpt">Un match maîtrisé et un doublé décisif pour offrir trois points précieux au FC Chiché.</p>
+              </div>
+            </article>
+            <article class="news-card">
+              <div class="news-card__image">
+                <img src="https://images.unsplash.com/photo-1505672678657-cc7037095e2c?auto=format&fit=crop&w=1600&q=80" alt="Tournoi jeunes" />
+              </div>
+              <div class="news-card__content">
+                <span class="card-meta">Jeunes</span>
+                <h3 class="news-card__title">Tournoi jeunes : une journée sous le soleil du bocage</h3>
+                <p class="news-card__excerpt">Des sourires, des buts et une ambiance conviviale pour toutes les catégories U13 à U17.</p>
+              </div>
+            </article>
+            <article class="news-card">
+              <div class="news-card__image">
+                <img src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80" alt="Soirée partenaires" />
+              </div>
+              <div class="news-card__content">
+                <span class="card-meta">Partenaires</span>
+                <h3 class="news-card__title">Retour sur la soirée partenaires 2025</h3>
+                <p class="news-card__excerpt">Le club a dévoilé sa feuille de route 2025 devant plus de 40 entreprises locales réunies.</p>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
       <section class="section">
-        <div class="container">
-          <div class="section__header">
-            <span class="section__eyebrow">Notre stade</span>
-            <h2 class="section__title">Retrouvez-nous à Chiché</h2>
-            <p class="section__subtitle">
-              Venez encourager les verts et blancs au complexe sportif. Buvette, tribunes couvertes et grand parking sont à votre
-              disposition.
-            </p>
-          </div>
-          <div class="map-shell map-shell--wide">
-            <iframe
-              title="Localisation du FC Chiché"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2706.655193924687!2d-0.543!3d46.783!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x480799b0517d8623%3A0x5d6587b9e90b8e0!2sChich%C3%A9!5e0!3m2!1sfr!2sfr!4v1700000000000"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              allowfullscreen
-            ></iframe>
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--alt">
         <div class="container">
           <div class="section__header">
             <span class="section__eyebrow">Soutiens</span>
             <h2 class="section__title">Nos partenaires</h2>
-            <p class="section__subtitle">Un grand merci aux entreprises locales qui accompagnent le FC Chiché.</p>
+            <p class="section__subtitle">Merci à toutes les entreprises qui soutiennent le FC Chiché.</p>
           </div>
           <div class="partner-marquee" role="list">
             <span class="partner-marquee__item" role="listitem">BCZ</span>
