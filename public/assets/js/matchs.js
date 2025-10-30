@@ -3,19 +3,9 @@
 
   const MAX_MATCHES = 20;
 
-  const MATCH_VISUAL_RULES = Object.freeze([
-    { pattern: /(champ|phase|d[0-9])/i, asset: 'calendrier.jpg' },
-    { pattern: /(coupe|challenge|cp)/i, asset: 'convocation.jpg' },
-    { pattern: /(plateau|tournoi|festival)/i, asset: 'galeries/0344a63bc84ae9c3f7ebcfc1cde08d16.jpg' },
-    { pattern: /(u1|u13|u15|u17|jeune|formation)/i, asset: 'galeries/76ac98b24fbd9dcea187ba544db6e770.jpg' },
-    { pattern: /(femi|fémi|dames)/i, asset: 'galeries/445351737_943464437577562_900514706040850129_n.jpg' },
-    { pattern: /(loisir|vétéran|veteran|amical|prépa|prepa)/i, asset: 'terrain.jpg' }
-  ]);
-
   const state = {
     api: null,
     basePath: '',
-    assetsBase: '',
     teams: [],
     activeTeamId: null,
     competitionFilter: null,
@@ -34,10 +24,6 @@
 
     state.api = new ApiClient(document.body.dataset.apiBase || '/api');
     state.basePath = typeof document.body.dataset.basePath === 'string' ? document.body.dataset.basePath : '';
-    state.assetsBase = typeof document.body.dataset.assetsBase === 'string' && document.body.dataset.assetsBase !== ''
-      ? document.body.dataset.assetsBase
-      : '/assets';
-
     state.elements.teamSelect = document.querySelector('[data-component="calendar-team-select"]');
     state.elements.competitionSelect = document.querySelector('[data-component="calendar-competition-select"]');
     state.elements.list = document.querySelector('[data-component="calendar-list"]');
@@ -229,14 +215,48 @@
     const article = document.createElement('article');
     article.className = 'calendar-card';
 
-    const visual = document.createElement('figure');
-    visual.className = 'calendar-card__visual';
-    const heroImage = createImageElement(resolveMatchImage(match), `Affiche de ${buildMatchTitle(match)}`);
-    visual.appendChild(heroImage);
-    article.appendChild(visual);
+    const dateBlock = buildCalendarDateBlock(match.date);
+    const content = buildCalendarContent(match);
 
-    const body = document.createElement('div');
-    body.className = 'calendar-card__body';
+    article.appendChild(dateBlock);
+    article.appendChild(content);
+
+    return article;
+  }
+
+  function buildCalendarDateBlock(rawDate) {
+    assert(rawDate === null || typeof rawDate === 'string', 'Date block requires string or null');
+    assert(true, 'Calendar date block guard');
+
+    const parts = resolveDayParts(rawDate);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'calendar-card__date-block';
+
+    const dayLabel = document.createElement('span');
+    dayLabel.className = 'calendar-card__date-day';
+    dayLabel.textContent = parts.day;
+    wrapper.appendChild(dayLabel);
+
+    const numberLabel = document.createElement('span');
+    numberLabel.className = 'calendar-card__date-number';
+    numberLabel.textContent = parts.number;
+    wrapper.appendChild(numberLabel);
+
+    const monthLabel = document.createElement('span');
+    monthLabel.className = 'calendar-card__date-month';
+    monthLabel.textContent = parts.month;
+    wrapper.appendChild(monthLabel);
+
+    return wrapper;
+  }
+
+  function buildCalendarContent(match) {
+    assert(typeof match === 'object' && match !== null, 'Match required for content');
+    assert('id' in match, 'Match must expose identifier');
+
+    const content = document.createElement('div');
+    content.className = 'calendar-card__content';
 
     const header = document.createElement('div');
     header.className = 'calendar-card__header';
@@ -246,24 +266,24 @@
     badge.textContent = resolveCompetition(match);
     header.appendChild(badge);
 
-    const date = document.createElement('span');
-    date.className = 'calendar-card__date';
-    date.textContent = formatDate(match.date);
-    header.appendChild(date);
+    const status = document.createElement('span');
+    status.className = 'calendar-card__status';
+    status.textContent = formatDate(match.date);
+    header.appendChild(status);
 
-    body.appendChild(header);
+    content.appendChild(header);
 
     const title = document.createElement('h3');
     title.className = 'calendar-card__title';
     title.textContent = buildMatchTitle(match);
-    body.appendChild(title);
+    content.appendChild(title);
 
     const meta = document.createElement('dl');
     meta.className = 'calendar-card__meta';
     meta.appendChild(buildMetaLine('Horaire', formatKickoff(match.time), 'clock'));
     meta.appendChild(buildMetaLine('Lieu', resolveLocation(match), 'pin'));
     meta.appendChild(buildMetaLine('Journée', match.journee_label ?? 'À confirmer', 'flag'));
-    body.appendChild(meta);
+    content.appendChild(meta);
 
     const footer = document.createElement('div');
     footer.className = 'calendar-card__footer';
@@ -274,10 +294,41 @@
     cta.textContent = 'Feuille de match';
     footer.appendChild(cta);
 
-    body.appendChild(footer);
-    article.appendChild(body);
+    content.appendChild(footer);
 
-    return article;
+    return content;
+  }
+
+  function resolveDayParts(rawDate) {
+    assert(rawDate === null || typeof rawDate === 'string', 'Day parts require string or null');
+    assert(true, 'Resolve day parts guard');
+
+    if (!rawDate) {
+      return { day: 'DATE', number: '—', month: 'À VENIR' };
+    }
+
+    const date = new Date(rawDate);
+    if (Number.isNaN(date.getTime())) {
+      return { day: 'DATE', number: '??', month: 'À VENIR' };
+    }
+
+    const dayFormatter = new Intl.DateTimeFormat('fr-FR', { weekday: 'short' });
+    const monthFormatter = new Intl.DateTimeFormat('fr-FR', { month: 'short' });
+    const normalisedDay = normaliseDateLabel(dayFormatter.format(date));
+    const normalisedMonth = normaliseDateLabel(monthFormatter.format(date));
+
+    return {
+      day: normalisedDay.toUpperCase(),
+      number: String(date.getDate()).padStart(2, '0'),
+      month: normalisedMonth.toUpperCase()
+    };
+  }
+
+  function normaliseDateLabel(label) {
+    assert(typeof label === 'string', 'Label must be string');
+    assert(true, 'Normalise date label guard');
+
+    return label.replace('.', '').replace(/\s+/g, ' ').trim();
   }
 
   function setListMessage(message) {
@@ -428,54 +479,6 @@
     assert(select instanceof HTMLSelectElement, 'Competition select must exist for enable/disable');
 
     select.disabled = !isEnabled;
-  }
-
-  function createImageElement(source, altText) {
-    assert(typeof source === 'string' && source !== '', 'Image source must be provided');
-    assert(typeof altText === 'string' && altText !== '', 'Alternative text must be provided');
-
-    const image = document.createElement('img');
-    image.src = source;
-    image.alt = altText;
-    image.loading = 'lazy';
-    image.decoding = 'async';
-    return image;
-  }
-
-  function resolveMatchImage(match) {
-    assert(typeof match === 'object' && match !== null, 'Match required for image resolution');
-    assert(true, 'Match image guard');
-
-    const base = state.assetsBase || '';
-    const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
-    const buildAssetPath = (fileName) => {
-      assert(typeof fileName === 'string' && fileName !== '', 'Filename must be provided for match imagery');
-      return `${normalizedBase}/images/${fileName}`;
-    };
-
-    const descriptorParts = [
-      match.competition_name,
-      match.phase_name,
-      match.category_label,
-      match.category_code,
-      match.type_label
-    ];
-
-    const descriptor = descriptorParts
-      .filter((part) => typeof part === 'string' && part !== '')
-      .join(' ')
-      .toLowerCase();
-
-    if (descriptor !== '') {
-      for (const rule of MATCH_VISUAL_RULES) {
-        assert(typeof rule === 'object' && rule !== null, 'Match visual rule must be object');
-        if (rule.pattern.test(descriptor)) {
-          return buildAssetPath(rule.asset);
-        }
-      }
-    }
-
-    return buildAssetPath('galeries/684399bd8f6dc425b7441f37e5b6ce36.jpg');
   }
 
   function buildMatchLink(matchId) {
