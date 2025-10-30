@@ -5,7 +5,10 @@
 
   const state = {
     api: null,
+    basePath: '',
     teams: [],
+    activeTeamId: null,
+    competitionFilter: null,
     elements: {
       teamSelect: null,
       competitionSelect: null,
@@ -20,6 +23,7 @@
     assert(typeof ApiClient === 'function', 'ApiClient dependency missing');
 
     state.api = new ApiClient(document.body.dataset.apiBase || '/api');
+    state.basePath = typeof document.body.dataset.basePath === 'string' ? document.body.dataset.basePath : '';
 
     state.elements.teamSelect = document.querySelector('[data-component="calendar-team-select"]');
     state.elements.competitionSelect = document.querySelector('[data-component="calendar-competition-select"]');
@@ -32,14 +36,18 @@
     state.elements.teamSelect.addEventListener('change', handleTeamChange);
     state.elements.competitionSelect.addEventListener('change', handleCompetitionChange);
 
+    state.activeTeamId = null;
+    state.competitionFilter = null;
+    setCompetitionEnabled(false);
+    setListMessage('Chargement des prochains matchs du club…');
+
+    void loadClubCalendar();
     void loadTeams();
   }
 
   async function loadTeams() {
     assert(state.api !== null, 'API client must be initialised');
     assert(state.elements.teamSelect instanceof HTMLSelectElement, 'Team select must exist');
-
-    setListMessage('Chargement des équipes…');
 
     try {
       const response = await state.api.get('/equipes.php');
@@ -48,25 +56,18 @@
       assert(Array.isArray(teams), 'Teams payload must be array');
 
       if (teams.length === 0) {
-        setListMessage('Aucune équipe disponible pour le moment.');
+        setCompetitionEnabled(false);
         return;
       }
 
       state.teams = teams;
       populateTeamSelect(teams);
-
-      if (state.elements.competitionSelect instanceof HTMLSelectElement) {
-        state.elements.competitionSelect.value = '';
-      }
-
-      const defaultId = safeParseInt(teams[0]?.id ?? 0);
-      if (defaultId > 0) {
-        state.elements.teamSelect.value = String(defaultId);
-        await loadCalendarForTeam(defaultId);
-      }
+      resetCompetitionFilter();
     } catch (error) {
       console.error('Erreur lors du chargement des équipes (calendrier)', error);
-      setListMessage('Impossible de récupérer la liste des équipes pour le moment.');
+      if (state.activeTeamId === null) {
+        setListMessage('Impossible de récupérer la liste des équipes pour le moment.');
+      }
     }
   }
 
@@ -102,10 +103,15 @@
 
     const teamId = safeParseInt(select.value);
     if (teamId <= 0) {
-      setListMessage('Choisissez une équipe pour afficher son calendrier.');
+      state.activeTeamId = null;
+      resetCompetitionFilter();
+      setCompetitionEnabled(false);
+      await loadClubCalendar();
       return;
     }
 
+    state.activeTeamId = teamId;
+    setCompetitionEnabled(true);
     await loadCalendarForTeam(teamId);
   }
 
@@ -119,10 +125,10 @@
 
     const teamId = safeParseInt(teamSelect.value);
     if (teamId <= 0) {
-      setListMessage('Choisissez une équipe pour appliquer un filtre de compétition.');
       return;
     }
 
+    state.activeTeamId = teamId;
     await loadCalendarForTeam(teamId);
   }
 
@@ -130,6 +136,7 @@
     assert(state.api !== null, 'API client must be initialised');
     assert(Number.isInteger(teamId) && teamId > 0, 'Team identifier must be positive integer');
 
+    state.activeTeamId = teamId;
     setListMessage('Chargement du calendrier…');
 
     try {
@@ -159,6 +166,32 @@
     }
   }
 
+  async function loadClubCalendar() {
+    assert(state.api !== null, 'API client must be initialised');
+    assert(state.elements.list instanceof HTMLElement, 'Calendar list element missing');
+
+    state.activeTeamId = null;
+    resetCompetitionFilter();
+    setCompetitionEnabled(false);
+
+    try {
+      const response = await state.api.getCalendrier(null, MAX_MATCHES);
+      assert(typeof response === 'object' && response !== null, 'Invalid response for club calendar');
+      const matchs = Array.isArray(response.data) ? response.data : [];
+      assert(Array.isArray(matchs), 'Club calendar payload must be array');
+
+      if (matchs.length === 0) {
+        setListMessage('Aucun match programmé pour le club pour le moment.');
+        return;
+      }
+
+      renderCalendar(matchs);
+    } catch (error) {
+      console.error('Erreur lors du chargement du calendrier club', error);
+      setListMessage('Impossible de récupérer les prochains matchs du club.');
+    }
+  }
+
   function renderCalendar(matchs) {
     assert(Array.isArray(matchs), 'Matchs list must be array');
     assert(state.elements.list instanceof HTMLElement, 'Calendar list element missing');
@@ -180,73 +213,62 @@
     assert(typeof match === 'object' && match !== null, 'Match object required');
     assert('date' in match, 'Match object must include date');
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-white/5 rounded-xl px-6 py-5';
+    const article = document.createElement('article');
+    article.className = 'calendar-card';
 
-    const infos = document.createElement('div');
-    infos.className = 'flex flex-col gap-2';
+    const visual = document.createElement('div');
+    visual.className = 'calendar-card__visual';
+    visual.appendChild(createImageElement(resolveMatchImage(match), `Affiche de ${buildMatchTitle(match)}`));
+    article.appendChild(visual);
 
-    const competition = document.createElement('p');
-    competition.className = 'text-primary text-sm font-semibold uppercase tracking-wider';
-    competition.textContent = resolveCompetition(match);
-    infos.appendChild(competition);
+    const body = document.createElement('div');
+    body.className = 'calendar-card__body';
 
-    const title = document.createElement('h3');
-    title.className = 'text-white text-2xl font-bold';
-    title.textContent = buildMatchTitle(match);
-    infos.appendChild(title);
+    const header = document.createElement('div');
+    header.className = 'calendar-card__header';
 
-    const location = document.createElement('p');
-    location.className = 'text-gray-300 text-sm flex items-center gap-2';
-    const locationIcon = document.createElement('span');
-    locationIcon.className = 'material-symbols-outlined text-primary';
-    locationIcon.textContent = 'location_on';
-    location.appendChild(locationIcon);
-    const locationText = document.createElement('span');
-    locationText.textContent = resolveLocation(match);
-    location.appendChild(locationText);
-    infos.appendChild(location);
+    const badge = document.createElement('span');
+    badge.className = 'section__eyebrow';
+    badge.textContent = resolveCompetition(match);
+    header.appendChild(badge);
 
-    wrapper.appendChild(infos);
+    const date = document.createElement('span');
+    date.textContent = formatDate(match.date);
+    header.appendChild(date);
 
-    const schedule = document.createElement('div');
-    schedule.className = 'flex flex-col items-start lg:items-end gap-2 text-gray-200';
+    body.appendChild(header);
 
-    const dateRow = document.createElement('p');
-    dateRow.className = 'flex items-center gap-2 text-base font-semibold';
-    const dateIcon = document.createElement('span');
-    dateIcon.className = 'material-symbols-outlined text-primary';
-    dateIcon.textContent = 'event';
-    dateRow.appendChild(dateIcon);
-    const dateText = document.createElement('span');
-    dateText.textContent = formatDate(match.date);
-    dateRow.appendChild(dateText);
-    schedule.appendChild(dateRow);
+    const teams = document.createElement('div');
+    teams.className = 'calendar-card__teams';
+    teams.textContent = buildMatchTitle(match);
+    body.appendChild(teams);
 
-    const timeRow = document.createElement('p');
-    timeRow.className = 'flex items-center gap-2 text-sm';
-    const timeIcon = document.createElement('span');
-    timeIcon.className = 'material-symbols-outlined text-primary';
-    timeIcon.textContent = 'schedule';
-    timeRow.appendChild(timeIcon);
-    const timeText = document.createElement('span');
-    timeText.textContent = formatKickoff(match.time);
-    timeRow.appendChild(timeText);
-    schedule.appendChild(timeRow);
+    const meta = document.createElement('div');
+    meta.className = 'calendar-card__meta';
+    meta.appendChild(buildMetaLine('Horaire', formatKickoff(match.time)));
+    meta.appendChild(buildMetaLine('Lieu', resolveLocation(match)));
+    meta.appendChild(buildMetaLine('Journée', match.journee_label ?? 'À confirmer'));
+    body.appendChild(meta);
 
-    wrapper.appendChild(schedule);
+    const cta = document.createElement('a');
+    cta.className = 'event-card__cta';
+    cta.href = buildMatchLink(match.id);
+    cta.textContent = 'Feuille de match';
+    body.appendChild(cta);
 
-    return wrapper;
+    article.appendChild(body);
+
+    return article;
   }
 
   function setListMessage(message) {
     assert(state.elements.list instanceof HTMLElement, 'Calendar list element missing');
     assert(typeof message === 'string', 'Message must be string');
 
-    const paragraph = document.createElement('p');
-    paragraph.className = 'rounded-xl bg-white/10 p-4 text-sm text-gray-300';
-    paragraph.textContent = message;
-    state.elements.list.replaceChildren(paragraph);
+    const placeholder = document.createElement('article');
+    placeholder.className = 'calendar-card calendar-card--placeholder';
+    placeholder.textContent = message;
+    state.elements.list.replaceChildren(placeholder);
   }
 
   function formatTeamLabel(team) {
@@ -274,10 +296,12 @@
     assert(rawValue.length <= 2, 'Competition type cannot exceed two characters');
 
     if (rawValue === '') {
+      state.competitionFilter = null;
       return null;
     }
 
     assert(rawValue === 'CH' || rawValue === 'CP', 'Competition type must be CH or CP');
+    state.competitionFilter = rawValue;
     return rawValue;
   }
 
@@ -347,5 +371,71 @@
       return 0;
     }
     return parsed;
+  }
+
+  function buildMetaLine(label, value) {
+    assert(typeof label === 'string' && label !== '', 'Meta label must be provided');
+    assert(typeof value === 'string' && value !== '', 'Meta value must be provided');
+
+    const span = document.createElement('span');
+    span.textContent = `${label} · ${value}`;
+    return span;
+  }
+
+  function resetCompetitionFilter() {
+    assert(state.elements.competitionSelect instanceof HTMLSelectElement, 'Competition select must exist to reset');
+    assert(state.competitionFilter === null || typeof state.competitionFilter === 'string', 'Competition filter state must be valid');
+
+    const select = state.elements.competitionSelect;
+    select.value = '';
+    state.competitionFilter = null;
+  }
+
+  function setCompetitionEnabled(isEnabled) {
+    assert(typeof isEnabled === 'boolean', 'Competition enabled flag must be boolean');
+    const select = state.elements.competitionSelect;
+    assert(select instanceof HTMLSelectElement, 'Competition select must exist for enable/disable');
+
+    select.disabled = !isEnabled;
+  }
+
+  function createImageElement(source, altText) {
+    assert(typeof source === 'string' && source !== '', 'Image source must be provided');
+    assert(typeof altText === 'string' && altText !== '', 'Alternative text must be provided');
+
+    const image = document.createElement('img');
+    image.src = source;
+    image.alt = altText;
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    return image;
+  }
+
+  function resolveMatchImage(match) {
+    assert(typeof match === 'object' && match !== null, 'Match required for image resolution');
+    assert(true, 'Match image guard');
+
+    const descriptor = String(match.competition_name ?? match.phase_name ?? match.category_label ?? '').toLowerCase();
+    if (descriptor.includes('champ')) {
+      return 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=960&q=80';
+    }
+    if (descriptor.includes('coupe') || descriptor.includes('cp')) {
+      return 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=960&q=80';
+    }
+    if (descriptor.includes('u1') || descriptor.includes('jeune')) {
+      return 'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?auto=format&fit=crop&w=960&q=80';
+    }
+    return 'https://images.unsplash.com/photo-1434648957308-5e6a859697e8?auto=format&fit=crop&w=960&q=80';
+  }
+
+  function buildMatchLink(matchId) {
+    assert(matchId === undefined || matchId === null || Number.isInteger(Number(matchId)), 'Match id must be numeric or null');
+    assert(typeof state.basePath === 'string', 'Base path must be a string');
+
+    const base = state.basePath || '';
+    if (matchId === null || matchId === undefined) {
+      return `${base}/matchs`;
+    }
+    return `${base}/matchs#match-${matchId}`;
   }
 })();
