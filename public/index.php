@@ -67,16 +67,6 @@ require_once __DIR__ . '/templates/header.php';
               <a class="btn btn--outline" href="<?= $basePath ?>/resultats">Derniers résultats</a>
             </div>
           </div>
-          <dl class="hero__details">
-            <div class="hero__detail">
-              <dt class="hero__detail-label">Stade municipal</dt>
-              <dd class="hero__detail-text">Ambiance garantie chaque samedi soir</dd>
-            </div>
-            <div class="hero__detail">
-              <dt class="hero__detail-label">Communauté</dt>
-              <dd class="hero__detail-text">Licenciés, supporters et bénévoles réunis autour du ballon</dd>
-            </div>
-          </dl>
         </div>
       </section>
 
