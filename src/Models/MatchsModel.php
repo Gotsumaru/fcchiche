@@ -26,11 +26,14 @@ class MatchsModel
      */
     private function enrichMatchData(array $match): array
     {
+        assert(array_key_exists('home_club_id', $match), 'Match must contain home_club_id');
+        assert(array_key_exists('away_club_id', $match), 'Match must contain away_club_id');
         $clubId = API_FFF_CLUB_ID;
-        
+
         // Déterminer si FC Chiche joue à domicile
         $match['is_home'] = ($match['home_club_id'] == $clubId);
-        
+        assert(is_bool($match['is_home']), 'is_home flag must be boolean');
+
         // Construire les noms d'affichage
         if ($match['is_home']) {
             // FC Chiche à domicile
@@ -41,8 +44,24 @@ class MatchsModel
             $match['home_name'] = $match['opponent_name'] ?? 'Adversaire à définir';
             $match['away_name'] = 'FC CHICHE';
         }
-        
+
+        assert(isset($match['home_name']), 'Home name must be defined');
+        assert(isset($match['away_name']), 'Away name must be defined');
+
         return $match;
+    }
+
+    /**
+     * Valide la structure d'un match issu de la BDD.
+     *
+     * @param array $match Données du match
+     * @return void
+     */
+    private function assertMatchShape(array $match): void
+    {
+        assert(isset($match['ma_no']), 'Match row must contain ma_no');
+        assert(array_key_exists('home_club_id', $match), 'Match row must contain home_club_id');
+        assert(array_key_exists('away_club_id', $match), 'Match row must contain away_club_id');
     }
 
     /**
@@ -53,6 +72,8 @@ class MatchsModel
      */
     private function enrichMatchsData(array $matchs): array
     {
+        assert(array_is_list($matchs) || $matchs === [], 'Match list must be sequential array');
+        assert(empty($matchs) || is_array($matchs[0]), 'Match list must contain arrays');
         return array_map([$this, 'enrichMatchData'], $matchs);
     }
 
@@ -96,21 +117,23 @@ class MatchsModel
             assert($limit <= 1000, 'Limit too high');
             $sql .= " LIMIT :limit";
         }
-        
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':club_id', API_FFF_CLUB_ID, PDO::PARAM_INT);
-        
+
         if ($isResult !== null) {
             $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
         }
-        
+
         if ($limit !== null && $limit > 0) {
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         }
-        
-        $stmt->execute();
+
+        $executed = $stmt->execute();
+        assert($executed === true, 'Match query execution must succeed');
         $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+        assert(is_array($matchs), 'Fetched matchs must be an array');
+
         return $this->enrichMatchsData($matchs);
     }
 
@@ -123,7 +146,8 @@ class MatchsModel
     public function getUpcomingMatchs(int $limit = 10): array
     {
         assert($limit > 0 && $limit <= 100, 'Invalid limit');
-        
+        assert(is_int($limit), 'Limit must be an integer');
+
         return $this->getAllMatchs(false, $limit);
     }
 
@@ -136,7 +160,8 @@ class MatchsModel
     public function getLastResults(int $limit = 10): array
     {
         assert($limit > 0 && $limit <= 100, 'Invalid limit');
-        
+        assert(is_int($limit), 'Limit must be an integer');
+
         return $this->getAllMatchs(true, $limit);
     }
 
@@ -149,8 +174,9 @@ class MatchsModel
     public function getMatchById(int $id): ?array
     {
         assert($id > 0, 'Match ID must be positive');
-        
-        $sql = "SELECT 
+        assert(is_int($id), 'Match ID must be integer');
+
+        $sql = "SELECT
                     m.*,
                     c.name as competition_name,
                     c.type as competition_type,
@@ -175,17 +201,20 @@ class MatchsModel
                 LIMIT 1";
         
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
+        $executed = $stmt->execute([
             'id' => $id,
             'club_id' => API_FFF_CLUB_ID
         ]);
-        
+        assert($executed === true, 'Match fetch must succeed');
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($result === false) {
             return null;
         }
-        
+
+        $this->assertMatchShape($result);
+
         return $this->enrichMatchData($result);
     }
 
