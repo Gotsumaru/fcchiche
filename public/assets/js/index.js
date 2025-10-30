@@ -5,15 +5,6 @@
   const MAX_RESULTS = 6;
   const SCROLL_STEP = 320;
 
-  const MATCH_VISUAL_RULES = Object.freeze([
-    { pattern: /(champ|phase|d[0-9])/i, asset: 'calendrier.jpg' },
-    { pattern: /(coupe|challenge|cp)/i, asset: 'convocation.jpg' },
-    { pattern: /(plateau|tournoi|festival)/i, asset: 'galeries/0344a63bc84ae9c3f7ebcfc1cde08d16.jpg' },
-    { pattern: /(u1|u13|u15|u17|jeune|formation)/i, asset: 'galeries/76ac98b24fbd9dcea187ba544db6e770.jpg' },
-    { pattern: /(femi|fémi|dames)/i, asset: 'galeries/445351737_943464437577562_900514706040850129_n.jpg' },
-    { pattern: /(loisir|vétéran|veteran|amical|prépa|prepa)/i, asset: 'terrain.jpg' }
-  ]);
-
   const state = {
     api: null,
     basePath: '',
@@ -511,35 +502,26 @@
     assert(true, 'Image resolution guard');
 
     const base = state.assetsBase || '';
-    const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
     const buildAssetPath = (fileName) => {
       assert(typeof fileName === 'string' && fileName !== '', 'Filename must be provided for asset path');
+      const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
       return `${normalizedBase}/images/${fileName}`;
     };
 
-    const descriptorParts = [
-      match.competition_name,
-      match.phase_name,
-      match.category_label,
-      match.category_code,
-      match.type_label
-    ];
-
-    const descriptor = descriptorParts
-      .filter((part) => typeof part === 'string' && part !== '')
-      .join(' ')
-      .toLowerCase();
-
-    if (descriptor !== '') {
-      for (const rule of MATCH_VISUAL_RULES) {
-        assert(typeof rule === 'object' && rule !== null, 'Match visual rule must be an object');
-        if (rule.pattern.test(descriptor)) {
-          return buildAssetPath(rule.asset);
-        }
-      }
+    const source = String(match.competition_name ?? match.phase_name ?? match.category_label ?? '').toLowerCase();
+    if (source.includes('champ')) {
+      return buildAssetPath('Agenda.png');
     }
-
-    return buildAssetPath('galeries/684399bd8f6dc425b7441f37e5b6ce36.jpg');
+    if (source.includes('coupe') || source.includes('cp')) {
+      return buildAssetPath('resultat.png');
+    }
+    if (source.includes('u1') || source.includes('jeune')) {
+      return buildAssetPath('Contact.png');
+    }
+    if (source.includes('fem') || source.includes('dames')) {
+      return buildAssetPath('resultat.png');
+    }
+    return buildAssetPath('home.png');
   }
 
   function buildMatchLink(page, matchId) {
