@@ -36,20 +36,14 @@ require_once __DIR__ . '/templates/header.php';
         <div class="container">
           <div class="result-info">
             <div class="result-info__visual" aria-hidden="true">
-              <picture>
-                <source
-                  srcset="<?= $assetsBase ?>/images/convocation.webp"
-                  type="image/webp"
-                />
-                <img
-                  src="<?= $assetsBase ?>/images/convocation.jpg"
-                  width="1792"
-                  height="1024"
-                  alt="Feuille officielle renseignant les résultats validés du FC Chiché"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
+              <img
+                src="<?= $assetsBase ?>/images/resultat.png"
+                width="4096"
+                height="4096"
+                alt="Feuille de match officielle du FC Chiché"
+                loading="lazy"
+                decoding="async"
+              />
             </div>
             <div class="result-info__content">
               <h2>Lecture des codes compétition</h2>
