@@ -510,18 +510,18 @@
 
     const source = String(match.competition_name ?? match.phase_name ?? match.category_label ?? '').toLowerCase();
     if (source.includes('champ')) {
-      return buildAssetPath('calendrier.jpg');
+      return buildAssetPath('Agenda.png');
     }
     if (source.includes('coupe') || source.includes('cp')) {
-      return buildAssetPath('convocation.jpg');
+      return buildAssetPath('resultat.png');
     }
     if (source.includes('u1') || source.includes('jeune')) {
-      return buildAssetPath('U15.jpg');
+      return buildAssetPath('Contact.png');
     }
     if (source.includes('fem') || source.includes('dames')) {
-      return buildAssetPath('home.jpg');
+      return buildAssetPath('resultat.png');
     }
-    return buildAssetPath('terrain.jpg');
+    return buildAssetPath('home.png');
   }
 
   function buildMatchLink(page, matchId) {

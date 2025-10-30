@@ -13,25 +13,11 @@ require_once __DIR__ . '/templates/header.php';
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero__media">
           <picture>
-            <source
-              srcset="
-                <?= $assetsBase ?>/images/home-480.webp 480w,
-                <?= $assetsBase ?>/images/home-800.webp 800w,
-                <?= $assetsBase ?>/images/home-1200.webp 1200w
-              "
-              type="image/webp"
-              sizes="(min-width: 80rem) 60vw, (min-width: 48rem) 75vw, 100vw"
-            />
-            <source
-              srcset="<?= $assetsBase ?>/images/home.jpg 2048w"
-              type="image/jpeg"
-              sizes="(min-width: 80rem) 60vw, (min-width: 48rem) 75vw, 100vw"
-            />
             <img
-              src="<?= $assetsBase ?>/images/home.jpg"
-              width="2048"
-              height="1152"
-              alt="Les joueurs du FC Chiché rentrent sur la pelouse du stade municipal"
+              src="<?= $assetsBase ?>/images/home.png"
+              width="4096"
+              height="4096"
+              alt="Vue aérienne du complexe sportif du FC Chiché"
               loading="eager"
               fetchpriority="high"
               decoding="async"
@@ -95,52 +81,34 @@ require_once __DIR__ . '/templates/header.php';
             <div class="story-grid__gallery">
               <div class="story-gallery">
                 <figure class="story-gallery__item story-gallery__item--wide">
-                  <picture>
-                    <source
-                      srcset="<?= $assetsBase ?>/images/equipe.jpg"
-                      type="image/jpeg"
-                    />
-                    <img
-                      src="<?= $assetsBase ?>/images/equipe.jpg"
-                      width="1792"
-                      height="1024"
-                      alt="Les seniors du FC Chiché réunis pour la photo officielle sur la pelouse"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </picture>
+                  <img
+                    src="<?= $assetsBase ?>/images/Agenda.png"
+                    width="4096"
+                    height="4096"
+                    alt="Vestiaire du FC Chiché préparé avant la rencontre"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </figure>
                 <figure class="story-gallery__item story-gallery__item--tall">
-                  <picture>
-                    <source
-                      srcset="<?= $assetsBase ?>/images/terrain-port.jpg"
-                      type="image/jpeg"
-                    />
-                    <img
-                      src="<?= $assetsBase ?>/images/terrain-port.jpg"
-                      width="419"
-                      height="608"
-                      alt="Vue verticale du terrain principal du FC Chiché"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </picture>
+                  <img
+                    src="<?= $assetsBase ?>/images/resultat.png"
+                    width="4096"
+                    height="4096"
+                    alt="Jeunes licenciés réunis autour du ballon du match"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </figure>
                 <figure class="story-gallery__item story-gallery__item--square">
-                  <picture>
-                    <source
-                      srcset="<?= $assetsBase ?>/images/bureau.jpg"
-                      type="image/jpeg"
-                    />
-                    <img
-                      src="<?= $assetsBase ?>/images/bureau.jpg"
-                      width="1080"
-                      height="617"
-                      alt="Le bureau des bénévoles du FC Chiché en activité au club-house"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </picture>
+                  <img
+                    src="<?= $assetsBase ?>/images/Contact.png"
+                    width="4096"
+                    height="4096"
+                    alt="Supporters du FC Chiché partageant un moment au club-house"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </figure>
               </div>
             </div>
@@ -174,20 +142,14 @@ require_once __DIR__ . '/templates/header.php';
           </div>
           <div class="result-showcase" data-component="home-results">
             <div class="result-showcase__gallery">
-              <picture>
-                <source
-                  srcset="<?= $assetsBase ?>/images/convocation.webp"
-                  type="image/webp"
-                />
-                <img
-                  src="<?= $assetsBase ?>/images/convocation.jpg"
-                  width="1792"
-                  height="1024"
-                  alt="Feuille de match et feuille de route prêtes pour les équipes du FC Chiché"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
+              <img
+                src="<?= $assetsBase ?>/images/resultat.png"
+                width="4096"
+                height="4096"
+                alt="Joueurs du FC Chiché célébrant les derniers résultats"
+                loading="lazy"
+                decoding="async"
+              />
             </div>
             <div class="result-showcase__stream">
               <div class="home-scroll home-scroll--compact">
