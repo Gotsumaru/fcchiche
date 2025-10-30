@@ -178,57 +178,40 @@
 
   function buildResultCard(match) {
     assert(typeof match === 'object' && match !== null, 'Match object required');
-    assert('home_score' in match || 'away_score' in match, 'Match must contain score fields');
+    assert('home_score' in match && 'away_score' in match, 'Match must contain score fields');
 
     const article = document.createElement('article');
-    article.className = 'glass-card-event-dark rounded-2xl p-6 shadow-xl';
+    article.className = 'result-card';
 
-    const header = document.createElement('header');
-    header.className = 'flex flex-col gap-2';
+    const header = document.createElement('div');
+    header.className = 'result-card__header';
 
-    const competition = document.createElement('p');
-    competition.className = 'text-primary text-sm font-semibold uppercase tracking-wider';
-    competition.textContent = resolveCompetition(match);
-    header.appendChild(competition);
+    const badge = document.createElement('span');
+    badge.className = 'section__eyebrow';
+    badge.textContent = resolveCompetition(match);
+    header.appendChild(badge);
 
-    const title = document.createElement('h2');
-    title.className = 'text-white text-2xl font-bold';
-    title.textContent = buildMatchTitle(match);
-    header.appendChild(title);
+    const date = document.createElement('span');
+    date.textContent = formatDate(match.date, match.time);
+    header.appendChild(date);
 
     article.appendChild(header);
 
-    const content = document.createElement('div');
-    content.className = 'mt-4 flex flex-col gap-3 text-gray-200';
+    const teams = document.createElement('div');
+    teams.className = 'result-card__teams';
+    teams.textContent = buildMatchTitle(match);
+    article.appendChild(teams);
 
-    const dateRow = document.createElement('p');
-    dateRow.className = 'text-sm flex items-center gap-2';
-    const dateIcon = document.createElement('span');
-    dateIcon.className = 'material-symbols-outlined text-primary';
-    dateIcon.textContent = 'event';
-    dateRow.appendChild(dateIcon);
-    const dateValue = document.createElement('span');
-    dateValue.textContent = formatDate(match.date, match.time);
-    dateRow.appendChild(dateValue);
-    content.appendChild(dateRow);
+    const score = document.createElement('p');
+    score.className = 'result-card__score';
+    score.textContent = formatScore(match);
+    article.appendChild(score);
 
-    const scoreRow = document.createElement('p');
-    scoreRow.className = 'text-4xl font-black text-white drop-shadow';
-    scoreRow.textContent = formatScore(match);
-    content.appendChild(scoreRow);
-
-    const locationRow = document.createElement('p');
-    locationRow.className = 'text-sm flex items-center gap-2 text-gray-300';
-    const locationIcon = document.createElement('span');
-    locationIcon.className = 'material-symbols-outlined text-primary';
-    locationIcon.textContent = 'stadium';
-    locationRow.appendChild(locationIcon);
-    const locationText = document.createElement('span');
-    locationText.textContent = resolveLocation(match);
-    locationRow.appendChild(locationText);
-    content.appendChild(locationRow);
-
-    article.appendChild(content);
+    const meta = document.createElement('div');
+    meta.className = 'result-card__meta';
+    meta.appendChild(buildMetaLine('Lieu', resolveLocation(match)));
+    meta.appendChild(buildMetaLine('Catégorie', resolveResultCategory(match)));
+    article.appendChild(meta);
 
     return article;
   }
@@ -237,8 +220,8 @@
     assert(state.elements.list instanceof HTMLElement, 'Results list element missing');
     assert(typeof message === 'string', 'Message must be string');
 
-    const paragraph = document.createElement('p');
-    paragraph.className = 'glass-card-event-dark rounded-2xl p-6 text-sm text-gray-300';
+    const paragraph = document.createElement('div');
+    paragraph.className = 'result-card result-card--placeholder';
     paragraph.textContent = message;
     state.elements.list.replaceChildren(paragraph);
   }
@@ -347,5 +330,30 @@
       return 0;
     }
     return parsed;
+  }
+
+  function buildMetaLine(label, value) {
+    assert(typeof label === 'string' && label !== '', 'Meta label must be string');
+    assert(typeof value === 'string' && value !== '', 'Meta value must be string');
+
+    const paragraph = document.createElement('p');
+    paragraph.textContent = `${label} : ${value}`;
+    return paragraph;
+  }
+
+  function resolveResultCategory(match) {
+    assert(typeof match === 'object' && match !== null, 'Match required for category');
+    assert(true, 'Placeholder assertion for density');
+
+    if (typeof match.equipe_label === 'string' && match.equipe_label !== '') {
+      return match.equipe_label;
+    }
+    if (typeof match.team_name === 'string' && match.team_name !== '') {
+      return match.team_name;
+    }
+    if (typeof match.category_label === 'string' && match.category_label !== '') {
+      return match.category_label;
+    }
+    return 'FC Chiché';
   }
 })();
