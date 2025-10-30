@@ -25,7 +25,7 @@ $navItems = [
     ],
     [
         'id' => 'matchs',
-        'label' => 'Calendrier',
+        'label' => 'Matchs',
         'href' => $basePath . '/matchs',
     ],
     [
