@@ -11,59 +11,33 @@ require_once __DIR__ . '/templates/header.php';
           <div class="section__header">
             <span class="section__eyebrow">Agenda</span>
             <h1 class="section__title">Prochains matchs</h1>
-            <p class="section__subtitle">Tous les rendez-vous pour soutenir les verts et blancs.</p>
+            <p class="section__subtitle">Retrouvez le calendrier officiel et filtrez par équipe et compétition.</p>
+          </div>
+          <div class="filter-bar" role="group" aria-label="Filtres du calendrier">
+            <div class="filter-bar__field">
+              <label class="label" for="calendar-team">Équipe</label>
+              <select class="select" id="calendar-team" data-component="calendar-team-select"></select>
+            </div>
+            <div class="filter-bar__field">
+              <label class="label" for="calendar-competition">Compétition</label>
+              <select class="select" id="calendar-competition" data-component="calendar-competition-select">
+                <option value="">Toutes les compétitions</option>
+                <option value="CH">Championnat</option>
+                <option value="CP">Coupe de France / Coupes</option>
+              </select>
+            </div>
           </div>
 
-          <div class="match-list">
-            <article class="match-card">
-              <div class="match-card__teams">
-                <span>FC Chiché 1</span>
-                <span>vs</span>
-                <span>Beaulieu Breuil ES</span>
-              </div>
-              <div class="match-card__meta">
-                <span class="badge">Championnat</span>
-                <span>25 mai 2025</span>
-                <span>15h00</span>
-                <span>Stade de Chiché</span>
-              </div>
-            </article>
-            <article class="match-card">
-              <div class="match-card__teams">
-                <span>FC Chiché U17</span>
-                <span>vs</span>
-                <span>US Parthenay</span>
-              </div>
-              <div class="match-card__meta">
-                <span class="badge">Championnat</span>
-                <span>31 mai 2025</span>
-                <span>18h30</span>
-                <span>Complexe La Broche</span>
-              </div>
-            </article>
-            <article class="match-card">
-              <div class="match-card__teams">
-                <span>FC Chiché U15</span>
-                <span>vs</span>
-                <span>Airvault</span>
-              </div>
-              <div class="match-card__meta">
-                <span class="badge">Coupe</span>
-                <span>2 juin 2025</span>
-                <span>14h00</span>
-                <span>Stade municipal</span>
-              </div>
-            </article>
-          </div>
+          <div class="calendar-list" data-component="calendar-list" aria-live="polite"></div>
         </div>
       </section>
 
-      <section class="section section--alt">
+      <section class="section section--alt" id="telechargement-calendrier">
         <div class="container">
           <div class="section__header">
             <span class="section__eyebrow">Saison</span>
             <h2 class="section__title">Calendrier de la saison</h2>
-            <p class="section__subtitle">Téléchargez la version complète à afficher dans votre vestiaire.</p>
+            <p class="section__subtitle">Téléchargez la version prête à l'impression et ajoutez-la à votre vestiaire.</p>
             <div class="hero__actions" style="margin-top: 2rem;">
               <a class="btn btn--primary" href="<?= $assetsBase ?>/docs/calendrier-fcchiche.pdf" download>Télécharger le calendrier PDF</a>
             </div>
@@ -73,18 +47,28 @@ require_once __DIR__ . '/templates/header.php';
 
       <section class="section">
         <div class="container">
-          <div class="section__header">
-            <span class="section__eyebrow">Soutiens</span>
-            <h2 class="section__title">Nos sponsors</h2>
-          </div>
-          <div class="partner-marquee" role="list">
-            <span class="partner-marquee__item" role="listitem">BCZ</span>
-            <span class="partner-marquee__item" role="listitem">Boche Chaussure</span>
-            <span class="partner-marquee__item" role="listitem">Cholet Traiteur</span>
-            <span class="partner-marquee__item" role="listitem">CR7</span>
-            <span class="partner-marquee__item" role="listitem">Clochard Dolor</span>
-            <span class="partner-marquee__item" role="listitem">Chiché Automobile</span>
-            <span class="partner-marquee__item" role="listitem">Maison Dubois</span>
+          <div class="calendar-highlight">
+            <div class="calendar-highlight__visual" aria-hidden="true">
+              <img
+                src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80"
+                width="640"
+                height="640"
+                alt="Supporters du FC Chiché en déplacement"
+                loading="lazy"
+              />
+            </div>
+            <div class="calendar-highlight__content">
+              <h2>Préparez vos déplacements</h2>
+              <p>
+                Chaque feuille de route indique l'heure de convocation, le lieu de rendez-vous et le type de compétition. Pensez
+                à vérifier la mise à jour des terrains en cas d'intempéries.
+              </p>
+              <ul>
+                <li>Notification automatique 48h avant le match</li>
+                <li>Feuilles de route envoyées par les éducateurs</li>
+                <li>Bénévoles logistique disponibles sur demande</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>

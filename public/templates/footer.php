@@ -2,43 +2,48 @@
 
       <footer class="app-footer">
         <div class="app-footer__inner">
-          <div class="app-footer__top">
-            <div class="app-footer__brand">
-              <img
-                src="<?= $assetsBase ?>/images/logo.svg"
-                width="52"
-                height="52"
-                alt="Logo FC Chiché"
-                loading="lazy"
-              />
-              <div class="app-footer__brand-text">
-                <p class="app-footer__title">FC Chiché</p>
-                <p class="app-footer__subtitle">Club de football amateur du bocage bressuirais</p>
-              </div>
+          <div class="app-footer__branding">
+            <img
+              src="<?= $assetsBase ?>/images/logo.svg"
+              width="56"
+              height="56"
+              alt="Logo FC Chiché"
+              loading="lazy"
+            />
+            <div class="app-footer__branding-text">
+              <p class="app-footer__title">FC Chiché</p>
+              <p class="app-footer__subtitle">Club de football amateur du bocage bressuirais</p>
             </div>
-            <div class="app-footer__actions">
-              <a class="btn btn--secondary" href="<?= $basePath ?>/partenaires">Devenir partenaire</a>
-              <a class="btn btn--ghost" href="<?= $basePath ?>/contact">Contact</a>
+          </div>
+
+          <div class="app-footer__cta">
+            <h2>Planifiez votre prochaine venue</h2>
+            <p>
+              Retrouvez toutes les informations pratiques pour vivre les matches à domicile et en déplacement avec les verts et blancs.
+            </p>
+            <div class="app-footer__cta-actions">
+              <a class="btn btn--primary" href="<?= $basePath ?>/matchs">Voir le calendrier</a>
+              <a class="btn btn--secondary" href="<?= $basePath ?>/contact">Prendre contact</a>
             </div>
           </div>
 
           <div class="app-footer__grid">
             <div class="app-footer__column">
-              <h2>Le club</h2>
+              <h2>Navigation</h2>
               <ul>
-                <li><a href="<?= $basePath ?>/equipes">Nos équipes</a></li>
-                <li><a href="<?= $basePath ?>/matchs">Matchs à venir</a></li>
+                <li><a href="<?= $basePath ?>/">Accueil</a></li>
                 <li><a href="<?= $basePath ?>/resultats">Résultats</a></li>
+                <li><a href="<?= $basePath ?>/matchs">Calendrier</a></li>
                 <li><a href="<?= $basePath ?>/classements">Classements</a></li>
+                <li><a href="<?= $basePath ?>/contact">Contact</a></li>
               </ul>
             </div>
             <div class="app-footer__column">
               <h2>Vie du club</h2>
               <ul>
-                <li><a href="<?= $basePath ?>/galerie">Galerie photos</a></li>
-                <li><a href="<?= $basePath ?>/partenaires">Partenaires</a></li>
-                <li><a href="<?= $basePath ?>/contact">Nous contacter</a></li>
-                <li><a href="#">Espace licenciés</a></li>
+                <li><a href="<?= $basePath ?>/matchs#telechargement-calendrier">Télécharger le calendrier</a></li>
+                <li><a href="<?= $basePath ?>/contact">Demander une licence</a></li>
+                <li><a href="<?= $basePath ?>/">Actualités du club</a></li>
               </ul>
             </div>
             <div class="app-footer__column">
