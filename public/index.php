@@ -13,11 +13,30 @@ require_once __DIR__ . '/templates/header.php';
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero__media">
           <picture>
+            <source
+              srcset="<?= $assetsBase ?>/images/home-low.webp"
+              type="image/webp"
+              media="(max-width: 30rem)"
+            />
+            <source
+              srcset="
+                <?= $assetsBase ?>/images/home-480.webp 480w,
+                <?= $assetsBase ?>/images/home-800.webp 800w,
+                <?= $assetsBase ?>/images/home-1200.webp 1200w
+              "
+              type="image/webp"
+              sizes="(min-width: 80rem) 60vw, (min-width: 48rem) 75vw, 100vw"
+            />
+            <source
+              srcset="<?= $assetsBase ?>/images/home.jpg 2048w"
+              type="image/jpeg"
+              sizes="(min-width: 80rem) 60vw, (min-width: 48rem) 75vw, 100vw"
+            />
             <img
-              src="<?= $assetsBase ?>/images/home.png"
-              width="4096"
-              height="4096"
-              alt="Vue aérienne du complexe sportif du FC Chiché"
+              src="<?= $assetsBase ?>/images/home.jpg"
+              width="2048"
+              height="1152"
+              alt="Les joueurs du FC Chiché rentrent sur la pelouse du stade municipal"
               loading="eager"
               fetchpriority="high"
               decoding="async"
@@ -50,7 +69,7 @@ require_once __DIR__ . '/templates/header.php';
               </p>
               <div class="story-points" role="list">
                 <article class="story-block" role="listitem">
-                  <span class="story-block__icon" aria-hidden="true">i</span>
+                  <span class="story-block__icon" aria-hidden="true">🏟</span>
                   <div>
                     <h3 class="story-block__title">Vestiaires premium</h3>
                     <p class="story-block__text">
@@ -59,7 +78,7 @@ require_once __DIR__ . '/templates/header.php';
                   </div>
                 </article>
                 <article class="story-block" role="listitem">
-                  <span class="story-block__icon" aria-hidden="true">i</span>
+                  <span class="story-block__icon" aria-hidden="true">🎓</span>
                   <div>
                     <h3 class="story-block__title">École de foot labellisée</h3>
                     <p class="story-block__text">
@@ -68,7 +87,7 @@ require_once __DIR__ . '/templates/header.php';
                   </div>
                 </article>
                 <article class="story-block" role="listitem">
-                  <span class="story-block__icon" aria-hidden="true">i</span>
+                  <span class="story-block__icon" aria-hidden="true">🍻</span>
                   <div>
                     <h3 class="story-block__title">Club-house vivant</h3>
                     <p class="story-block__text">
@@ -77,39 +96,101 @@ require_once __DIR__ . '/templates/header.php';
                   </div>
                 </article>
               </div>
+              <div class="story-stats" role="list">
+                <div class="story-stat" role="listitem">
+                  <span class="story-stat__value">220+</span>
+                  <span class="story-stat__label">licenciés accompagnés chaque saison</span>
+                </div>
+                <div class="story-stat" role="listitem">
+                  <span class="story-stat__value">32</span>
+                  <span class="story-stat__label">séances hebdomadaires encadrées</span>
+                </div>
+                <div class="story-stat" role="listitem">
+                  <span class="story-stat__value">18 bénévoles</span>
+                  <span class="story-stat__label">mobilisés sur les jours de match</span>
+                </div>
+              </div>
             </div>
             <div class="story-grid__gallery">
-              <div class="story-gallery">
-                <figure class="story-gallery__item story-gallery__item--wide">
-                  <img
-                    src="<?= $assetsBase ?>/images/Agenda.png"
-                    width="4096"
-                    height="4096"
-                    alt="Vestiaire du FC Chiché préparé avant la rencontre"
-                    loading="lazy"
-                    decoding="async"
-                  />
+              <div class="story-canvas">
+                <div class="story-canvas__glow" aria-hidden="true"></div>
+                <figure class="story-canvas__frame story-canvas__frame--main">
+                  <picture>
+                    <source
+                      srcset="
+                        <?= $assetsBase ?>/images/premiere-480.webp 480w,
+                        <?= $assetsBase ?>/images/premiere-800.webp 800w,
+                        <?= $assetsBase ?>/images/premiere-1200.webp 1200w
+                      "
+                      type="image/webp"
+                      sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 100vw"
+                    />
+                    <source
+                      srcset="<?= $assetsBase ?>/images/premiere.jpg 1200w"
+                      type="image/jpeg"
+                      sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 100vw"
+                    />
+                    <img
+                      src="<?= $assetsBase ?>/images/premiere.jpg"
+                      width="1300"
+                      height="866"
+                      alt="L'équipe fanion du FC Chiché célèbre une victoire devant les supporters"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
                 </figure>
-                <figure class="story-gallery__item story-gallery__item--tall">
-                  <img
-                    src="<?= $assetsBase ?>/images/resultat.png"
-                    width="4096"
-                    height="4096"
-                    alt="Jeunes licenciés réunis autour du ballon du match"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                <figure class="story-canvas__frame story-canvas__frame--side">
+                  <picture>
+                    <source
+                      srcset="<?= $assetsBase ?>/images/buvette.webp"
+                      type="image/webp"
+                    />
+                    <source
+                      srcset="<?= $assetsBase ?>/images/buvette.jpg"
+                      type="image/jpeg"
+                    />
+                    <img
+                      src="<?= $assetsBase ?>/images/buvette.jpg"
+                      width="1792"
+                      height="1024"
+                      alt="Bénévoles et supporters autour de la buvette animée du stade"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
                 </figure>
-                <figure class="story-gallery__item story-gallery__item--square">
-                  <img
-                    src="<?= $assetsBase ?>/images/Contact.png"
-                    width="4096"
-                    height="4096"
-                    alt="Supporters du FC Chiché partageant un moment au club-house"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                <figure class="story-canvas__frame story-canvas__frame--locker">
+                  <picture>
+                    <source
+                      srcset="
+                        <?= $assetsBase ?>/images/Reserve-480.webp 480w,
+                        <?= $assetsBase ?>/images/Reserve-800.webp 800w,
+                        <?= $assetsBase ?>/images/Reserve-1200.webp 1200w
+                      "
+                      type="image/webp"
+                      sizes="(min-width: 72rem) 260px, (min-width: 48rem) 40vw, 75vw"
+                    />
+                    <source
+                      srcset="<?= $assetsBase ?>/images/Reserve.jpg 1200w"
+                      type="image/jpeg"
+                      sizes="(min-width: 72rem) 260px, (min-width: 48rem) 40vw, 75vw"
+                    />
+                    <img
+                      src="<?= $assetsBase ?>/images/Reserve.jpg"
+                      width="1200"
+                      height="800"
+                      alt="Le vestiaire des verts et blancs prêt pour accueillir l'équipe réserve"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
                 </figure>
+                <div class="story-canvas__badge">
+                  <span class="story-canvas__badge-title">+ de 450 repas</span>
+                  <span class="story-canvas__badge-subtitle">servis sur la saison au club-house</span>
+                </div>
+                <div class="story-canvas__pulse" aria-hidden="true"></div>
               </div>
             </div>
           </div>
@@ -142,14 +223,21 @@ require_once __DIR__ . '/templates/header.php';
           </div>
           <div class="result-showcase" data-component="home-results">
             <div class="result-showcase__gallery">
-              <img
-                src="<?= $assetsBase ?>/images/resultat.png"
-                width="4096"
-                height="4096"
-                alt="Joueurs du FC Chiché célébrant les derniers résultats"
-                loading="lazy"
-                decoding="async"
-              />
+              <picture>
+                <source
+                  srcset="<?= $assetsBase ?>/images/galeries/441321599_943464427577563_1527836518105961020_n.jpg 2048w"
+                  type="image/jpeg"
+                  sizes="(min-width: 75rem) 420px, (min-width: 48rem) 60vw, 100vw"
+                />
+                <img
+                  src="<?= $assetsBase ?>/images/galeries/441321599_943464427577563_1527836518105961020_n.jpg"
+                  width="2048"
+                  height="1670"
+                  alt="Scène de match du FC Chiché capturée depuis la tribune principale"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
             </div>
             <div class="result-showcase__stream">
               <div class="home-scroll home-scroll--compact">
