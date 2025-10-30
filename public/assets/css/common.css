@@ -1468,12 +1468,6 @@ ul {
   gap: 2.5rem;
 }
 
-@media (min-width: 1200px) {
-  .result-showcase {
-    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
-    align-items: center;
-  }
-}
 
 .result-showcase__gallery {
   border-radius: var(--fc-radius-lg);
