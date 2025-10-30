@@ -11,27 +11,33 @@ require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/templates/header.php';
 ?>
       <section class="hero" aria-labelledby="hero-title">
-        <div class="container">
-          <div class="hero__layout">
-            <header class="hero__lead">
-              <span class="hero__eyebrow">Football Club Chiché</span>
-              <h1 class="hero__title" id="hero-title">Vibrez vert et blanc, chaque week-end</h1>
-              <div class="hero__support" role="note">
-                <span class="hero__support-icon" aria-hidden="true">⚡️</span>
-                <div class="hero__support-copy">
-                  <span class="hero__support-title">Billetterie express</span>
-                  <a class="hero__support-link" href="<?= $basePath ?>/matchs">Réservez vos places en 2&nbsp;min</a>
-                </div>
+        <div class="container hero__inner">
+          <div class="hero__topline">
+            <span class="hero__eyebrow">Football Club Chiché</span>
+            <div class="hero__support" role="note">
+              <span class="hero__support-icon" aria-hidden="true">⚡️</span>
+              <div class="hero__support-copy">
+                <span class="hero__support-title">Billetterie express</span>
+                <a class="hero__support-link" href="<?= $basePath ?>/matchs">Réservez vos places en 2 min</a>
               </div>
+            </div>
+          </div>
+          <div class="hero__content">
+            <div class="hero__lead">
+              <h1 class="hero__title" id="hero-title">Vibrez vert et blanc, chaque week-end</h1>
               <p class="hero__subtitle">
-                Suivez nos équipes, préparez vos déplacements et vivez le club en temps réel avec des infos fiables et mises à
-                jour.
+                Suivez nos équipes, préparez vos déplacements et plongez dans la vie du club avec une expérience pensée pour
+                les supporters comme pour les licenciés.
               </p>
               <div class="hero__actions" role="group" aria-label="Actions principales">
                 <a class="btn btn--primary" href="<?= $basePath ?>/matchs">Voir le calendrier</a>
                 <a class="btn btn--outline" href="<?= $basePath ?>/resultats">Derniers résultats</a>
               </div>
-            </header>
+              <div class="hero__note">
+                <span class="hero__note-title">Stade municipal</span>
+                <span class="hero__note-text">Ambiance garantie chaque samedi soir</span>
+              </div>
+            </div>
             <figure class="hero__visual">
               <div class="hero__media">
                 <picture>
@@ -47,12 +53,12 @@ require_once __DIR__ . '/templates/header.php';
                       <?= $assetsBase ?>/images/home-1200.webp 1200w
                     "
                     type="image/webp"
-                    sizes="(min-width: 70rem) 640px, (min-width: 48rem) 70vw, 100vw"
+                    sizes="(min-width: 70rem) 480px, (min-width: 48rem) 46vw, 100vw"
                   />
                   <source
                     srcset="<?= $assetsBase ?>/images/home.jpg 2048w"
                     type="image/jpeg"
-                    sizes="(min-width: 70rem) 640px, (min-width: 48rem) 70vw, 100vw"
+                    sizes="(min-width: 70rem) 480px, (min-width: 48rem) 46vw, 100vw"
                   />
                   <img
                     src="<?= $assetsBase ?>/images/home.jpg"
@@ -68,16 +74,6 @@ require_once __DIR__ . '/templates/header.php';
               <figcaption class="hero__caption">Tribune principale rénovée · Capacité 420 places</figcaption>
             </figure>
           </div>
-          <dl class="hero__details">
-            <div class="hero__detail">
-              <dt class="hero__detail-label">Stade municipal</dt>
-              <dd class="hero__detail-text">Ambiance garantie chaque samedi soir</dd>
-            </div>
-            <div class="hero__detail">
-              <dt class="hero__detail-label">Communauté</dt>
-              <dd class="hero__detail-text">Licenciés, supporters et bénévoles réunis autour du ballon</dd>
-            </div>
-          </dl>
         </div>
       </section>
 
