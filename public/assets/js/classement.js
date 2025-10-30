@@ -343,15 +343,21 @@
     container.replaceChildren();
 
     const table = document.createElement('table');
+    table.className = 'min-w-full divide-y divide-white/10';
 
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
+    headerRow.className = 'text-left text-gray-200 text-xs uppercase tracking-wide';
+
     const headers = ['Rang', 'Club', 'J', 'G', 'N', 'P', 'Diff', 'Pts'];
     const headerLimit = headers.length;
     for (let index = 0; index < headerLimit; index += 1) {
       const text = headers[index];
-      assert(typeof text === 'string', 'Header label must be string');
       const th = document.createElement('th');
+      th.className = index === 1 ? 'py-3 pr-4' : 'py-3 pr-4 text-center';
+      if (index === headers.length - 1) {
+        th.className = 'py-3 text-center';
+      }
       th.textContent = text;
       headerRow.appendChild(th);
     }
@@ -359,6 +365,7 @@
     table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
+    tbody.className = 'divide-y divide-white/10 text-gray-100';
 
     const limit = Math.min(rows.length, MAX_ROWS);
     for (let index = 0; index < limit; index += 1) {
@@ -366,28 +373,32 @@
       assert(typeof row === 'object' && row !== null, 'Classement row must be object');
 
       const tr = document.createElement('tr');
+      if ((index % 2) === 0) {
+        tr.classList.add('bg-white/5');
+      }
       const clubId = safeParseInt(row.cl_no);
       if (clubId === MAIN_CLUB_ID) {
-        tr.classList.add('is-highlight');
+        tr.classList.add('bg-primary/10');
       }
 
-      const cells = [
-        formatRanking(row.ranking),
-        resolveClubName(row),
-        formatNumber(row.total_games_count),
-        formatNumber(row.won_games_count),
-        formatNumber(row.draw_games_count),
-        formatNumber(row.lost_games_count),
-        formatDiff(row.goals_diff),
-        formatNumber(row.point_count)
+      const columns = [
+        ['py-3 pr-4 font-semibold text-primary', formatRanking(row.ranking)],
+        ['py-3 pr-4 font-semibold', resolveClubName(row)],
+        ['py-3 pr-4 text-center', formatNumber(row.total_games_count)],
+        ['py-3 pr-4 text-center', formatNumber(row.won_games_count)],
+        ['py-3 pr-4 text-center', formatNumber(row.draw_games_count)],
+        ['py-3 pr-4 text-center', formatNumber(row.lost_games_count)],
+        ['py-3 pr-4 text-center', formatDiff(row.goals_diff)],
+        ['py-3 text-center text-lg font-bold', formatNumber(row.point_count)]
       ];
 
-      const cellLimit = cells.length;
-      for (let columnIndex = 0; columnIndex < cellLimit; columnIndex += 1) {
-        const value = cells[columnIndex];
-        assert(typeof value === 'string', 'Cell value must be string');
+      const columnLimit = columns.length;
+      for (let columnIndex = 0; columnIndex < columnLimit; columnIndex += 1) {
+        const column = columns[columnIndex];
+        assert(Array.isArray(column) && column.length === 2, 'Column definition invalid');
         const td = document.createElement('td');
-        td.textContent = value;
+        td.className = column[0];
+        td.textContent = column[1];
         tr.appendChild(td);
       }
 
@@ -420,8 +431,8 @@
     assert(state.elements.tableContainer instanceof HTMLElement, 'Table container missing');
     assert(typeof message === 'string', 'Message must be a string');
 
-    const paragraph = document.createElement('div');
-    paragraph.className = 'classement-table__message';
+    const paragraph = document.createElement('p');
+    paragraph.className = 'text-sm text-gray-300';
     paragraph.textContent = message;
     state.elements.tableContainer.replaceChildren(paragraph);
   }
