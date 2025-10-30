@@ -17,28 +17,28 @@
               </div>
             </div>
             <div class="app-footer__actions">
-              <a class="btn btn--secondary" href="<?= $basePath ?>/matchs">Voir le calendrier</a>
-              <a class="btn btn--ghost" href="<?= $basePath ?>/contact">Prendre contact</a>
+              <a class="btn btn--secondary" href="<?= $basePath ?>/partenaires">Devenir partenaire</a>
+              <a class="btn btn--ghost" href="<?= $basePath ?>/contact">Contact</a>
             </div>
           </div>
 
           <div class="app-footer__grid">
             <div class="app-footer__column">
-              <h2>Navigation</h2>
+              <h2>Le club</h2>
               <ul>
-                <li><a href="<?= $basePath ?>/">Accueil</a></li>
+                <li><a href="<?= $basePath ?>/equipes">Nos équipes</a></li>
+                <li><a href="<?= $basePath ?>/matchs">Matchs à venir</a></li>
                 <li><a href="<?= $basePath ?>/resultats">Résultats</a></li>
-                <li><a href="<?= $basePath ?>/matchs">Calendrier</a></li>
                 <li><a href="<?= $basePath ?>/classements">Classements</a></li>
-                <li><a href="<?= $basePath ?>/contact">Contact</a></li>
               </ul>
             </div>
             <div class="app-footer__column">
               <h2>Vie du club</h2>
               <ul>
-                <li><a href="<?= $basePath ?>/matchs#telechargement-calendrier">Télécharger le calendrier</a></li>
-                <li><a href="<?= $basePath ?>/contact">Demander une licence</a></li>
-                <li><a href="<?= $basePath ?>/">Actualités du club</a></li>
+                <li><a href="<?= $basePath ?>/galerie">Galerie photos</a></li>
+                <li><a href="<?= $basePath ?>/partenaires">Partenaires</a></li>
+                <li><a href="<?= $basePath ?>/contact">Nous contacter</a></li>
+                <li><a href="#">Espace licenciés</a></li>
               </ul>
             </div>
             <div class="app-footer__column">
