@@ -180,73 +180,51 @@
     assert(typeof match === 'object' && match !== null, 'Match object required');
     assert('date' in match, 'Match object must include date');
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-white/5 rounded-xl px-6 py-5';
+    const article = document.createElement('article');
+    article.className = 'calendar-card';
 
-    const infos = document.createElement('div');
-    infos.className = 'flex flex-col gap-2';
+    const header = document.createElement('div');
+    header.className = 'calendar-card__header';
 
-    const competition = document.createElement('p');
-    competition.className = 'text-primary text-sm font-semibold uppercase tracking-wider';
-    competition.textContent = resolveCompetition(match);
-    infos.appendChild(competition);
+    const badge = document.createElement('span');
+    badge.className = 'section__eyebrow';
+    badge.textContent = resolveCompetition(match);
+    header.appendChild(badge);
 
-    const title = document.createElement('h3');
-    title.className = 'text-white text-2xl font-bold';
-    title.textContent = buildMatchTitle(match);
-    infos.appendChild(title);
+    const date = document.createElement('span');
+    date.textContent = formatDate(match.date);
+    header.appendChild(date);
 
-    const location = document.createElement('p');
-    location.className = 'text-gray-300 text-sm flex items-center gap-2';
-    const locationIcon = document.createElement('span');
-    locationIcon.className = 'material-symbols-outlined text-primary';
-    locationIcon.textContent = 'location_on';
-    location.appendChild(locationIcon);
-    const locationText = document.createElement('span');
-    locationText.textContent = resolveLocation(match);
-    location.appendChild(locationText);
-    infos.appendChild(location);
+    article.appendChild(header);
 
-    wrapper.appendChild(infos);
+    const teams = document.createElement('div');
+    teams.className = 'calendar-card__teams';
+    teams.textContent = buildMatchTitle(match);
+    article.appendChild(teams);
 
-    const schedule = document.createElement('div');
-    schedule.className = 'flex flex-col items-start lg:items-end gap-2 text-gray-200';
+    const meta = document.createElement('div');
+    meta.className = 'calendar-card__meta';
+    meta.appendChild(buildMetaLine('Horaire', formatKickoff(match.time)));
+    meta.appendChild(buildMetaLine('Lieu', resolveLocation(match)));
+    meta.appendChild(buildMetaLine('Journée', match.journee_label ?? 'À confirmer'));
+    article.appendChild(meta);
 
-    const dateRow = document.createElement('p');
-    dateRow.className = 'flex items-center gap-2 text-base font-semibold';
-    const dateIcon = document.createElement('span');
-    dateIcon.className = 'material-symbols-outlined text-primary';
-    dateIcon.textContent = 'event';
-    dateRow.appendChild(dateIcon);
-    const dateText = document.createElement('span');
-    dateText.textContent = formatDate(match.date);
-    dateRow.appendChild(dateText);
-    schedule.appendChild(dateRow);
+    const footer = document.createElement('div');
+    footer.className = 'calendar-card__footer';
+    footer.appendChild(document.createTextNode('Contact dirigeant : club@fcchiche.fr'));
+    article.appendChild(footer);
 
-    const timeRow = document.createElement('p');
-    timeRow.className = 'flex items-center gap-2 text-sm';
-    const timeIcon = document.createElement('span');
-    timeIcon.className = 'material-symbols-outlined text-primary';
-    timeIcon.textContent = 'schedule';
-    timeRow.appendChild(timeIcon);
-    const timeText = document.createElement('span');
-    timeText.textContent = formatKickoff(match.time);
-    timeRow.appendChild(timeText);
-    schedule.appendChild(timeRow);
-
-    wrapper.appendChild(schedule);
-
-    return wrapper;
+    return article;
   }
 
   function setListMessage(message) {
     assert(state.elements.list instanceof HTMLElement, 'Calendar list element missing');
     assert(typeof message === 'string', 'Message must be string');
 
-    const paragraph = document.createElement('p');
-    paragraph.className = 'rounded-xl bg-white/10 p-4 text-sm text-gray-300';
-    paragraph.textContent = message;
-    state.elements.list.replaceChildren(paragraph);
+    const placeholder = document.createElement('div');
+    placeholder.className = 'calendar-card calendar-card--placeholder';
+    placeholder.textContent = message;
+    state.elements.list.replaceChildren(placeholder);
   }
 
   function formatTeamLabel(team) {
@@ -347,5 +325,14 @@
       return 0;
     }
     return parsed;
+  }
+
+  function buildMetaLine(label, value) {
+    assert(typeof label === 'string' && label !== '', 'Meta label must be provided');
+    assert(typeof value === 'string' && value !== '', 'Meta value must be provided');
+
+    const paragraph = document.createElement('p');
+    paragraph.textContent = `${label} : ${value}`;
+    return paragraph;
   }
 })();
