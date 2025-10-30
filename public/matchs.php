@@ -49,25 +49,14 @@ require_once __DIR__ . '/templates/header.php';
         <div class="container">
           <div class="calendar-highlight">
             <div class="calendar-highlight__visual" aria-hidden="true">
-              <picture>
-                <source
-                  srcset="
-                    <?= $assetsBase ?>/images/upcoming-480.webp 480w,
-                    <?= $assetsBase ?>/images/upcoming-800.webp 800w,
-                    <?= $assetsBase ?>/images/upcoming-1200.webp 1200w
-                  "
-                  type="image/webp"
-                  sizes="(min-width: 75rem) 480px, (min-width: 48rem) 60vw, 100vw"
-                />
-                <img
-                  src="<?= $assetsBase ?>/images/upcoming.png"
-                  width="1300"
-                  height="752"
-                  alt="Vue synthétique du calendrier numérique des matchs du FC Chiché"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
+              <img
+                src="<?= $assetsBase ?>/images/Agenda.png"
+                width="4096"
+                height="4096"
+                alt="Agenda visuel des déplacements du FC Chiché"
+                loading="lazy"
+                decoding="async"
+              />
             </div>
             <div class="calendar-highlight__content">
               <h2>Préparez vos déplacements</h2>

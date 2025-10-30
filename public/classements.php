@@ -55,20 +55,14 @@ require_once __DIR__ . '/templates/header.php';
               </ul>
             </div>
             <div class="classement-highlight__visual" aria-hidden="true">
-              <picture>
-                <source
-                  srcset="<?= $assetsBase ?>/images/classement.webp"
-                  type="image/webp"
-                />
-                <img
-                  src="<?= $assetsBase ?>/images/classement.jpg"
-                  width="1792"
-                  height="1024"
-                  alt="Analyse des classements officiels du FC Chiché sur support numérique"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
+              <img
+                src="<?= $assetsBase ?>/images/Classement.png"
+                width="4096"
+                height="4096"
+                alt="Illustration du classement des équipes du FC Chiché"
+                loading="lazy"
+                decoding="async"
+              />
             </div>
           </div>
         </div>
