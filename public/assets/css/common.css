@@ -19,6 +19,10 @@
   --fc-container-max: 1200px;
 }
 
+.hidden {
+  display: none !important;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -564,50 +568,309 @@ ul {
 }
 
 /* ======================================================================
-   MEDIA LISTS
+   FILTERS
    ====================================================================== */
-.match-list {
+.filter-bar {
   display: grid;
   gap: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
-.match-card {
+@media (min-width: 960px) {
+  .filter-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+  }
+}
+
+.filter-bar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ======================================================================
+   HOME – INFO CARDS
+   ====================================================================== */
+.info-grid {
   display: grid;
-  gap: 1rem;
-  padding: 1.75rem;
+  gap: 1.75rem;
+}
+
+@media (min-width: 960px) {
+  .info-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.info-card {
+  padding: 2rem;
   border-radius: var(--fc-radius-lg);
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid var(--fc-border);
-  backdrop-filter: var(--fc-blur);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: var(--fc-shadow-soft);
+  display: grid;
+  gap: 1.1rem;
+}
+
+.info-card h3 {
+  font-size: 1.25rem;
+}
+
+.icon-placeholder {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--fc-radius-lg);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  background: rgba(0, 136, 0, 0.12);
+  color: var(--fc-green);
+  font-size: 1.2rem;
+}
+
+/* ======================================================================
+   EVENTS, CALENDRIER & RESULTATS
+   ====================================================================== */
+.events-grid,
+.results-grid,
+.calendar-list {
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (min-width: 1024px) {
+  .events-grid,
+  .results-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.event-card,
+.calendar-card,
+.result-card {
+  border-radius: var(--fc-radius-lg);
+  padding: 1.75rem;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: var(--fc-shadow-soft);
+  display: grid;
+  gap: 1.15rem;
+}
+
+.event-card__header,
+.calendar-card__header,
+.result-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.event-card__teams,
+.calendar-card__teams,
+.result-card__teams {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.event-card__meta,
+.calendar-card__meta,
+.result-card__meta {
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+  color: rgba(17, 17, 17, 0.65);
+}
+
+.event-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--fc-green);
+}
+
+.result-card__score {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.calendar-card__meta {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.event-card--placeholder,
+.result-card--placeholder,
+.calendar-card--placeholder {
+  color: rgba(17, 17, 17, 0.6);
+  text-align: center;
+  font-style: italic;
+}
+
+.calendar-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  color: rgba(17, 17, 17, 0.7);
+  font-size: 0.95rem;
+}
+
+/* ======================================================================
+   PLACEHOLDERS & MAPS
+   ====================================================================== */
+.image-placeholder {
+  display: grid;
+  place-items: center;
+  border-radius: var(--fc-radius-lg);
+  border: 1px dashed rgba(0, 136, 0, 0.35);
+  color: rgba(0, 136, 0, 0.7);
+  background: rgba(255, 255, 255, 0.65);
+  font-weight: 600;
+  min-height: 220px;
+}
+
+.map-shell--wide {
+  border-radius: var(--fc-radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--fc-shadow);
+}
+
+.map-shell--wide iframe {
+  width: 100%;
+  min-height: 420px;
+  border: 0;
+}
+
+/* ======================================================================
+   CONTENT HIGHLIGHTS
+   ====================================================================== */
+.result-info,
+.calendar-highlight,
+.classement-highlight {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .result-info,
+  .calendar-highlight,
+  .classement-highlight {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.result-info__visual,
+.calendar-highlight__visual,
+.classement-highlight__visual {
+  border-radius: var(--fc-radius-lg);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+}
+
+.result-info__content,
+.calendar-highlight__content,
+.classement-highlight__content {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.result-info__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.calendar-highlight__content ul,
+.classement-highlight__content ul {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+  color: rgba(17, 17, 17, 0.65);
+}
+
+/* ======================================================================
+   CLASSEMENT
+   ====================================================================== */
+.classement-meta {
+  margin-bottom: 1.5rem;
+}
+
+.classement-meta__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.4rem;
+  border-radius: var(--fc-radius-pill);
+  background: rgba(0, 136, 0, 0.12);
+  color: var(--fc-green);
+  font-weight: 500;
+}
+
+.classement-table__message {
+  padding: 1.5rem;
+  border-radius: var(--fc-radius-lg);
+  background: rgba(255, 255, 255, 0.75);
+  text-align: center;
+  color: rgba(17, 17, 17, 0.6);
   box-shadow: var(--fc-shadow-soft);
 }
 
-.match-card__teams {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 600;
-  font-size: 1.2rem;
-  color: var(--fc-ink);
+.classement-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: var(--fc-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--fc-shadow-soft);
 }
 
-.match-card__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  font-size: 0.95rem;
-  color: rgba(17, 17, 17, 0.6);
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.4rem 1rem;
-  border-radius: var(--fc-radius-pill);
-  background: rgba(0, 136, 0, 0.14);
-  color: var(--fc-green);
-  font-weight: 500;
+.classement-table thead {
+  background: rgba(0, 136, 0, 0.12);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   font-size: 0.85rem;
+}
+
+.classement-table th,
+.classement-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.classement-table tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.classement-table tbody tr.is-highlight {
+  background: rgba(0, 136, 0, 0.18);
+  color: var(--fc-white);
+}
+
+.classement-table tbody tr.is-highlight td {
+  color: inherit;
+}
+
+.classement-table td:nth-child(3),
+.classement-table td:nth-child(4),
+.classement-table td:nth-child(5),
+.classement-table td:nth-child(6),
+.classement-table td:nth-child(7),
+.classement-table td:nth-child(8) {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ======================================================================
