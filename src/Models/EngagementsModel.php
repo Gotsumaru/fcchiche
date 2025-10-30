@@ -13,6 +13,9 @@ class EngagementsModel
 
     public function __construct(PDO $pdo)
     {
+        assert($pdo instanceof PDO, 'PDO instance required');
+        assert($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION, 'PDO must use exception mode');
+
         $this->pdo = $pdo;
     }
 
@@ -24,7 +27,7 @@ class EngagementsModel
      */
     public function getAllEngagements(): array
     {
-        $sql = "SELECT 
+        $sql = "SELECT
                     e.*,
                     eq.short_name as equipe_name,
                     eq.category_code,
@@ -36,9 +39,13 @@ class EngagementsModel
                 LEFT JOIN " . self::TABLE_EQUIPES . " eq ON e.equipe_id = eq.id
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON e.competition_id = c.id
                 ORDER BY eq.category_code ASC, eq.number ASC";
-        
-        $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $this->prepareAndExecute($sql, []);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch engagements');
+        assert(count($results) <= 500, 'Too many engagements fetched');
+
+        return $results;
     }
 
     /**
@@ -63,11 +70,18 @@ class EngagementsModel
                 WHERE e.id = :id
                 LIMIT 1";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['id' => $id]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid engagement result');
+
+        if ($result !== false) {
+            assert(isset($result['id']), 'Engagement id missing');
+            assert(isset($result['competition_id']), 'Competition id missing');
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -91,10 +105,12 @@ class EngagementsModel
                 WHERE e.equipe_id = :equipe_id
                 ORDER BY c.type ASC, c.name ASC";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['equipe_id' => $equipeId]);
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->prepareAndExecute($sql, ['equipe_id' => $equipeId]);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch engagements by equipe');
+        assert(count($results) <= 100, 'Too many engagements fetched');
+
+        return $results;
     }
 
     /**
@@ -118,10 +134,12 @@ class EngagementsModel
                 WHERE e.competition_id = :competition_id
                 ORDER BY eq.category_code ASC, eq.number ASC";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['competition_id' => $competitionId]);
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->prepareAndExecute($sql, ['competition_id' => $competitionId]);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch equipes by competition');
+        assert(count($results) <= 200, 'Too many equipes fetched');
+
+        return $results;
     }
 
     /**
@@ -147,14 +165,21 @@ class EngagementsModel
                 AND e.competition_id = :competition_id
                 LIMIT 1";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
+        $stmt = $this->prepareAndExecute($sql, [
             'equipe_id' => $equipeId,
             'competition_id' => $competitionId
         ]);
-        
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid engagement result');
+
+        if ($result !== false) {
+            assert(isset($result['equipe_id']), 'Equipe id missing');
+            assert(isset($result['competition_id']), 'Competition id missing');
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -179,10 +204,12 @@ class EngagementsModel
                 WHERE eq.category_code = :category
                 ORDER BY eq.number ASC, c.type ASC";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['category' => $category]);
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->prepareAndExecute($sql, ['category' => $category]);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch engagements by category');
+        assert(count($results) <= 200, 'Too many engagements fetched');
+
+        return $results;
     }
 
     /**
@@ -192,7 +219,7 @@ class EngagementsModel
      */
     public function getChampionnatEngagements(): array
     {
-        $sql = "SELECT 
+        $sql = "SELECT
                     e.*,
                     eq.short_name as equipe_name,
                     eq.category_code,
@@ -204,9 +231,13 @@ class EngagementsModel
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON e.competition_id = c.id
                 WHERE c.type = 'CH'
                 ORDER BY eq.category_code ASC, eq.number ASC";
-        
-        $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $this->prepareAndExecute($sql, []);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch championnat engagements');
+        assert(count($results) <= 200, 'Too many engagements fetched');
+
+        return $results;
     }
 
     /**
@@ -216,7 +247,7 @@ class EngagementsModel
      */
     public function getCoupeEngagements(): array
     {
-        $sql = "SELECT 
+        $sql = "SELECT
                     e.*,
                     eq.short_name as equipe_name,
                     eq.category_code,
@@ -228,9 +259,13 @@ class EngagementsModel
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON e.competition_id = c.id
                 WHERE c.type = 'CDF'
                 ORDER BY eq.category_code ASC, eq.number ASC";
-        
-        $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $this->prepareAndExecute($sql, []);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch coupe engagements');
+        assert(count($results) <= 200, 'Too many engagements fetched');
+
+        return $results;
     }
 
     /**
@@ -249,14 +284,16 @@ class EngagementsModel
                 WHERE equipe_id = :equipe_id 
                 AND competition_id = :competition_id";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
+        $stmt = $this->prepareAndExecute($sql, [
             'equipe_id' => $equipeId,
             'competition_id' => $competitionId
         ]);
-        
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false && (int)$result['count'] > 0;
+        assert($result !== false, 'Engagement existence query failed');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'] > 0;
     }
 
     /**
@@ -267,10 +304,13 @@ class EngagementsModel
     public function countEngagements(): int
     {
         $sql = "SELECT COUNT(*) as count FROM " . self::TABLE;
-        $stmt = $this->pdo->query($sql);
-        
+        $stmt = $this->prepareAndExecute($sql, []);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? (int)$result['count'] : 0;
+        assert($result !== false, 'Count query must return a row');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'];
     }
 
     /**
@@ -286,10 +326,33 @@ class EngagementsModel
         $sql = "SELECT COUNT(*) as count FROM " . self::TABLE . " 
                 WHERE equipe_id = :equipe_id";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['equipe_id' => $equipeId]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['equipe_id' => $equipeId]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? (int)$result['count'] : 0;
+        assert($result !== false, 'Count query must return a row');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'];
+    }
+
+    /**
+     * Prépare et exécute une requête préparée
+     *
+     * @param string $sql Requête SQL
+     * @param array $params Paramètres à lier
+     * @return PDOStatement Statement exécuté
+     */
+    private function prepareAndExecute(string $sql, array $params): PDOStatement
+    {
+        assert($sql !== '', 'SQL query cannot be empty');
+        assert(count($params) <= 20, 'Too many parameters provided');
+
+        $stmt = $this->pdo->prepare($sql);
+        assert($stmt instanceof PDOStatement, 'Failed to prepare statement');
+
+        $executed = $stmt->execute($params);
+        assert($executed, 'Failed to execute statement');
+
+        return $stmt;
     }
 }

@@ -38,7 +38,13 @@ class FFFApiClient
     public function getClubInfo(): ?array
     {
         $endpoint = sprintf('/clubs/%d', $this->club_id);
-        return $this->makeRequest($endpoint);
+        $data = $this->makeRequest($endpoint);
+        if ($data !== null) {
+            assert(isset($data['cl_no']), 'Club info must contain cl_no');
+            assert(isset($data['name']), 'Club info must contain name');
+        }
+
+        return $data;
     }
     
     /**
@@ -50,14 +56,20 @@ class FFFApiClient
     {
         $endpoint = sprintf('/clubs/%d/equipes', $this->club_id);
         $data = $this->makeRequest($endpoint);
-        
+
         if ($data !== null && isset($data[0])) {
+            assert(is_array($data[0]), 'Equipe entry must be array');
+            assert(isset($data[0]['code']), 'Equipe entry must contain code');
             return [
                 'hydra:member' => $data,
                 'hydra:totalItems' => count($data)
             ];
         }
-        
+
+        if ($data !== null && isset($data['hydra:member'])) {
+            assert(is_array($data['hydra:member']), 'Hydra member must be array');
+        }
+
         return $data;
     }
     
@@ -70,14 +82,20 @@ class FFFApiClient
     {
         $endpoint = sprintf('/engagements?club.cl_no=%d', $this->club_id);
         $data = $this->makeRequest($endpoint);
-        
+
         if ($data !== null && isset($data[0])) {
+            assert(isset($data[0]['competition']), 'Engagement entry must contain competition');
+            assert(isset($data[0]['phase']), 'Engagement entry must contain phase');
             return [
                 'hydra:member' => $data,
                 'hydra:totalItems' => count($data)
             ];
         }
-        
+
+        if ($data !== null && isset($data['hydra:member'])) {
+            assert(is_array($data['hydra:member']), 'Hydra member must be array for engagements');
+        }
+
         return $data;
     }
 
@@ -130,23 +148,29 @@ class FFFApiClient
         $all_classements = [];
         $max_iterations = 50;
         $counter = 0;
-        
+        assert($max_iterations > 0, 'Classement iteration bound must be positive');
+
         $engagements = $this->getEngagements();
-        
+
         if ($engagements === null || !isset($engagements['hydra:member'])) {
             $this->logger->error('Failed to fetch engagements for classements');
             return [];
         }
-        
+
+        assert(is_array($engagements['hydra:member']), 'Engagements hydra member must be array');
+
         foreach ($engagements['hydra:member'] as $engagement) {
             if ($counter >= $max_iterations) {
                 break;
             }
-            
+
             if (!isset($engagement['competition']['cp_no'])) {
                 continue;
             }
-            
+
+            assert(isset($engagement['phase']), 'Engagement must contain phase data');
+            assert(isset($engagement['poule']), 'Engagement must contain poule data');
+
             $cp_no = $engagement['competition']['cp_no'];
             $phase_no = $engagement['phase']['number'] ?? 1;
             $poule_no = $engagement['poule']['stage_number'] ?? 1;
@@ -154,9 +178,12 @@ class FFFApiClient
             
             if ($competition_type === 'CH') {
                 $classement = $this->getClassement($cp_no, $phase_no, $poule_no);
-                
+
                 if ($classement !== null && isset($classement['hydra:member']) && !empty($classement['hydra:member'])) {
+                    assert(is_array($classement['hydra:member']), 'Classement hydra member must be array');
                     foreach ($classement['hydra:member'] as $entry) {
+                        assert(is_array($entry), 'Classement entry must be array');
+                        assert(isset($entry['cj_no']), 'Classement entry must contain cj_no');
                         $entry['competition'] = $engagement['competition'];
                         $all_classements[] = $entry;
                     }
@@ -389,7 +416,8 @@ class FFFApiClient
     private function makeRequest(string $endpoint): ?array
     {
         assert(!empty($endpoint), 'Endpoint cannot be empty');
-        
+        assert(strpos($endpoint, '/') === 0, 'Endpoint must start with /');
+
         $url = $this->base_url . $endpoint;
         $start_time = microtime(true);
         

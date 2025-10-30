@@ -11,6 +11,9 @@ class ClubsCacheModel
 
     public function __construct(PDO $pdo)
     {
+        assert($pdo instanceof PDO, 'PDO instance required');
+        assert($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION, 'PDO must use exception mode');
+
         $this->pdo = $pdo;
     }
 
@@ -23,9 +26,14 @@ class ClubsCacheModel
     public function getAllClubs(): array
     {
         $sql = "SELECT * FROM " . self::TABLE . " ORDER BY name ASC";
-        $stmt = $this->pdo->query($sql);
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert($sql !== '', 'SQL cannot be empty');
+
+        $stmt = $this->prepareAndExecute($sql, []);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch clubs');
+        assert(count($results) <= 500, 'Too many clubs fetched');
+
+        return $results;
     }
 
     /**
@@ -40,11 +48,18 @@ class ClubsCacheModel
         assert($clNo !== API_FFF_CLUB_ID, 'Cannot fetch FC Chiche from cache');
         
         $sql = "SELECT * FROM " . self::TABLE . " WHERE cl_no = :cl_no LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['cl_no' => $clNo]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['cl_no' => $clNo]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid club cache result');
+
+        if ($result !== false) {
+            assert(isset($result['cl_no']), 'Club cl_no missing');
+            assert(isset($result['name']), 'Club name missing');
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -58,11 +73,18 @@ class ClubsCacheModel
         assert($id > 0, 'Club ID must be positive');
         
         $sql = "SELECT * FROM " . self::TABLE . " WHERE id = :id LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['id' => $id]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid club cache result');
+
+        if ($result !== false) {
+            assert(isset($result['id']), 'Club id missing');
+            assert(isset($result['name']), 'Club name missing');
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -76,11 +98,17 @@ class ClubsCacheModel
         assert($clNo > 0, 'Club cl_no must be positive');
         
         $sql = "SELECT logo_url FROM " . self::TABLE . " WHERE cl_no = :cl_no LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['cl_no' => $clNo]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['cl_no' => $clNo]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result['logo_url'] : null;
+        assert($result === false || is_array($result), 'Invalid club cache result');
+
+        if ($result !== false) {
+            assert(array_key_exists('logo_url', $result), 'Logo url missing');
+            return (string)$result['logo_url'];
+        }
+
+        return null;
     }
 
     /**
@@ -93,16 +121,20 @@ class ClubsCacheModel
     {
         assert(!empty($search), 'Search term cannot be empty');
         
-        $search = '%' . $search . '%';
-        $sql = "SELECT * FROM " . self::TABLE . " 
-                WHERE name LIKE :search 
+        $searchTerm = '%' . $search . '%';
+        assert(strlen($searchTerm) <= 300, 'Search term too long');
+
+        $sql = "SELECT * FROM " . self::TABLE . "
+                WHERE name LIKE :search
                 OR short_name LIKE :search
                 ORDER BY name ASC";
-        
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['search' => $search]);
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $this->prepareAndExecute($sql, ['search' => $searchTerm]);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to search clubs');
+        assert(count($results) <= 200, 'Too many clubs fetched');
+
+        return $results;
     }
 
     /**
@@ -116,11 +148,13 @@ class ClubsCacheModel
         assert($clNo > 0, 'Club cl_no must be positive');
         
         $sql = "SELECT COUNT(*) as count FROM " . self::TABLE . " WHERE cl_no = :cl_no";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['cl_no' => $clNo]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['cl_no' => $clNo]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false && (int)$result['count'] > 0;
+        assert($result !== false, 'Exists query must return a row');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'] > 0;
     }
 
     /**
@@ -131,10 +165,13 @@ class ClubsCacheModel
     public function countClubs(): int
     {
         $sql = "SELECT COUNT(*) as count FROM " . self::TABLE;
-        $stmt = $this->pdo->query($sql);
-        
+        $stmt = $this->prepareAndExecute($sql, []);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? (int)$result['count'] : 0;
+        assert($result !== false, 'Count query must return a row');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'];
     }
 
     /**
@@ -151,10 +188,52 @@ class ClubsCacheModel
                 ORDER BY created_at DESC 
                 LIMIT :limit";
         
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->prepareStatement($sql);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $executed = $stmt->execute();
+        assert($executed, 'Failed to execute recent clubs query');
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch recent clubs');
+        assert(count($results) <= $limit, 'Fetched more clubs than limit');
+
+        return $results;
+    }
+
+    /**
+     * Prépare et exécute une requête préparée
+     *
+     * @param string $sql Requête SQL
+     * @param array $params Paramètres à lier
+     * @return PDOStatement Statement exécuté
+     */
+    private function prepareAndExecute(string $sql, array $params): PDOStatement
+    {
+        assert($sql !== '', 'SQL query cannot be empty');
+        assert(count($params) <= 10, 'Too many parameters provided');
+
+        $stmt = $this->prepareStatement($sql);
+
+        $executed = $stmt->execute($params);
+        assert($executed, 'Failed to execute statement');
+
+        return $stmt;
+    }
+
+    /**
+     * Prépare une requête PDO avec vérifications
+     *
+     * @param string $sql Requête SQL
+     * @return PDOStatement Statement préparé
+     */
+    private function prepareStatement(string $sql): PDOStatement
+    {
+        assert($sql !== '', 'SQL cannot be empty');
+
+        $stmt = $this->pdo->prepare($sql);
+        assert($stmt instanceof PDOStatement, 'Failed to prepare statement');
+
+        return $stmt;
     }
 }
