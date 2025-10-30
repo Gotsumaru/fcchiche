@@ -687,7 +687,7 @@ ul {
    ====================================================================== */
 .hero {
   position: relative;
-  padding: clamp(5rem, 4.25rem + 3vw, 7.25rem) 0 clamp(4.25rem, 3.75rem + 3.5vw, 6.75rem);
+  padding: 20px 0px;
   background: #f5f5f7;
 }
 
@@ -2029,7 +2029,7 @@ ul {
 
 @media (max-width: 720px) {
   .page-shell__content {
-    padding-top: 4.5rem;
+    padding-top: 0;
   }
 
   .section {
