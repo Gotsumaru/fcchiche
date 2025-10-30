@@ -25,28 +25,13 @@ $navItems = [
     ],
     [
         'id' => 'matchs',
-        'label' => 'Matchs',
+        'label' => 'Calendrier',
         'href' => $basePath . '/matchs',
     ],
     [
         'id' => 'classements',
         'label' => 'Classements',
         'href' => $basePath . '/classements',
-    ],
-    [
-        'id' => 'equipes',
-        'label' => 'Équipes',
-        'href' => $basePath . '/equipes',
-    ],
-    [
-        'id' => 'galerie',
-        'label' => 'Photos',
-        'href' => $basePath . '/galerie',
-    ],
-    [
-        'id' => 'partenaires',
-        'label' => 'Partenaires',
-        'href' => $basePath . '/partenaires',
     ],
     [
         'id' => 'contact',
@@ -123,10 +108,6 @@ $navItems = [
               </li>
             <?php endforeach; ?>
           </ul>
-          <div class="app-nav__cta-group">
-            <a class="app-nav__cta app-nav__cta--outline" href="#">Inscription</a>
-            <a class="app-nav__cta app-nav__cta--filled" href="#">Connexion</a>
-          </div>
         </nav>
 
         <button

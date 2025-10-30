@@ -25,16 +25,25 @@ require_once __DIR__ . '/templates/header.php';
           <div class="gallery-grid" style="margin-top: 2.5rem;">
             <?php
             $photos = [
-                'https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?auto=format&fit=crop&w=1600&q=80',
-                'https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf?auto=format&fit=crop&w=1600&q=80',
-                'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1600&q=80',
-                'https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=1600&q=80',
-                'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=1600&q=80',
-                'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1600&q=80',
-              ];
-            foreach ($photos as $photo): ?>
+                ['file' => 'home.png', 'alt' => "Tribunes du stade du FC Chiché"],
+                ['file' => 'Agenda.png', 'alt' => "Vestiaires préparés avant le match"],
+                ['file' => 'resultat.png', 'alt' => "Victoire du FC Chiché célébrée en équipe"],
+                ['file' => 'Classement.png', 'alt' => "Analyse des classements du FC Chiché"],
+                ['file' => 'Contact.png', 'alt' => "Supporters réunis au club-house"],
+                ['file' => 'Agenda.png', 'alt' => "Préparation tactique dans les vestiaires"],
+            ];
+            foreach ($photos as $photo):
+              $src = $assetsBase . '/images/' . $photo['file'];
+            ?>
               <div class="gallery-item">
-                <img src="<?= htmlspecialchars($photo, ENT_QUOTES, 'UTF-8') ?>" alt="Moment FC Chiché" loading="lazy" />
+                <img
+                  src="<?= htmlspecialchars($src, ENT_QUOTES, 'UTF-8') ?>"
+                  width="4096"
+                  height="4096"
+                  alt="<?= htmlspecialchars($photo['alt'], ENT_QUOTES, 'UTF-8') ?>"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             <?php endforeach; ?>
           </div>
