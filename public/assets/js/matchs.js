@@ -3,15 +3,6 @@
 
   const MAX_MATCHES = 20;
 
-  const MATCH_VISUAL_RULES = Object.freeze([
-    { pattern: /(champ|phase|d[0-9])/i, asset: 'calendrier.jpg' },
-    { pattern: /(coupe|challenge|cp)/i, asset: 'convocation.jpg' },
-    { pattern: /(plateau|tournoi|festival)/i, asset: 'galeries/0344a63bc84ae9c3f7ebcfc1cde08d16.jpg' },
-    { pattern: /(u1|u13|u15|u17|jeune|formation)/i, asset: 'galeries/76ac98b24fbd9dcea187ba544db6e770.jpg' },
-    { pattern: /(femi|fémi|dames)/i, asset: 'galeries/445351737_943464437577562_900514706040850129_n.jpg' },
-    { pattern: /(loisir|vétéran|veteran|amical|prépa|prepa)/i, asset: 'terrain.jpg' }
-  ]);
-
   const state = {
     api: null,
     basePath: '',
@@ -435,29 +426,17 @@
       return `${normalizedBase}/images/${fileName}`;
     };
 
-    const descriptorParts = [
-      match.competition_name,
-      match.phase_name,
-      match.category_label,
-      match.category_code,
-      match.type_label
-    ];
-
-    const descriptor = descriptorParts
-      .filter((part) => typeof part === 'string' && part !== '')
-      .join(' ')
-      .toLowerCase();
-
-    if (descriptor !== '') {
-      for (const rule of MATCH_VISUAL_RULES) {
-        assert(typeof rule === 'object' && rule !== null, 'Match visual rule must be object');
-        if (rule.pattern.test(descriptor)) {
-          return buildAssetPath(rule.asset);
-        }
-      }
+    const descriptor = String(match.competition_name ?? match.phase_name ?? match.category_label ?? '').toLowerCase();
+    if (descriptor.includes('champ')) {
+      return buildAssetPath('Agenda.png');
     }
-
-    return buildAssetPath('galeries/684399bd8f6dc425b7441f37e5b6ce36.jpg');
+    if (descriptor.includes('coupe') || descriptor.includes('cp')) {
+      return buildAssetPath('resultat.png');
+    }
+    if (descriptor.includes('u1') || descriptor.includes('jeune')) {
+      return buildAssetPath('Contact.png');
+    }
+    return buildAssetPath('home.png');
   }
 
   function buildMatchLink(matchId) {
