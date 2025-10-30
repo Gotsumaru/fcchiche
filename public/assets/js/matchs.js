@@ -3,6 +3,15 @@
 
   const MAX_MATCHES = 20;
 
+  const MATCH_VISUAL_RULES = Object.freeze([
+    { pattern: /(champ|phase|d[0-9])/i, asset: 'calendrier.jpg' },
+    { pattern: /(coupe|challenge|cp)/i, asset: 'convocation.jpg' },
+    { pattern: /(plateau|tournoi|festival)/i, asset: 'galeries/0344a63bc84ae9c3f7ebcfc1cde08d16.jpg' },
+    { pattern: /(u1|u13|u15|u17|jeune|formation)/i, asset: 'galeries/76ac98b24fbd9dcea187ba544db6e770.jpg' },
+    { pattern: /(femi|fémi|dames)/i, asset: 'galeries/445351737_943464437577562_900514706040850129_n.jpg' },
+    { pattern: /(loisir|vétéran|veteran|amical|prépa|prepa)/i, asset: 'terrain.jpg' }
+  ]);
+
   const state = {
     api: null,
     basePath: '',
@@ -220,9 +229,10 @@
     const article = document.createElement('article');
     article.className = 'calendar-card';
 
-    const visual = document.createElement('div');
+    const visual = document.createElement('figure');
     visual.className = 'calendar-card__visual';
-    visual.appendChild(createImageElement(resolveMatchImage(match), `Affiche de ${buildMatchTitle(match)}`));
+    const heroImage = createImageElement(resolveMatchImage(match), `Affiche de ${buildMatchTitle(match)}`);
+    visual.appendChild(heroImage);
     article.appendChild(visual);
 
     const body = document.createElement('div');
@@ -232,34 +242,39 @@
     header.className = 'calendar-card__header';
 
     const badge = document.createElement('span');
-    badge.className = 'section__eyebrow';
+    badge.className = 'calendar-card__badge';
     badge.textContent = resolveCompetition(match);
     header.appendChild(badge);
 
     const date = document.createElement('span');
+    date.className = 'calendar-card__date';
     date.textContent = formatDate(match.date);
     header.appendChild(date);
 
     body.appendChild(header);
 
-    const teams = document.createElement('div');
-    teams.className = 'calendar-card__teams';
-    teams.textContent = buildMatchTitle(match);
-    body.appendChild(teams);
+    const title = document.createElement('h3');
+    title.className = 'calendar-card__title';
+    title.textContent = buildMatchTitle(match);
+    body.appendChild(title);
 
-    const meta = document.createElement('div');
+    const meta = document.createElement('dl');
     meta.className = 'calendar-card__meta';
-    meta.appendChild(buildMetaLine('Horaire', formatKickoff(match.time)));
-    meta.appendChild(buildMetaLine('Lieu', resolveLocation(match)));
-    meta.appendChild(buildMetaLine('Journée', match.journee_label ?? 'À confirmer'));
+    meta.appendChild(buildMetaLine('Horaire', formatKickoff(match.time), 'clock'));
+    meta.appendChild(buildMetaLine('Lieu', resolveLocation(match), 'pin'));
+    meta.appendChild(buildMetaLine('Journée', match.journee_label ?? 'À confirmer', 'flag'));
     body.appendChild(meta);
 
+    const footer = document.createElement('div');
+    footer.className = 'calendar-card__footer';
+
     const cta = document.createElement('a');
-    cta.className = 'event-card__cta';
+    cta.className = 'calendar-card__cta';
     cta.href = buildMatchLink(match.id);
     cta.textContent = 'Feuille de match';
-    body.appendChild(cta);
+    footer.appendChild(cta);
 
+    body.appendChild(footer);
     article.appendChild(body);
 
     return article;
@@ -377,13 +392,25 @@
     return parsed;
   }
 
-  function buildMetaLine(label, value) {
+  function buildMetaLine(label, value, icon) {
     assert(typeof label === 'string' && label !== '', 'Meta label must be provided');
     assert(typeof value === 'string' && value !== '', 'Meta value must be provided');
+    assert(icon === undefined || typeof icon === 'string', 'Meta icon must be string or undefined');
 
-    const span = document.createElement('span');
-    span.textContent = `${label} · ${value}`;
-    return span;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'calendar-card__meta-item';
+    const iconName = typeof icon === 'string' && icon.trim() !== '' ? icon.trim() : 'info';
+    wrapper.dataset.icon = iconName;
+
+    const dt = document.createElement('dt');
+    dt.textContent = label;
+    wrapper.appendChild(dt);
+
+    const dd = document.createElement('dd');
+    dd.textContent = value;
+    wrapper.appendChild(dd);
+
+    return wrapper;
   }
 
   function resetCompetitionFilter() {
@@ -426,17 +453,29 @@
       return `${normalizedBase}/images/${fileName}`;
     };
 
-    const descriptor = String(match.competition_name ?? match.phase_name ?? match.category_label ?? '').toLowerCase();
-    if (descriptor.includes('champ')) {
-      return buildAssetPath('Agenda.png');
+    const descriptorParts = [
+      match.competition_name,
+      match.phase_name,
+      match.category_label,
+      match.category_code,
+      match.type_label
+    ];
+
+    const descriptor = descriptorParts
+      .filter((part) => typeof part === 'string' && part !== '')
+      .join(' ')
+      .toLowerCase();
+
+    if (descriptor !== '') {
+      for (const rule of MATCH_VISUAL_RULES) {
+        assert(typeof rule === 'object' && rule !== null, 'Match visual rule must be object');
+        if (rule.pattern.test(descriptor)) {
+          return buildAssetPath(rule.asset);
+        }
+      }
     }
-    if (descriptor.includes('coupe') || descriptor.includes('cp')) {
-      return buildAssetPath('resultat.png');
-    }
-    if (descriptor.includes('u1') || descriptor.includes('jeune')) {
-      return buildAssetPath('Contact.png');
-    }
-    return buildAssetPath('home.png');
+
+    return buildAssetPath('galeries/684399bd8f6dc425b7441f37e5b6ce36.jpg');
   }
 
   function buildMatchLink(matchId) {
