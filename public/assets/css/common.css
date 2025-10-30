@@ -101,6 +101,10 @@ ul {
   flex: 1;
   display: flex;
   flex-direction: column;
+  padding-top: 0;
+}
+
+.page-body:not(.page-index) .page-shell__content {
   padding-top: 5.5rem;
 }
 
@@ -151,10 +155,30 @@ ul {
    HOME — STORY & GALLERIES
    ====================================================================== */
 .section--story {
-  background: var(--fc-white);
+  position: relative;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(0, 136, 0, 0.16), transparent 58%),
+    radial-gradient(circle at 88% 8%, rgba(68, 187, 68, 0.12), transparent 50%),
+    linear-gradient(180deg, rgba(245, 245, 247, 0.6), rgba(255, 255, 255, 0.9));
+  overflow: hidden;
+}
+
+.section--story::before {
+  content: '';
+  position: absolute;
+  inset: auto -25% -55% 35%;
+  aspect-ratio: 1 / 1;
+  background: radial-gradient(circle, rgba(0, 136, 0, 0.18), transparent 70%);
+  filter: blur(60px);
+  opacity: 0.6;
+  transform: rotate(18deg);
+  animation: story-glow 22s linear infinite;
+  pointer-events: none;
 }
 
 .story-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: clamp(2.5rem, 2rem + 1vw, 3.5rem);
 }
@@ -169,7 +193,8 @@ ul {
 
 .story-grid__content {
   display: grid;
-  gap: 1.75rem;
+  gap: 1.8rem;
+  position: relative;
 }
 
 .story-points {
@@ -187,9 +212,10 @@ ul {
   align-items: start;
   padding: 1.5rem;
   border-radius: var(--fc-radius-lg);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  background: rgba(0, 136, 0, 0.04);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 136, 0, 0.14);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(12px);
 }
 
 .story-block__icon {
@@ -199,10 +225,11 @@ ul {
   width: 48px;
   height: 48px;
   border-radius: 16px;
-  background: rgba(0, 136, 0, 0.12);
+  background: linear-gradient(135deg, rgba(0, 136, 0, 0.08), rgba(68, 187, 68, 0.2));
   color: var(--fc-green);
   font-weight: 600;
   font-size: 1.1rem;
+  box-shadow: inset 0 0 0 1px rgba(0, 136, 0, 0.2);
 }
 
 .story-block__title {
@@ -216,66 +243,227 @@ ul {
   line-height: 1.8;
 }
 
-.story-grid__gallery {
+.story-stats {
   display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
 
-.story-gallery {
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.story-stat {
   position: relative;
-}
-
-.story-gallery__item {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1.4rem 1.6rem;
+  border-radius: calc(var(--fc-radius-lg) + 4px);
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(0, 136, 0, 0.16);
+  box-shadow: 0 24px 48px rgba(0, 136, 0, 0.12);
+  backdrop-filter: blur(10px);
   overflow: hidden;
-  border-radius: var(--fc-radius-lg);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.08);
+  transition: transform var(--fc-transition), box-shadow var(--fc-transition);
 }
 
-.story-gallery__item img {
+.story-stat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(68, 187, 68, 0.22), transparent 68%);
+  opacity: 0;
+  transition: opacity var(--fc-transition);
+}
+
+.story-stat:hover,
+.story-stat:focus-within {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 52px rgba(0, 136, 0, 0.18);
+}
+
+.story-stat:hover::after,
+.story-stat:focus-within::after {
+  opacity: 1;
+}
+
+.story-stat__value {
+  font-size: clamp(1.6rem, 1.2rem + 1vw, 2rem);
+  font-weight: 600;
+  color: var(--fc-green);
+  z-index: 1;
+}
+
+.story-stat__label {
+  font-size: 0.95rem;
+  color: rgba(17, 17, 17, 0.66);
+  z-index: 1;
+}
+
+.story-grid__gallery {
+  display: flex;
+  justify-content: center;
+}
+
+.story-canvas {
+  position: relative;
+  width: min(100%, 520px);
+  aspect-ratio: 4 / 5;
+  border-radius: 36px;
+  padding: 2.25rem;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.52));
+  box-shadow: 0 60px 100px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.story-canvas__glow {
+  position: absolute;
+  inset: -35% -30% 10%;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 136, 0, 0.28), transparent 70%);
+  opacity: 0.75;
+  filter: blur(40px);
+  animation: story-pulse 16s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.story-canvas__frame {
+  position: absolute;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 28px 48px rgba(0, 0, 0, 0.26);
+  transform-style: preserve-3d;
+  animation: story-float 18s ease-in-out infinite;
+}
+
+.story-canvas__frame picture,
+.story-canvas__frame img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.story-gallery__item--wide {
-  grid-column: 1 / -1;
-  max-height: 420px;
+.story-canvas__frame--main {
+  inset: 12% 10% 18% 10%;
+  animation-delay: 0s;
 }
 
-.story-gallery__item--tall {
-  height: clamp(360px, 50vw, 520px);
+.story-canvas__frame--side {
+  top: 10%;
+  right: -6%;
+  width: clamp(180px, 40%, 220px);
+  aspect-ratio: 3 / 4;
+  animation-delay: 4s;
 }
 
-.story-gallery__item--square {
-  height: clamp(280px, 45vw, 360px);
-  align-self: end;
-  justify-self: end;
+.story-canvas__frame--locker {
+  bottom: 6%;
+  left: -6%;
+  width: clamp(180px, 42%, 230px);
+  aspect-ratio: 4 / 3;
+  animation-delay: 8s;
 }
 
-@media (min-width: 1024px) {
-  .story-gallery {
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(6, 60px);
-    height: 520px;
+.story-canvas__badge {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  padding: 1rem 1.6rem;
+  border-radius: var(--fc-radius-pill);
+  background: rgba(0, 0, 0, 0.68);
+  color: var(--fc-white);
+  text-align: center;
+  display: grid;
+  gap: 0.15rem;
+  min-width: 260px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(18px);
+  animation: story-badge 14s ease-in-out infinite;
+}
+
+.story-canvas__badge-title {
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.story-canvas__badge-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.story-canvas__pulse {
+  position: absolute;
+  top: 14%;
+  right: 14%;
+  width: clamp(120px, 30%, 180px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  opacity: 0.75;
+  animation: story-ring 12s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes story-glow {
+  from {
+    transform: rotate(0deg);
   }
 
-  .story-gallery__item--wide {
-    grid-column: 1 / span 4;
-    grid-row: 1 / span 4;
-    height: 100%;
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes story-pulse {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(1);
   }
 
-  .story-gallery__item--tall {
-    grid-column: 4 / span 2;
-    grid-row: 2 / span 4;
+  50% {
+    opacity: 0.45;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes story-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate3d(0, 0, 1, 0deg);
   }
 
-  .story-gallery__item--square {
-    grid-column: 3 / span 2;
-    grid-row: 4 / span 2;
+  50% {
+    transform: translate3d(0, -12px, 0) rotate3d(0, 0, 1, 2deg);
+  }
+}
+
+@keyframes story-badge {
+  0%,
+  100% {
+    transform: translate3d(-50%, 0, 0);
+    opacity: 0.95;
+  }
+
+  50% {
+    transform: translate3d(-50%, -6px, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes story-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 0.8;
   }
 }
 
@@ -526,6 +714,10 @@ ul {
   isolation: isolate;
 }
 
+.page-index .hero {
+  margin-top: -1px;
+}
+
 .hero__media {
   position: absolute;
   inset: 0;
@@ -758,6 +950,12 @@ ul {
   gap: 1.75rem;
 }
 
+@media (min-width: 1024px) {
+  .calendar-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .home-scroll {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -918,37 +1116,8 @@ ul {
   gap: 1rem;
 }
 
-.calendar-card {
-  display: grid;
-  gap: 1.5rem;
-  border-radius: var(--fc-radius-lg);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 22px 40px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-}
-
-.calendar-card__visual {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 16 / 9;
-}
-
-.calendar-card__visual img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.calendar-card__body {
-  display: grid;
-  gap: 1rem;
-  padding: 1.75rem;
-}
-
 .event-card__header,
-.result-card__header,
-.calendar-card__header {
+.result-card__header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -957,8 +1126,7 @@ ul {
 }
 
 .event-card__teams,
-.result-card__teams,
-.calendar-card__teams {
+.result-card__teams {
   display: grid;
   gap: 0.4rem;
   font-weight: 600;
@@ -967,8 +1135,7 @@ ul {
 }
 
 .event-card__meta,
-.result-card__meta,
-.calendar-card__meta {
+.result-card__meta {
   display: grid;
   gap: 0.45rem;
   font-size: 0.95rem;
@@ -976,13 +1143,236 @@ ul {
 }
 
 .event-card__meta span,
-.result-card__meta span,
-.calendar-card__meta span {
+.result-card__meta span {
   display: block;
 }
 
+
+.calendar-card {
+  position: relative;
+  display: grid;
+  gap: 1.75rem;
+  padding: 1.75rem;
+  border-radius: 28px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(245, 245, 247, 0.75)),
+    rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 42px 88px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  transition: transform var(--fc-transition), box-shadow var(--fc-transition);
+}
+
+.calendar-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(0, 136, 0, 0.22), transparent 60%);
+  opacity: 0.85;
+  pointer-events: none;
+  transition: opacity var(--fc-transition);
+}
+
+.calendar-card:hover,
+.calendar-card:focus-within {
+  transform: translateY(-6px);
+  box-shadow: 0 48px 90px rgba(0, 0, 0, 0.16);
+}
+
+.calendar-card:hover::before,
+.calendar-card:focus-within::before {
+  opacity: 1;
+}
+
+@media (min-width: 880px) {
+  .calendar-card {
+    grid-template-columns: minmax(220px, 0.95fr) 1.2fr;
+    align-items: stretch;
+  }
+}
+
+.calendar-card__hero {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  min-height: 220px;
+  display: grid;
+  align-content: end;
+  isolation: isolate;
+}
+
+.calendar-card__media {
+  position: absolute;
+  inset: 0;
+}
+
+.calendar-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.05);
+  transition: transform var(--fc-transition), filter var(--fc-transition);
+  filter: saturate(1.05) brightness(0.95);
+}
+
+.calendar-card:hover .calendar-card__media img,
+.calendar-card:focus-within .calendar-card__media img {
+  transform: scale(1.12);
+  filter: saturate(1.15) brightness(1);
+}
+
+.calendar-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(200deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.1) 70%);
+  z-index: 1;
+}
+
+.calendar-card__hero-badges {
+  position: relative;
+  z-index: 2;
+  padding: 1.6rem;
+  display: grid;
+  gap: 0.85rem;
+  color: var(--fc-white);
+}
+
+.calendar-card__tag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  gap: 0.45rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--fc-radius-pill);
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.calendar-card__date {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.calendar-card__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.6rem;
+}
+
+.calendar-card__title {
+  font-size: clamp(1.4rem, 1.2rem + 0.6vw, 1.65rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
 .calendar-card__meta {
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .calendar-card__meta {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+.calendar-card__meta-item {
+  position: relative;
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem 1.25rem 1rem 3.25rem;
+  border-radius: 18px;
+  background: rgba(0, 136, 0, 0.05);
+  border: 1px solid rgba(0, 136, 0, 0.12);
+  color: rgba(17, 17, 17, 0.78);
+  overflow: hidden;
+}
+
+.calendar-card__meta-item::before {
+  content: '';
+  position: absolute;
+  left: 1.4rem;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  background: rgba(0, 136, 0, 0.85);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+.calendar-card__meta-item[data-icon='clock']::before {
+  mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"%3E%3Cpath d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8.009 8.009 0 0 1-8 8Zm.5-13h-1v6l5.25 3.15.5-.86-4.75-2.84Z"/%3E%3C/svg%3E');
+}
+
+.calendar-card__meta-item[data-icon='pin']::before {
+  mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"%3E%3Cpath d="M12 2a7 7 0 0 0-7 7c0 4.58 6.3 12.22 6.58 12.55a.54.54 0 0 0 .84 0C12.7 21.22 19 13.58 19 9a7 7 0 0 0-7-7Zm0 17.3C10.08 16.23 7 11.64 7 9a5 5 0 0 1 10 0c0 2.64-3.08 7.23-5 10.3Zm0-13.8a3.5 3.5 0 1 0 3.5 3.5A3.5 3.5 0 0 0 12 5.5Z"/%3E%3C/svg%3E');
+}
+
+.calendar-card__meta-item[data-icon='flag']::before {
+  mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"%3E%3Cpath d="M19.5 4h-7l-.22-.44A1 1 0 0 0 11.38 3H5.5a1 1 0 0 0 0 2H7v15a1 1 0 0 0 2 0v-5h4.88l.22.44a1 1 0 0 0 .9.56h4.5a1 1 0 0 0 .89-1.45L17.76 11l2.63-5.55A1 1 0 0 0 19.5 4Zm-3.43 7H9V5h2.94l.22.44a1 1 0 0 0 .9.56h4.3Z"/%3E%3C/svg%3E');
+}
+
+.calendar-card__meta-item[data-icon='info']::before {
+  mask-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"%3E%3Cpath d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8.009 8.009 0 0 1-8 8Zm.75-12.5h-1.5V9h1.5ZM13 11h-2v6h2Z"/%3E%3C/svg%3E');
+}
+
+.calendar-card__meta-item dt {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.54);
+}
+
+.calendar-card__meta-item dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.calendar-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.calendar-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: var(--fc-radius-pill);
+  background: linear-gradient(135deg, rgba(0, 136, 0, 0.92), rgba(68, 187, 68, 0.92));
+  color: var(--fc-white);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 16px 30px rgba(0, 136, 0, 0.22);
+  transition: transform var(--fc-transition), box-shadow var(--fc-transition);
+}
+
+.calendar-card__cta::after {
+  content: '';
+  width: 0.75rem;
+  height: 0.75rem;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.calendar-card__cta:hover,
+.calendar-card__cta:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(0, 136, 0, 0.28);
 }
 
 .calendar-card--placeholder {
@@ -991,6 +1381,15 @@ ul {
   place-items: center;
   font-style: italic;
   color: rgba(17, 17, 17, 0.6);
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.74);
+  border-radius: 24px;
+  border: 1px dashed rgba(0, 136, 0, 0.25);
+}
+
+.calendar-card--placeholder::before {
+  display: none;
 }
 
 .event-card__cta {
@@ -1744,6 +2143,49 @@ ul {
 
 .gallery-item:hover img {
   transform: scale(1.08);
+}
+
+.gallery-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 31, 16, 0) 0%, rgba(10, 31, 16, 0.78) 100%);
+  opacity: 0.85;
+  transition: opacity var(--fc-transition);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gallery-item__caption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 1.25rem 1.5rem;
+  display: grid;
+  gap: 0.35rem;
+  color: #fff;
+  z-index: 2;
+  transform: translateY(0);
+  transition: transform var(--fc-transition), opacity var(--fc-transition);
+}
+
+.gallery-item__label {
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.gallery-item__meta {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+.gallery-item:hover::after {
+  opacity: 1;
+}
+
+.gallery-item:hover .gallery-item__caption {
+  transform: translateY(-4px);
 }
 
 .team-grid {
