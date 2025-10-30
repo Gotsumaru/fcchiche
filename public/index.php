@@ -126,46 +126,55 @@ require_once __DIR__ . '/templates/header.php';
                 </div>
               </div>
             </div>
-            <div class="story-stage" aria-hidden="true">
-              <figure class="story-stage__item story-stage__item--primary">
-                <div class="story-stage__frame">
+            <div class="story__media">
+              <figure class="story__visual story__visual--primary">
+                <div class="story__visual-media">
                   <picture>
                     <source
                       srcset="
                         <?= $assetsBase ?>/images/premiere-480.webp 480w,
                         <?= $assetsBase ?>/images/premiere-800.webp 800w,
                         <?= $assetsBase ?>/images/premiere-1200.webp 1200w
-                      "
-                      type="image/webp"
-                      sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 90vw"
-                    />
-                    <source
-                      srcset="<?= $assetsBase ?>/images/premiere.jpg 1200w"
-                      type="image/jpeg"
-                      sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 90vw"
-                    />
+                    "
+                    type="image/webp"
+                    sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 90vw"
+                  />
+                  <source
+                    srcset="<?= $assetsBase ?>/images/premiere.jpg 1200w"
+                    type="image/jpeg"
+                    sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 90vw"
+                  />
+                  <img
+                    src="<?= $assetsBase ?>/images/premiere.jpg"
+                    width="1300"
+                    height="866"
+                    alt="Ambiance nocturne au Pas des Biches"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+                </div>
+                <figcaption class="story__visual-caption">Ambiance nocturne au Pas des Biches</figcaption>
+              </figure>
+              <figure class="story__visual story__visual--secondary">
+                <div class="story__visual-media">
+                  <picture>
+                    <source srcset="<?= $assetsBase ?>/images/buvette.webp" type="image/webp" />
+                    <source srcset="<?= $assetsBase ?>/images/buvette.jpg" type="image/jpeg" />
                     <img
-                      src="<?= $assetsBase ?>/images/premiere.jpg"
-                      width="1300"
-                      height="866"
-                      alt=""
+                      src="<?= $assetsBase ?>/images/buvette.jpg"
+                      width="1792"
+                      height="1024"
+                      alt="Préparation du club-house avant le match"
                       loading="lazy"
                       decoding="async"
                     />
                   </picture>
                 </div>
+                <figcaption class="story__visual-caption">450 repas servis au club-house cette saison</figcaption>
               </figure>
-              <figure class="story-stage__item story-stage__item--secondary">
-                <div class="story-stage__frame">
-                  <picture>
-                    <source srcset="<?= $assetsBase ?>/images/buvette.webp" type="image/webp" />
-                    <source srcset="<?= $assetsBase ?>/images/buvette.jpg" type="image/jpeg" />
-                    <img src="<?= $assetsBase ?>/images/buvette.jpg" width="1792" height="1024" alt="" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-              </figure>
-              <figure class="story-stage__item story-stage__item--tertiary">
-                <div class="story-stage__frame">
+              <figure class="story__visual story__visual--tertiary">
+                <div class="story__visual-media">
                   <picture>
                     <source
                       srcset="
@@ -181,15 +190,18 @@ require_once __DIR__ . '/templates/header.php';
                       type="image/jpeg"
                       sizes="(min-width: 72rem) 320px, (min-width: 48rem) 40vw, 80vw"
                     />
-                    <img src="<?= $assetsBase ?>/images/Reserve.jpg" width="1200" height="800" alt="" loading="lazy" decoding="async" />
+                    <img
+                      src="<?= $assetsBase ?>/images/Reserve.jpg"
+                      width="1200"
+                      height="800"
+                      alt="Échauffement collectif de l'équipe réserve"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </picture>
                 </div>
+                <figcaption class="story__visual-caption">Échauffement collectif de l'équipe réserve</figcaption>
               </figure>
-              <div class="story-stage__glow"></div>
-              <div class="story-stage__note">
-                <span class="story-stage__note-title">450 repas</span>
-                <span class="story-stage__note-subtitle">servis au club-house cette saison</span>
-              </div>
             </div>
           </div>
         </div>

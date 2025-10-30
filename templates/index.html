@@ -25,6 +25,7 @@
             --radius-lg: 28px;
             --radius-md: 18px;
             --radius-sm: 12px;
+            --radius-pill: 999px;
             --max-width: min(1180px, calc(100vw - 48px));
             --transition: 200ms ease;
         }
@@ -729,59 +730,156 @@
 
         .about {
             display: grid;
-            gap: 60px;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: clamp(40px, 28px + 3vw, 64px);
+        }
+
+        @media (min-width: 960px) {
+            .about {
+                grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+                align-items: center;
+            }
+        }
+
+        .about-card--territory {
+            display: grid;
+            gap: clamp(32px, 22px + 1.6vw, 52px);
             align-items: start;
         }
 
-        .about-card {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            padding: 36px;
-            border: 1px solid rgba(0, 88, 36, 0.08);
-            box-shadow: 0 28px 52px rgba(14, 61, 26, 0.12);
-            display: grid;
-            gap: 22px;
+        @media (min-width: 960px) {
+            .about-card--territory {
+                grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+                align-items: center;
+            }
         }
 
-        .about-card strong {
-            font-size: 24px;
+        .about-copy {
+            display: grid;
+            gap: clamp(16px, 14px + 0.8vw, 26px);
+        }
+
+        .about-copy strong {
+            font-size: clamp(24px, 20px + 1.2vw, 34px);
             color: var(--accent-strong);
+            letter-spacing: -0.01em;
         }
 
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 18px;
-        }
-
-        .gallery figure {
-            border-radius: var(--radius-md);
-            overflow: hidden;
+        .about-gallery {
             position: relative;
-            box-shadow: 0 22px 44px rgba(14, 61, 26, 0.12);
+            display: grid;
+            gap: clamp(22px, 18px + 1vw, 32px);
+            justify-items: end;
+            align-items: center;
         }
 
-        .gallery img {
+        @media (min-width: 720px) {
+            .about-gallery {
+                min-height: clamp(380px, 44vw, 540px);
+            }
+        }
+
+        .about-frame {
+            position: relative;
+            border-radius: clamp(26px, 3.6vw, 42px);
+            overflow: hidden;
+            box-shadow: 0 28px 80px -32px rgba(15, 27, 18, 0.42);
+            background: #ffffff;
+            border: 1px solid rgba(15, 27, 18, 0.06);
+            transition: transform 320ms ease, box-shadow 320ms ease;
+            isolation: isolate;
+        }
+
+        .about-frame:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 38px 96px -30px rgba(15, 27, 18, 0.45);
+        }
+
+        .about-frame picture,
+        .about-frame img {
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform var(--transition);
         }
 
-        .gallery figure:hover img {
-            transform: scale(1.04);
-        }
-
-        .gallery figcaption {
+        .about-frame__caption {
             position: absolute;
-            inset: auto 12px 12px 12px;
-            padding: 14px 18px;
-            border-radius: 14px;
-            background: rgba(0, 88, 36, 0.78);
-            font-weight: 600;
-            font-size: 14px;
-            color: #ffffff;
+            left: clamp(22px, 2.6vw, 36px);
+            top: clamp(22px, 2.6vw, 36px);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            border-radius: var(--radius-pill, 999px);
+            background: rgba(255, 255, 255, 0.78);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+        }
+
+        .about-frame__dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        @media (min-width: 720px) {
+            .about-frame {
+                width: auto;
+            }
+
+            .about-frame--primary {
+                width: clamp(280px, 36vw, 480px);
+                transform-origin: center;
+            }
+
+            .about-frame--secondary {
+                position: absolute;
+                width: clamp(200px, 24vw, 320px);
+                top: clamp(46px, 6vw, 92px);
+                right: clamp(-32px, -4vw, -60px);
+                transform: translate3d(12%, 0, 0) rotate(-5deg);
+            }
+        }
+
+        @media (max-width: 719px) {
+            .about-gallery {
+                justify-items: center;
+            }
+
+            .about-frame {
+                width: 100%;
+            }
+
+            .about-frame--secondary {
+                order: -1;
+                transform: none;
+            }
+        }
+
+        .about-card--panel {
+            display: grid;
+            gap: clamp(18px, 14px + 1vw, 28px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(235, 243, 236, 0.92));
+            border-radius: var(--radius-lg);
+            padding: clamp(28px, 20px + 1.5vw, 36px);
+            border: 1px solid rgba(15, 27, 18, 0.06);
+            box-shadow: 0 34px 70px -40px rgba(15, 27, 18, 0.5);
+        }
+
+        .about-panel__list {
+            display: grid;
+            gap: 16px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            color: var(--text-muted);
+            font-size: 15px;
         }
 
         footer {
@@ -1145,23 +1243,25 @@
                     <p class="section-subtitle">Implanté au cœur de Chiché, le club s'appuie sur un réseau de bénévoles, d'éducateurs diplômés et de partenaires locaux qui partagent la même ambition : faire rayonner le football amateur.</p>
                 </div>
                 <div class="about">
-                    <article class="about-card">
-                        <strong>Centre sportif du Pas des Biches</strong>
-                        <p>Terrain d'honneur, tribunes couvertes, espace club-house et zone de préparation physique. Lieu de vie du club et point de ralliement de tous les passionnés.</p>
-                        <div class="gallery">
-                            <figure>
+                    <article class="about-card about-card--territory">
+                        <div class="about-copy">
+                            <strong>Centre sportif du Pas des Biches</strong>
+                            <p>Terrain d'honneur, tribunes couvertes, espace club-house et zone de préparation physique. Lieu de vie du club et point de ralliement de tous les passionnés.</p>
+                        </div>
+                        <div class="about-gallery">
+                            <figure class="about-frame about-frame--primary">
                                 <img src="/assets/images/Agenda.png" alt="Terrain du FC Chiché en nocturne" loading="lazy" width="4096" height="4096">
-                                <figcaption>Ambiance nocturne</figcaption>
+                                <figcaption class="about-frame__caption"><span class="about-frame__dot" aria-hidden="true"></span>Ambiance nocturne</figcaption>
                             </figure>
-                            <figure>
+                            <figure class="about-frame about-frame--secondary">
                                 <img src="/assets/images/resultat.png" alt="Joueurs du FC Chiché à l'échauffement" loading="lazy" width="4096" height="4096">
-                                <figcaption>Échauffement collectif</figcaption>
+                                <figcaption class="about-frame__caption"><span class="about-frame__dot" aria-hidden="true"></span>Échauffement collectif</figcaption>
                             </figure>
                         </div>
                     </article>
-                    <article class="about-card">
+                    <article class="about-card about-card--panel">
                         <strong>Un engagement sociétal</strong>
-                        <ul style="list-style:none;display:grid;gap:16px;color:var(--text-muted);font-size:15px;">
+                        <ul class="about-panel__list">
                             <li>• École de foot labellisée FFF</li>
                             <li>• Programme féminisation et mixité</li>
                             <li>• Accueil d'événements associatifs locaux</li>
