@@ -25,7 +25,14 @@ require_once __DIR__ . '/templates/header.php';
           <div class="team-grid" style="margin-top: 2.5rem;">
             <a class="team-card" href="<?= $basePath ?>/equipes/fcchiche1.php">
               <div class="team-card__media">
-                <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1400&q=80" alt="Équipe seniors" />
+                <img
+                  src="<?= $assetsBase ?>/images/home.png"
+                  width="4096"
+                  height="4096"
+                  alt="Équipe seniors du FC Chiché"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <div>
                 <h3>FC Chiché 1</h3>
@@ -34,7 +41,14 @@ require_once __DIR__ . '/templates/header.php';
             </a>
             <a class="team-card" href="<?= $basePath ?>/equipes/fcchiche2.php">
               <div class="team-card__media">
-                <img src="https://images.unsplash.com/photo-1475154404624-07909433bbfb?auto=format&fit=crop&w=1400&q=80" alt="Équipe réserve" />
+                <img
+                  src="<?= $assetsBase ?>/images/Agenda.png"
+                  width="4096"
+                  height="4096"
+                  alt="Équipe réserve du FC Chiché"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <div>
                 <h3>FC Chiché 2</h3>
@@ -43,7 +57,14 @@ require_once __DIR__ . '/templates/header.php';
             </a>
             <a class="team-card" href="<?= $basePath ?>/equipes/u17.php">
               <div class="team-card__media">
-                <img src="https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=1400&q=80" alt="Équipe U17" />
+                <img
+                  src="<?= $assetsBase ?>/images/resultat.png"
+                  width="4096"
+                  height="4096"
+                  alt="Équipe U17 du FC Chiché"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <div>
                 <h3>FC Chiché U17</h3>
@@ -52,7 +73,14 @@ require_once __DIR__ . '/templates/header.php';
             </a>
             <a class="team-card" href="<?= $basePath ?>/equipes/u15.php">
               <div class="team-card__media">
-                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1400&q=80" alt="Équipe U15" />
+                <img
+                  src="<?= $assetsBase ?>/images/Classement.png"
+                  width="4096"
+                  height="4096"
+                  alt="Équipe U15 du FC Chiché"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <div>
                 <h3>FC Chiché U15</h3>
@@ -61,7 +89,14 @@ require_once __DIR__ . '/templates/header.php';
             </a>
             <a class="team-card" href="<?= $basePath ?>/equipes/u13.php">
               <div class="team-card__media">
-                <img src="https://images.unsplash.com/photo-1459865264687-595d652de67e?auto=format&fit=crop&w=1400&q=80" alt="Équipe U13" />
+                <img
+                  src="<?= $assetsBase ?>/images/Contact.png"
+                  width="4096"
+                  height="4096"
+                  alt="Équipe U13 du FC Chiché"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <div>
                 <h3>FC Chiché U13</h3>
