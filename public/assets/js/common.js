@@ -19,7 +19,6 @@
       menu.classList.toggle('is-open', isOpen);
       toggle.setAttribute('aria-expanded', String(isOpen));
       toggle.setAttribute('aria-label', isOpen ? 'Fermer la navigation' : 'Ouvrir la navigation');
-      toggle.classList.toggle('is-active', isOpen);
 
       if (srLabel instanceof HTMLElement) {
         srLabel.textContent = isOpen ? 'Fermer la navigation' : 'Ouvrir la navigation';
