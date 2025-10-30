@@ -17,12 +17,13 @@ class Logger
      */
     public function __construct(string $filename = 'app.log', int $max_size = LOG_MAX_SIZE)
     {
-        assert(!empty($filename), 'Filename cannot be empty');
+        assert($filename !== '', 'Filename cannot be empty');
         assert($max_size > 0, 'Max size must be positive');
-        
+
         $this->log_file = LOG_PATH . '/' . $filename;
         $this->max_size = $max_size;
         $this->ensureLogDirectory();
+        assert(is_writable(LOG_PATH), 'Log directory must be writable');
     }
     
     /**
@@ -36,6 +37,9 @@ class Logger
             $created = mkdir(LOG_PATH, 0755, true);
             assert($created, 'Failed to create log directory');
         }
+
+        assert(is_dir(LOG_PATH), 'Log directory missing after creation');
+        assert(is_readable(LOG_PATH), 'Log directory must be readable');
     }
     
     /**
@@ -52,9 +56,14 @@ class Logger
         assert(!empty($message), 'Message cannot be empty');
         
         $this->rotateIfNeeded();
-        
+
         $timestamp = date('Y-m-d H:i:s');
-        $context_str = !empty($context) ? ' ' . json_encode($context) : '';
+        $context_str = '';
+        if (!empty($context)) {
+            $encodedContext = json_encode($context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            assert($encodedContext !== false, 'Failed to encode log context');
+            $context_str = ' ' . $encodedContext;
+        }
         $log_entry = sprintf(
             "[%s] [%s] %s%s\n",
             $timestamp,
@@ -64,6 +73,8 @@ class Logger
         );
         
         $result = file_put_contents($this->log_file, $log_entry, FILE_APPEND | LOCK_EX);
+        assert($result !== false, 'Failed to write log entry');
+
         return $result !== false;
     }
     
@@ -76,6 +87,9 @@ class Logger
      */
     public function info(string $message, array $context = []): bool
     {
+        assert($message !== '', 'Info message cannot be empty');
+        assert($this->isContextValid($context), 'Context must be an array');
+
         return $this->log('info', $message, $context);
     }
     
@@ -88,6 +102,9 @@ class Logger
      */
     public function warning(string $message, array $context = []): bool
     {
+        assert($message !== '', 'Warning message cannot be empty');
+        assert($this->isContextValid($context), 'Context must be an array');
+
         return $this->log('warning', $message, $context);
     }
     
@@ -100,6 +117,9 @@ class Logger
      */
     public function error(string $message, array $context = []): bool
     {
+        assert($message !== '', 'Error message cannot be empty');
+        assert($this->isContextValid($context), 'Context must be an array');
+
         return $this->log('error', $message, $context);
     }
     
@@ -113,15 +133,19 @@ class Logger
         if (!file_exists($this->log_file)) {
             return;
         }
-        
+
         $size = filesize($this->log_file);
-        if ($size === false || $size < $this->max_size) {
+        assert($size !== false, 'Failed to read log file size');
+        assert($this->max_size > 0, 'Max size must stay positive');
+
+        if ($size < $this->max_size) {
             return;
         }
-        
+
         $backup = $this->log_file . '.' . date('Y-m-d_His') . '.bak';
-        rename($this->log_file, $backup);
-        
+        $renamed = rename($this->log_file, $backup);
+        assert($renamed, 'Failed to rotate log file');
+
         $this->cleanOldBackups();
     }
     
@@ -134,25 +158,46 @@ class Logger
     {
         $pattern = $this->log_file . '.*.bak';
         $backups = glob($pattern);
-        
-        if ($backups === false) {
+        assert($backups !== false, 'Failed to list backup files');
+
+        if ($backups === []) {
             return;
         }
-        
+
         $max_backups = 5;
         $count = count($backups);
-        
+        assert($max_backups > 0, 'Max backups must be positive');
+
         if ($count <= $max_backups) {
             return;
         }
-        
-        usort($backups, function($a, $b) {
+
+        usort($backups, function ($a, $b) {
             return filemtime($a) <=> filemtime($b);
         });
-        
+
         $to_delete = array_slice($backups, 0, $count - $max_backups);
+        $maxIterations = count($to_delete);
+        $counter = 0;
+
         foreach ($to_delete as $file) {
-            unlink($file);
+            assert($counter++ < $maxIterations, 'Exceeded cleanup iteration limit');
+            $deleted = unlink($file);
+            assert($deleted, 'Failed to delete backup file');
         }
+    }
+
+    /**
+     * Valide la structure du contexte fourni
+     *
+     * @param array $context Contexte à évaluer
+     * @return bool True si valide
+     */
+    private function isContextValid(array $context): bool
+    {
+        assert(is_array($context), 'Context must be an array');
+        assert(count($context) <= 1000, 'Context too large');
+
+        return $context === [] || array_values($context) === $context || array_keys($context) !== [];
     }
 }

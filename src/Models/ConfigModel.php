@@ -11,6 +11,9 @@ class ConfigModel
 
     public function __construct(PDO $pdo)
     {
+        assert($pdo instanceof PDO, 'PDO instance required');
+        assert($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION, 'PDO must use exception mode');
+
         $this->pdo = $pdo;
     }
 
@@ -24,16 +27,23 @@ class ConfigModel
     public function get(string $key): ?string
     {
         assert(!empty($key), 'Config key cannot be empty');
-        
-        $sql = "SELECT config_value FROM " . self::TABLE . " 
-                WHERE config_key = :key 
+        assert(strlen($key) <= 255, 'Config key too long');
+
+        $sql = "SELECT config_value FROM " . self::TABLE . "
+                WHERE config_key = :key
                 LIMIT 1";
-        
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['key' => $key]);
-        
+
+        $stmt = $this->prepareAndExecute($sql, ['key' => $key]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result['config_value'] : null;
+        assert($result === false || is_array($result), 'Invalid config fetch result');
+
+        if ($result !== false) {
+            assert(array_key_exists('config_value', $result), 'Config value missing');
+            return (string)$result['config_value'];
+        }
+
+        return null;
     }
 
     /**
@@ -44,17 +54,23 @@ class ConfigModel
     public function getAll(): array
     {
         $sql = "SELECT config_key, config_value FROM " . self::TABLE;
-        $stmt = $this->pdo->query($sql);
-        
+        assert($sql !== '', 'SQL cannot be empty');
+
+        $stmt = $this->prepareAndExecute($sql, []);
+        assert($stmt->columnCount() >= 2, 'Expected columns missing');
+
         $configs = [];
         $counter = 0;
         $maxIterations = 1000;
-        
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        assert($maxIterations > 0, 'Invalid iteration guard');
+
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             assert($counter++ < $maxIterations, 'Too many config entries');
+            assert(isset($row['config_key']), 'Config key missing');
+            assert(array_key_exists('config_value', $row), 'Config value missing');
             $configs[$row['config_key']] = $row['config_value'];
         }
-        
+
         return $configs;
     }
 
@@ -68,22 +84,26 @@ class ConfigModel
     {
         assert(!empty($keys), 'Keys array cannot be empty');
         assert(count($keys) <= 100, 'Too many keys requested');
-        
+        assert(count(array_filter($keys, 'is_string')) === count($keys), 'Keys must be strings');
+
         $placeholders = str_repeat('?,', count($keys) - 1) . '?';
-        $sql = "SELECT config_key, config_value FROM " . self::TABLE . " 
+        $sql = "SELECT config_key, config_value FROM " . self::TABLE . "
                 WHERE config_key IN ($placeholders)";
-        
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($keys);
-        
+
+        $stmt = $this->prepareAndExecute($sql, array_values($keys));
+        assert($stmt->columnCount() >= 2, 'Expected columns missing');
+
         $configs = [];
         $counter = 0;
-        
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            assert($counter++ < count($keys), 'Unexpected number of results');
+        $maxResults = count($keys);
+
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
+            assert($counter++ < $maxResults, 'Unexpected number of results');
+            assert(isset($row['config_key']), 'Config key missing');
+            assert(array_key_exists('config_value', $row), 'Config value missing');
             $configs[$row['config_key']] = $row['config_value'];
         }
-        
+
         return $configs;
     }
 
@@ -126,21 +146,24 @@ class ConfigModel
      */
     public function getAllLastSync(): array
     {
-        $sql = "SELECT config_key, config_value FROM " . self::TABLE . " 
+        $sql = "SELECT config_key, config_value FROM " . self::TABLE . "
                 WHERE config_key LIKE 'last_sync_%'";
-        
-        $stmt = $this->pdo->query($sql);
-        
+
+        $stmt = $this->prepareAndExecute($sql, []);
+
         $syncs = [];
         $counter = 0;
         $maxIterations = 100;
-        
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        assert($maxIterations > 0, 'Invalid iteration guard');
+
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             assert($counter++ < $maxIterations, 'Too many sync entries');
+            assert(isset($row['config_key']), 'Sync key missing');
+            assert(array_key_exists('config_value', $row), 'Sync value missing');
             $type = str_replace('last_sync_', '', $row['config_key']);
             $syncs[$type] = $row['config_value'];
         }
-        
+
         return $syncs;
     }
 
@@ -157,11 +180,13 @@ class ConfigModel
         $sql = "SELECT COUNT(*) as count FROM " . self::TABLE . " 
                 WHERE config_key = :key";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['key' => $key]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['key' => $key]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false && (int)$result['count'] > 0;
+        assert($result !== false, 'Exists query must return a row');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'] > 0;
     }
 
     /**
@@ -177,18 +202,20 @@ class ConfigModel
         $sql = "SELECT config_key, config_value FROM " . self::TABLE . " 
                 WHERE config_key LIKE :prefix";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['prefix' => $prefix . '%']);
-        
+        $stmt = $this->prepareAndExecute($sql, ['prefix' => $prefix . '%']);
+
         $configs = [];
         $counter = 0;
         $maxIterations = 1000;
-        
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        assert($maxIterations > 0, 'Invalid iteration guard');
+
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             assert($counter++ < $maxIterations, 'Too many config entries');
+            assert(isset($row['config_key']), 'Config key missing');
+            assert(array_key_exists('config_value', $row), 'Config value missing');
             $configs[$row['config_key']] = $row['config_value'];
         }
-        
+
         return $configs;
     }
 
@@ -200,10 +227,13 @@ class ConfigModel
     public function count(): int
     {
         $sql = "SELECT COUNT(*) as count FROM " . self::TABLE;
-        $stmt = $this->pdo->query($sql);
-        
+        $stmt = $this->prepareAndExecute($sql, []);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? (int)$result['count'] : 0;
+        assert($result !== false, 'Count query must return a row');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'];
     }
 
     /**
@@ -220,10 +250,38 @@ class ConfigModel
                 WHERE config_key = :key 
                 LIMIT 1";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['key' => $key]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['key' => $key]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid config fetch result');
+
+        if ($result !== false) {
+            assert(isset($result['config_key']), 'Config key missing');
+            assert(array_key_exists('config_value', $result), 'Config value missing');
+            return $result;
+        }
+
+        return null;
+    }
+
+    /**
+     * Prépare et exécute une requête préparée
+     *
+     * @param string $sql Requête SQL
+     * @param array $params Paramètres à lier
+     * @return PDOStatement Statement exécuté
+     */
+    private function prepareAndExecute(string $sql, array $params): PDOStatement
+    {
+        assert($sql !== '', 'SQL query cannot be empty');
+        assert(count($params) <= 200, 'Too many parameters provided');
+
+        $stmt = $this->pdo->prepare($sql);
+        assert($stmt instanceof PDOStatement, 'Failed to prepare statement');
+
+        $executed = $stmt->execute($params);
+        assert($executed, 'Failed to execute statement');
+
+        return $stmt;
     }
 }

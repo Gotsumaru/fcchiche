@@ -11,6 +11,9 @@ class SyncLogsModel
 
     public function __construct(PDO $pdo)
     {
+        assert($pdo instanceof PDO, 'PDO instance required');
+        assert($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION, 'PDO must use exception mode');
+
         $this->pdo = $pdo;
     }
 
@@ -25,15 +28,21 @@ class SyncLogsModel
     {
         assert($limit > 0 && $limit <= 1000, 'Invalid limit');
         
-        $sql = "SELECT * FROM " . self::TABLE . " 
-                ORDER BY created_at DESC 
+        $sql = "SELECT * FROM " . self::TABLE . "
+                ORDER BY created_at DESC
                 LIMIT :limit";
-        
-        $stmt = $this->pdo->prepare($sql);
+
+        $stmt = $this->prepareStatement($sql);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $executed = $stmt->execute();
+        assert($executed, 'Failed to execute logs query');
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch logs');
+        assert(count($results) <= $limit, 'Fetched more logs than limit');
+
+        return $results;
     }
 
     /**
@@ -47,11 +56,18 @@ class SyncLogsModel
         assert($id > 0, 'Log ID must be positive');
         
         $sql = "SELECT * FROM " . self::TABLE . " WHERE id = :id LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['id' => $id]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid log result');
+
+        if ($result !== false) {
+            assert(isset($result['id']), 'Log id missing');
+            assert(isset($result['endpoint']), 'Log endpoint missing');
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -66,17 +82,23 @@ class SyncLogsModel
         assert(!empty($endpoint), 'Endpoint cannot be empty');
         assert($limit > 0 && $limit <= 1000, 'Invalid limit');
         
-        $sql = "SELECT * FROM " . self::TABLE . " 
-                WHERE endpoint = :endpoint 
-                ORDER BY created_at DESC 
+        $sql = "SELECT * FROM " . self::TABLE . "
+                WHERE endpoint = :endpoint
+                ORDER BY created_at DESC
                 LIMIT :limit";
-        
-        $stmt = $this->pdo->prepare($sql);
+
+        $stmt = $this->prepareStatement($sql);
         $stmt->bindValue(':endpoint', $endpoint, PDO::PARAM_STR);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $executed = $stmt->execute();
+        assert($executed, 'Failed to execute logs by endpoint');
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch endpoint logs');
+        assert(count($results) <= $limit, 'Fetched more logs than limit');
+
+        return $results;
     }
 
     /**
@@ -91,17 +113,23 @@ class SyncLogsModel
         assert(in_array($status, ['success', 'error', 'warning']), 'Invalid status');
         assert($limit > 0 && $limit <= 1000, 'Invalid limit');
         
-        $sql = "SELECT * FROM " . self::TABLE . " 
-                WHERE status = :status 
-                ORDER BY created_at DESC 
+        $sql = "SELECT * FROM " . self::TABLE . "
+                WHERE status = :status
+                ORDER BY created_at DESC
                 LIMIT :limit";
-        
-        $stmt = $this->pdo->prepare($sql);
+
+        $stmt = $this->prepareStatement($sql);
         $stmt->bindValue(':status', $status, PDO::PARAM_STR);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $executed = $stmt->execute();
+        assert($executed, 'Failed to execute logs by status');
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch status logs');
+        assert(count($results) <= $limit, 'Fetched more logs than limit');
+
+        return $results;
     }
 
     /**
@@ -112,6 +140,9 @@ class SyncLogsModel
      */
     public function getErrors(int $limit = 50): array
     {
+        assert($limit > 0 && $limit <= 1000, 'Invalid limit');
+        assert($limit === (int)$limit, 'Limit must be integer');
+
         return $this->getLogsByStatus('error', $limit);
     }
 
@@ -123,6 +154,9 @@ class SyncLogsModel
      */
     public function getSuccesses(int $limit = 50): array
     {
+        assert($limit > 0 && $limit <= 1000, 'Invalid limit');
+        assert($limit === (int)$limit, 'Limit must be integer');
+
         return $this->getLogsByStatus('success', $limit);
     }
 
@@ -140,18 +174,24 @@ class SyncLogsModel
         assert(!empty($dateEnd), 'End date cannot be empty');
         assert($limit > 0 && $limit <= 1000, 'Invalid limit');
         
-        $sql = "SELECT * FROM " . self::TABLE . " 
-                WHERE DATE(created_at) BETWEEN :date_start AND :date_end 
-                ORDER BY created_at DESC 
+        $sql = "SELECT * FROM " . self::TABLE . "
+                WHERE DATE(created_at) BETWEEN :date_start AND :date_end
+                ORDER BY created_at DESC
                 LIMIT :limit";
-        
-        $stmt = $this->pdo->prepare($sql);
+
+        $stmt = $this->prepareStatement($sql);
         $stmt->bindValue(':date_start', $dateStart, PDO::PARAM_STR);
         $stmt->bindValue(':date_end', $dateEnd, PDO::PARAM_STR);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $executed = $stmt->execute();
+        assert($executed, 'Failed to execute date range query');
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch date range logs');
+        assert(count($results) <= $limit, 'Fetched more logs than limit');
+
+        return $results;
     }
 
     /**
@@ -162,6 +202,8 @@ class SyncLogsModel
     public function getTodayLogs(): array
     {
         $today = date('Y-m-d');
+        assert(preg_match('/^\d{4}-\d{2}-\d{2}$/', $today) === 1, 'Invalid today format');
+
         return $this->getLogsByDateRange($today, $today, 500);
     }
 
@@ -179,19 +221,25 @@ class SyncLogsModel
         assert(in_array($status, ['success', 'error', 'warning']), 'Invalid status');
         assert($limit > 0 && $limit <= 1000, 'Invalid limit');
         
-        $sql = "SELECT * FROM " . self::TABLE . " 
-                WHERE endpoint = :endpoint 
-                AND status = :status 
-                ORDER BY created_at DESC 
+        $sql = "SELECT * FROM " . self::TABLE . "
+                WHERE endpoint = :endpoint
+                AND status = :status
+                ORDER BY created_at DESC
                 LIMIT :limit";
-        
-        $stmt = $this->pdo->prepare($sql);
+
+        $stmt = $this->prepareStatement($sql);
         $stmt->bindValue(':endpoint', $endpoint, PDO::PARAM_STR);
         $stmt->bindValue(':status', $status, PDO::PARAM_STR);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $executed = $stmt->execute();
+        assert($executed, 'Failed to execute endpoint+status query');
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch endpoint status logs');
+        assert(count($results) <= $limit, 'Fetched more logs than limit');
+
+        return $results;
     }
 
     /**
@@ -212,10 +260,18 @@ class SyncLogsModel
                     MIN(execution_time_ms) as min_execution_time
                 FROM " . self::TABLE;
         
-        $stmt = $this->pdo->query($sql);
+        $stmt = $this->prepareAndExecute($sql, []);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        return $result !== false ? $result : [];
+        assert($result === false || is_array($result), 'Invalid stats result');
+
+        if ($result === false) {
+            return [];
+        }
+
+        assert(isset($result['total_logs']), 'total_logs missing');
+        assert(isset($result['total_success']), 'total_success missing');
+
+        return $result;
     }
 
     /**
@@ -241,11 +297,19 @@ class SyncLogsModel
                 WHERE endpoint = :endpoint
                 GROUP BY endpoint";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['endpoint' => $endpoint]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['endpoint' => $endpoint]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : [];
+        assert($result === false || is_array($result), 'Invalid endpoint stats result');
+
+        if ($result === false) {
+            return [];
+        }
+
+        assert(isset($result['total_calls']), 'total_calls missing');
+        assert(isset($result['success_count']), 'success_count missing');
+
+        return $result;
     }
 
     /**
@@ -267,8 +331,12 @@ class SyncLogsModel
                 GROUP BY endpoint
                 ORDER BY last_call DESC";
         
-        $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->prepareAndExecute($sql, []);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch endpoint stats');
+        assert(count($results) <= 500, 'Too many endpoint stats');
+
+        return $results;
     }
 
     /**
@@ -288,16 +356,25 @@ class SyncLogsModel
         
         $sql .= " ORDER BY created_at DESC LIMIT 1";
         
-        $stmt = $this->pdo->prepare($sql);
-        
+        $stmt = $this->prepareStatement($sql);
+
+        $params = [];
         if ($endpoint !== null) {
-            $stmt->execute(['endpoint' => $endpoint]);
-        } else {
-            $stmt->execute();
+            $params['endpoint'] = $endpoint;
         }
-        
+
+        $executed = $stmt->execute($params);
+        assert($executed, 'Failed to execute last log query');
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid last log result');
+
+        if ($result !== false) {
+            assert(isset($result['id']), 'Last log missing id');
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -315,16 +392,21 @@ class SyncLogsModel
             $sql .= " WHERE status = :status";
         }
         
-        $stmt = $this->pdo->prepare($sql);
-        
+        $stmt = $this->prepareStatement($sql);
+
+        $params = [];
         if ($status !== null) {
-            $stmt->execute(['status' => $status]);
-        } else {
-            $stmt->execute();
+            $params['status'] = $status;
         }
-        
+
+        $executed = $stmt->execute($params);
+        assert($executed, 'Failed to execute count logs query');
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? (int)$result['count'] : 0;
+        assert($result !== false, 'Count query must return a row');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'];
     }
 
     /**
@@ -339,19 +421,27 @@ class SyncLogsModel
         assert(!empty($search), 'Search term cannot be empty');
         assert($limit > 0 && $limit <= 1000, 'Invalid limit');
         
-        $search = '%' . $search . '%';
-        $sql = "SELECT * FROM " . self::TABLE . " 
-                WHERE message LIKE :search 
+        $searchTerm = '%' . $search . '%';
+        assert(strlen($searchTerm) <= 500, 'Search term too long');
+
+        $sql = "SELECT * FROM " . self::TABLE . "
+                WHERE message LIKE :search
                 OR endpoint LIKE :search
-                ORDER BY created_at DESC 
+                ORDER BY created_at DESC
                 LIMIT :limit";
-        
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':search', $search, PDO::PARAM_STR);
+
+        $stmt = $this->prepareStatement($sql);
+        $stmt->bindValue(':search', $searchTerm, PDO::PARAM_STR);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $executed = $stmt->execute();
+        assert($executed, 'Failed to execute logs search');
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch logs search results');
+        assert(count($results) <= $limit, 'Fetched more logs than limit');
+
+        return $results;
     }
 
     /**
@@ -364,16 +454,22 @@ class SyncLogsModel
     {
         assert($limit > 0 && $limit <= 100, 'Invalid limit');
         
-        $sql = "SELECT * FROM " . self::TABLE . " 
+        $sql = "SELECT * FROM " . self::TABLE . "
                 WHERE execution_time_ms IS NOT NULL
-                ORDER BY execution_time_ms DESC 
+                ORDER BY execution_time_ms DESC
                 LIMIT :limit";
-        
-        $stmt = $this->pdo->prepare($sql);
+
+        $stmt = $this->prepareStatement($sql);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $executed = $stmt->execute();
+        assert($executed, 'Failed to execute slowest logs query');
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch slowest logs');
+        assert(count($results) <= $limit, 'Fetched more logs than limit');
+
+        return $results;
     }
 
     /**
@@ -386,16 +482,58 @@ class SyncLogsModel
     {
         assert($limit > 0 && $limit <= 100, 'Invalid limit');
         
-        $sql = "SELECT * FROM " . self::TABLE . " 
+        $sql = "SELECT * FROM " . self::TABLE . "
                 WHERE execution_time_ms IS NOT NULL
                 AND execution_time_ms > 0
-                ORDER BY execution_time_ms ASC 
+                ORDER BY execution_time_ms ASC
                 LIMIT :limit";
-        
-        $stmt = $this->pdo->prepare($sql);
+
+        $stmt = $this->prepareStatement($sql);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $executed = $stmt->execute();
+        assert($executed, 'Failed to execute fastest logs query');
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch fastest logs');
+        assert(count($results) <= $limit, 'Fetched more logs than limit');
+
+        return $results;
+    }
+
+    /**
+     * Prépare et exécute une requête préparée
+     *
+     * @param string $sql Requête SQL
+     * @param array $params Paramètres à lier
+     * @return PDOStatement Statement exécuté
+     */
+    private function prepareAndExecute(string $sql, array $params): PDOStatement
+    {
+        assert($sql !== '', 'SQL query cannot be empty');
+        assert(count($params) <= 10, 'Too many parameters provided');
+
+        $stmt = $this->prepareStatement($sql);
+
+        $executed = $stmt->execute($params);
+        assert($executed, 'Failed to execute statement');
+
+        return $stmt;
+    }
+
+    /**
+     * Prépare une requête PDO avec vérifications
+     *
+     * @param string $sql Requête SQL
+     * @return PDOStatement Statement préparé
+     */
+    private function prepareStatement(string $sql): PDOStatement
+    {
+        assert($sql !== '', 'SQL cannot be empty');
+
+        $stmt = $this->pdo->prepare($sql);
+        assert($stmt instanceof PDOStatement, 'Failed to prepare statement');
+
+        return $stmt;
     }
 }

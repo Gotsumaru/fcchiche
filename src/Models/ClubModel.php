@@ -11,6 +11,9 @@ class ClubModel
 
     public function __construct(PDO $pdo)
     {
+        assert($pdo instanceof PDO, 'PDO instance required');
+        assert($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION, 'PDO must use exception mode');
+
         $this->pdo = $pdo;
     }
 
@@ -23,11 +26,18 @@ class ClubModel
     public function getClub(): ?array
     {
         $sql = "SELECT * FROM " . self::TABLE . " WHERE cl_no = :cl_no LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['cl_no' => API_FFF_CLUB_ID]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['cl_no' => API_FFF_CLUB_ID]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid club fetch result');
+
+        if ($result !== false) {
+            assert(isset($result['id']), 'Club record missing id');
+            assert(isset($result['name']), 'Club record missing name');
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -45,11 +55,18 @@ class ClubModel
                 WHERE cl_no = :cl_no 
                 LIMIT 1";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['cl_no' => API_FFF_CLUB_ID]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['cl_no' => API_FFF_CLUB_ID]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid essentials fetch result');
+
+        if ($result !== false) {
+            assert(isset($result['id']), 'Essential club record missing id');
+            assert(isset($result['name']), 'Essential club record missing name');
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -60,11 +77,17 @@ class ClubModel
     public function getClubId(): ?int
     {
         $sql = "SELECT id FROM " . self::TABLE . " WHERE cl_no = :cl_no LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['cl_no' => API_FFF_CLUB_ID]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['cl_no' => API_FFF_CLUB_ID]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? (int)$result['id'] : null;
+        assert($result === false || is_array($result), 'Invalid club id fetch result');
+
+        if ($result !== false) {
+            assert(isset($result['id']), 'Club id missing');
+            return (int)$result['id'];
+        }
+
+        return null;
     }
 
     /**
@@ -75,11 +98,17 @@ class ClubModel
     public function getClubLogo(): ?string
     {
         $sql = "SELECT logo_url FROM " . self::TABLE . " WHERE cl_no = :cl_no LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['cl_no' => API_FFF_CLUB_ID]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['cl_no' => API_FFF_CLUB_ID]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result['logo_url'] : null;
+        assert($result === false || is_array($result), 'Invalid club logo fetch result');
+
+        if ($result !== false) {
+            assert(array_key_exists('logo_url', $result), 'Club logo missing');
+            return (string)$result['logo_url'];
+        }
+
+        return null;
     }
 
     /**
@@ -90,10 +119,33 @@ class ClubModel
     public function exists(): bool
     {
         $sql = "SELECT COUNT(*) as count FROM " . self::TABLE . " WHERE cl_no = :cl_no";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['cl_no' => API_FFF_CLUB_ID]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['cl_no' => API_FFF_CLUB_ID]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false && (int)$result['count'] > 0;
+        assert($result !== false, 'Count query must return a row');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'] > 0;
+    }
+
+    /**
+     * Prépare et exécute une requête préparée avec contrôles
+     *
+     * @param string $sql Requête SQL
+     * @param array $params Paramètres associés
+     * @return PDOStatement Statement prêt à l'emploi
+     */
+    private function prepareAndExecute(string $sql, array $params): PDOStatement
+    {
+        assert($sql !== '', 'SQL query cannot be empty');
+        assert(count($params) <= 25, 'Too many parameters provided');
+
+        $stmt = $this->pdo->prepare($sql);
+        assert($stmt instanceof PDOStatement, 'Failed to prepare statement');
+
+        $executed = $stmt->execute($params);
+        assert($executed, 'Failed to execute statement');
+
+        return $stmt;
     }
 }

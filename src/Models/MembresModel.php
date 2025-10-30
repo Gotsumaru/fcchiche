@@ -11,6 +11,9 @@ class MembresModel
 
     public function __construct(PDO $pdo)
     {
+        assert($pdo instanceof PDO, 'PDO instance required');
+        assert($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION, 'PDO must use exception mode');
+
         $this->pdo = $pdo;
     }
 
@@ -23,9 +26,14 @@ class MembresModel
     public function getAllMembres(): array
     {
         $sql = "SELECT * FROM " . self::TABLE . " ORDER BY nom ASC, prenom ASC";
-        $stmt = $this->pdo->query($sql);
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert($sql !== '', 'SQL cannot be empty');
+
+        $stmt = $this->prepareAndExecute($sql, []);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch membres');
+        assert(count($results) <= 200, 'Too many membres fetched');
+
+        return $results;
     }
 
     /**
@@ -39,11 +47,18 @@ class MembresModel
         assert($id > 0, 'Membre ID must be positive');
         
         $sql = "SELECT * FROM " . self::TABLE . " WHERE id = :id LIMIT 1";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        
+        $stmt = $this->prepareAndExecute($sql, ['id' => $id]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? $result : null;
+        assert($result === false || is_array($result), 'Invalid membre fetch result');
+
+        if ($result !== false) {
+            assert(isset($result['id']), 'Membre id missing');
+            assert(isset($result['nom']), 'Membre nom missing');
+            return $result;
+        }
+
+        return null;
     }
 
     /**
@@ -60,10 +75,12 @@ class MembresModel
                 WHERE titre = :titre 
                 ORDER BY nom ASC, prenom ASC";
         
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['titre' => $titre]);
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->prepareAndExecute($sql, ['titre' => $titre]);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to fetch membres by titre');
+        assert(count($results) <= 100, 'Too many membres fetched');
+
+        return $results;
     }
 
     /**
@@ -76,17 +93,21 @@ class MembresModel
     {
         assert(!empty($search), 'Search term cannot be empty');
         
-        $search = '%' . $search . '%';
-        $sql = "SELECT * FROM " . self::TABLE . " 
-                WHERE nom LIKE :search 
-                OR prenom LIKE :search 
+        $searchTerm = '%' . $search . '%';
+        assert(strlen($searchTerm) <= 300, 'Search term too long');
+
+        $sql = "SELECT * FROM " . self::TABLE . "
+                WHERE nom LIKE :search
+                OR prenom LIKE :search
                 OR titre LIKE :search
                 ORDER BY nom ASC, prenom ASC";
-        
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['search' => $search]);
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt = $this->prepareAndExecute($sql, ['search' => $searchTerm]);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        assert(is_array($results), 'Failed to search membres');
+        assert(count($results) <= 200, 'Too many membres fetched');
+
+        return $results;
     }
 
     /**
@@ -97,9 +118,33 @@ class MembresModel
     public function countMembres(): int
     {
         $sql = "SELECT COUNT(*) as count FROM " . self::TABLE;
-        $stmt = $this->pdo->query($sql);
-        
+        $stmt = $this->prepareAndExecute($sql, []);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result !== false ? (int)$result['count'] : 0;
+        assert($result !== false, 'Count query must return a row');
+        assert(isset($result['count']), 'Count field missing');
+
+        return (int)$result['count'];
+    }
+
+    /**
+     * Prépare et exécute une requête préparée
+     *
+     * @param string $sql Requête SQL
+     * @param array $params Paramètres à lier
+     * @return PDOStatement Statement exécuté
+     */
+    private function prepareAndExecute(string $sql, array $params): PDOStatement
+    {
+        assert($sql !== '', 'SQL query cannot be empty');
+        assert(count($params) <= 10, 'Too many parameters provided');
+
+        $stmt = $this->pdo->prepare($sql);
+        assert($stmt instanceof PDOStatement, 'Failed to prepare statement');
+
+        $executed = $stmt->execute($params);
+        assert($executed, 'Failed to execute statement');
+
+        return $stmt;
     }
 }
