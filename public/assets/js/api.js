@@ -3,8 +3,12 @@
  * Communication avec le backend PHP
  */
 
+'use strict';
+
 const apiBaseFromDom = (() => {
+    assert(typeof document === 'object' && document !== null, 'Document object must be available');
     const body = document.body;
+    assert(body === null || body instanceof HTMLElement, 'Body element must be an HTMLElement or null');
     if (!body || !body.dataset) {
         return '/api';
     }
@@ -15,9 +19,13 @@ const apiBaseFromDom = (() => {
 
 class ApiClient {
     constructor(baseUrl = apiBaseFromDom) {
+        assert(typeof baseUrl === 'string', 'Base URL must be a string');
+        assert(baseUrl.length > 0, 'Base URL must not be empty');
         this.baseUrl = baseUrl;
         this.timeout = 10000;
         this.maxRetries = 3;
+        assert(Number.isInteger(this.maxRetries) && this.maxRetries > 0, 'Max retries must be a positive integer');
+        assert(Number.isInteger(this.timeout) && this.timeout >= 1000, 'Timeout must be an integer over one second');
     }
 
     /**
@@ -212,21 +220,32 @@ class ApiClient {
      * Récupérer infos du club
      */
     async getClubInfo() {
+        assert(typeof this.get === 'function', 'HTTP helper must be available');
+        assert(typeof this.baseUrl === 'string' && this.baseUrl.length > 0, 'Base URL must be set before calling club info');
         return this.get('/club.php');
     }
-    
+
     /**
      * Récupérer liste des équipes
      */
     async getEquipes() {
+        assert(typeof this.get === 'function', 'HTTP helper must be callable');
+        assert(typeof this.baseUrl === 'string' && this.baseUrl.length > 0, 'Base URL must be set before calling teams');
         return this.get('/equipes.php');
     }
-    
+
     /**
      * Délai pour retry
      */
     delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        const numericValue = Number(ms);
+        assert(Number.isFinite(numericValue), 'Delay must resolve to a finite number');
+        assert(numericValue >= 0, 'Delay must be positive or zero');
+        const duration = Math.floor(Math.max(0, numericValue));
+        return new Promise(resolve => {
+            assert(typeof resolve === 'function', 'Promise resolver must be callable');
+            setTimeout(resolve, duration);
+        });
     }
 }
 
