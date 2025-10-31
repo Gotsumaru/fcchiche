@@ -6,8 +6,8 @@
 - **Backend** : PHP 8.1 (vanilla)
 - **Base de données** : MySQL/MariaDB avec PDO
 - **API** : FFF API (api-dofa.fff.fr)
-- **Hébergement** : OVH
-- **Déploiement** : SFTP
+- **Hébergement** : OVH (infrastructure mutualisée)
+- **Déploiement** : Dépôt Git OVH avec auto-déploiement continu (push = publication)
 
 ### Fonctionnalités
 - Synchronisation automatique données API FFF (2x/jour : 8h et 20h)
@@ -106,6 +106,14 @@ SELECT * FROM pprod_config WHERE config_key LIKE 'last_sync_%';
 -- Logs synchronisation
 SELECT * FROM pprod_sync_logs ORDER BY created_at DESC LIMIT 10;
 ```
+
+## Déploiement OVH via Git Auto
+
+- **Workflow** : chaque push sur la branche `main` du dépôt OVH déclenche l'auto-déploiement côté hébergement mutualisé.
+- **Préparation locale** : `git pull` pour rester aligné, développement en feature branch, puis merge propre sur `main`.
+- **Déclenchement** : `git push ovh main` (ou remote `production`) publie immédiatement l'application.
+- **Post-déploiement** : vérifier `public/` en HTTPS, consulter `logs/cron.log` et `logs/sync.log`.
+- **Fallback** : en cas de rollback, re-pusher un tag précédent (`git push ovh v1.2.3:main`).
 
 ## Structure Projet
 

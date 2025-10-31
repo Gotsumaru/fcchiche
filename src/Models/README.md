@@ -19,7 +19,7 @@ Tous les modèles sont situés dans `src/Models/` et suivent les conventions:
 require_once 'config/database.php';
 require_once 'src/Models/ModelsLoader.php';
 
-$pdo = getDbConnection();
+$pdo = Database::getInstance();
 $models = ModelsLoader::loadAll($pdo);
 
 // Utilisation
@@ -32,7 +32,7 @@ $club = $models['club']->getClub();
 require_once 'config/database.php';
 require_once 'src/Models/ClubModel.php';
 
-$pdo = getDbConnection();
+$pdo = Database::getInstance();
 $clubModel = new ClubModel($pdo);
 $club = $clubModel->getClub();
 ```
