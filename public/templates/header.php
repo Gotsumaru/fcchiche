@@ -50,6 +50,9 @@ $navItems = [
     name="description"
     content="FC Chiché — Club de football amateur du bocage bressuirais, fondé en 1946. Retrouvez résultats, matchs, équipes et actualités."
   />
+  <meta name="theme-color" content="#006837" />
+  <link rel="manifest" href="<?= $basePath === '' ? '/manifest.json' : $basePath . '/manifest.json' ?>" />
+  <link rel="apple-touch-icon" sizes="192x192" href="<?= $assetsBase ?>/images/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
