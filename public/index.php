@@ -102,20 +102,20 @@ require_once __DIR__ . '/templates/header.php';
                     <picture>
                       <source
                         srcset="
-                          <?= $assetsBase ?>/images/premiere-480.webp 480w,
-                          <?= $assetsBase ?>/images/premiere-800.webp 800w,
-                          <?= $assetsBase ?>/images/premiere-1200.webp 1200w
+                          <?= $assetsBase ?>/images/fcchiche_tableau.jpg 480w,
+                          <?= $assetsBase ?>/images/fcchiche_tableau.jpg 800w,
+                          <?= $assetsBase ?>/images/fcchiche_tableau.jpg 1200w
                         "
-                        type="image/webp"
-                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
-                      />
-                      <source
-                        srcset="<?= $assetsBase ?>/images/premiere.jpg 1200w"
                         type="image/jpeg"
                         sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
                       />
+                      <source
+                        srcset="<?= $assetsBase ?>/images/bal_du_foot.png 1200w"
+                        type="image/png"
+                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
+                      />
                       <img
-                        src="<?= $assetsBase ?>/images/premiere.jpg"
+                        src="<?= $assetsBase ?>/images/concours_pallets.png"
                         width="1300"
                         height="866"
                         alt="Les nouveaux vestiaires du FC Chiché préparés avant un match"
