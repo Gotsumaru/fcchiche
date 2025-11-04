@@ -63,20 +63,13 @@ require_once __DIR__ . '/templates/header.php';
             </div>
           </figure>
           <div class="hero__content">
-            <div class="hero__support" role="note">
-              <span class="hero__support-icon" aria-hidden="true">⚡️</span>
-              <div class="hero__support-copy">
-                <span class="hero__support-title">Billetterie express</span>
-                <a class="hero__support-link" href="<?= $basePath ?>/matchs">Réservez vos places en 2&nbsp;min</a>
-              </div>
-            </div>
             <p class="hero__subtitle">
               Suivez nos équipes, préparez vos déplacements et vivez le club en temps réel avec des infos fiables et mises à
               jour.
             </p>
             <div class="hero__actions" role="group" aria-label="Actions principales">
               <a class="btn btn--primary" href="<?= $basePath ?>/matchs">Voir le calendrier</a>
-              <a class="btn btn--outline" href="<?= $basePath ?>/resultats">Derniers résultats</a>
+              <a class="btn btn--primary" href="<?= $basePath ?>/resultats">Derniers résultats</a>
             </div>
           </div>
         </div>
