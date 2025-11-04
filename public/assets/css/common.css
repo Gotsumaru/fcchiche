@@ -2301,3 +2301,52 @@ ul {
   min-height: 300px;
   filter: grayscale(0.05) saturate(1.05);
 }
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Contraindre les conteneurs principaux */
+.page-shell,
+.page-shell__content,
+.section,
+.container {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Fix pour le scroll horizontal sur mobile */
+@media (max-width: 720px) {
+  /* Retirer mask-image qui crée des bugs d'overflow sur mobile */
+  .home-scroll__track,
+  .partner-carousel__viewport {
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+  
+  /* Adapter les min-width au viewport mobile */
+  .media-card {
+    min-width: min(300px, 85vw) !important;
+  }
+  
+  .partner-card {
+    min-width: min(240px, 70vw) !important;
+  }
+  
+  /* S'assurer que les conteneurs de scroll ne forcent pas l'overflow */
+  .home-scroll,
+  .partner-carousel {
+    max-width: 100%;
+    overflow: visible;
+  }
+  
+  .home-scroll__track,
+  .partner-carousel__viewport {
+    max-width: 100%;
+  }
+}
