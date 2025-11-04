@@ -89,9 +89,9 @@ require_once __DIR__ . '/templates/header.php';
             <div class="club-showcase" role="list">
               <article class="club-showcase__item" role="listitem">
                 <div class="club-showcase__content">
-                  <h3 class="club-showcase__title">Tableaux Classements</h3>
+                  <h3 class="club-showcase__title">Tableau Classements</h3>
                   <p class="club-showcase__text">
-                    Nouveau tableaux de classement sponsorisé par la <strong>Carrière de Luche</strong>.
+                    Nouveau tableau de classement sponsorisé par la <strong>Carrière de Luche</strong>, merci à eux !
                   </p>
                   <p class="club-showcase__text">
                     Il nous permet d'afficher <strong>les rencontres et les classements</strong> pour nos trois équipes séniors.
@@ -128,9 +128,9 @@ require_once __DIR__ . '/templates/header.php';
               </article>
               <article class="club-showcase__item" role="listitem">
                 <div class="club-showcase__content">
-                  <h3 class="club-showcase__title">Bal du FCChiche</h3>
+                  <h3 class="club-showcase__title">Bal du Foot</h3>
                   <p class="club-showcase__text">
-                    Le bal du foot est un dinner dansant, avec traiteur et orchestre.
+                    Le Football Club de Chiche organise un dinner dansant, avec traiteur, serveurs, un orchestre et de la bonne ambiance.
                   </p>
                   <p class="club-showcase__text">
                     Il a lieu tous les ans le 10 Novembre pour accueil <strong>300+ personnes</strong>.
