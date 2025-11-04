@@ -25,6 +25,7 @@
 
 * {
   box-sizing: border-box;
+  overflow-y: hidden;
 }
 
 html {
