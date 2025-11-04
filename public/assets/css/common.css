@@ -627,9 +627,9 @@ ul {
 }
 
 .hero__container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   align-items: center;
+  justify-items: center;
   gap: clamp(2.75rem, 2.25rem + 1.5vw, 3.5rem);
 }
 
@@ -682,6 +682,37 @@ ul {
   gap: clamp(1.75rem, 1.45rem + 1vw, 2.5rem);
   justify-items: center;
   text-align: center;
+}
+
+@media (min-width: 64rem) {
+  .hero__container {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-areas:
+      "hero-intro hero-visual"
+      "hero-content hero-visual";
+    justify-items: stretch;
+    column-gap: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  .hero__intro {
+    grid-area: hero-intro;
+    text-align: left;
+    justify-items: start;
+    align-items: start;
+  }
+
+  .hero__content {
+    grid-area: hero-content;
+    justify-items: start;
+    text-align: left;
+    max-width: 32rem;
+    align-items: start;
+  }
+
+  .hero__visual {
+    grid-area: hero-visual;
+    justify-self: center;
+  }
 }
 
 .hero__support {
