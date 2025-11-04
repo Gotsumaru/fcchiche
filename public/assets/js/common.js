@@ -153,7 +153,7 @@
           obs.unobserve(target);
         }
       }
-    }, { threshold: 0.25, rootMargin: '0px 0px -10%' });
+    }, { threshold: 0.25, rootMargin: '0px 0px 150px 0px' });
 
     for (let index = 0; index < allReveals.length; index += 1) {
       const element = allReveals[index];
