@@ -89,12 +89,12 @@ require_once __DIR__ . '/templates/header.php';
             <div class="club-showcase" role="list">
               <article class="club-showcase__item" role="listitem">
                 <div class="club-showcase__content">
-                  <h3 class="club-showcase__title">Vestiaires premium</h3>
+                  <h3 class="club-showcase__title">Tableaux Classements</h3>
                   <p class="club-showcase__text">
-                    Espaces remis à neuf avec zone de récupération, éclairage LED et sonorisation d'avant-match.
+                    Nouveau tableaux de classement sponsorisé par la <strong>Carrière de Luche</strong>.
                   </p>
                   <p class="club-showcase__text">
-                    Des vestiaires pensés pour accueillir <strong>220+ licenciés</strong> tout au long de la saison.
+                    Il nous permet d'afficher <strong>les rencontres et les classements</strong> pour nos trois équipes séniors.
                   </p>
                 </div>
                 <figure class="club-showcase__media">
@@ -128,12 +128,12 @@ require_once __DIR__ . '/templates/header.php';
               </article>
               <article class="club-showcase__item" role="listitem">
                 <div class="club-showcase__content">
-                  <h3 class="club-showcase__title">École de foot labellisée</h3>
+                  <h3 class="club-showcase__title">Bal du FCChiche</h3>
                   <p class="club-showcase__text">
-                    Séances adaptées à chaque catégorie, éducateurs certifiés et suivi des progrès sur toute la saison.
+                    Le bal du foot est un dinner dansant, avec traiteur et orchestre.
                   </p>
                   <p class="club-showcase__text">
-                    <strong>32 séances hebdomadaires</strong> pour transmettre nos valeurs et faire progresser chaque jeune.
+                    Il a lieu tous les ans le 10 Novembre pour accueil <strong>300+ personnes</strong>.
                   </p>
                 </div>
                 <figure class="club-showcase__media">
@@ -163,12 +163,12 @@ require_once __DIR__ . '/templates/header.php';
               </article>
               <article class="club-showcase__item" role="listitem">
                 <div class="club-showcase__content">
-                  <h3 class="club-showcase__title">Club-house vivant</h3>
+                  <h3 class="club-showcase__title">Ecole de Foot</h3>
                   <p class="club-showcase__text">
-                    Espace restauration, retransmissions et terrasse panoramique pour vivre les matches autrement.
+                    Recrutement d'un alternant pour la gestion de nos effectifs jeunes.
                   </p>
                   <p class="club-showcase__text">
-                    <strong>18 bénévoles mobilisés</strong> chaque jour de match pour offrir un accueil chaleureux.
+                    Avec <strong>50+ licenciés jeunes</strong> et une équipe évoluant dans chaque catégorie allant de <strong>U6 à U17</strong>.
                   </p>
                 </div>
                 <figure class="club-showcase__media">
