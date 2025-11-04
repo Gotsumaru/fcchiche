@@ -17,7 +17,7 @@ require_once __DIR__ . '/templates/header.php';
             <span class="hero__tagline" role="text">
               <img
                 class="hero__tagline-logo"
-                src="<?= $assetsBase ?>/images/logo-fcc.svg"
+                src="<?= $assetsBase ?>/images/logo.svg"
                 width="40"
                 height="40"
                 alt=""
