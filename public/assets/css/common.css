@@ -661,20 +661,20 @@ ul {
   border-radius: 999px;
   text-align: right;
   color: rgba(47, 49, 48, 0.92);
-  font-size: 0.95rem;
+  font-size: 1.5rem;
   font-weight: 500;
   flex: 0 0 auto;
 }
 
 .hero__tagline-logo {
   display: block;
-  width: 2rem;
-  height: 2rem;
+  width: 4rem;
+  height: 4rem;
 }
 
 .hero__tagline-text {
   display: block;
-  max-width: 16ch;
+  max-width: 13ch;
 }
 
 @media (max-width: 48rem) {

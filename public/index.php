@@ -25,7 +25,7 @@ require_once __DIR__ . '/templates/header.php';
                 loading="lazy"
                 decoding="async"
               />
-              <span class="hero__tagline-text">Pour l'amour de maillot</span>
+              <span class="hero__tagline-text">Pour l'amour du maillot vert</span>
             </span>
           </header>
           <figure class="hero__visual">
