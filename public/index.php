@@ -12,7 +12,7 @@ require_once __DIR__ . '/templates/header.php';
 ?>
       <section class="hero" aria-labelledby="hero-title">
         <div class="container hero__container">
-          <header class="hero__intro">
+          <header class="hero__intro" data-reveal="hero" data-reveal-delay="0">
             <h1 class="hero__title" id="hero-title">F.C. Chiché</h1>
             <span class="hero__tagline" role="text">
               <img
@@ -28,7 +28,7 @@ require_once __DIR__ . '/templates/header.php';
               <span class="hero__tagline-text">Pour l'amour du maillot vert</span>
             </span>
           </header>
-          <figure class="hero__visual">
+          <figure class="hero__visual" data-reveal="hero" data-reveal-delay="0.15">
             <div class="hero__media">
               <picture>
                 <source
@@ -62,7 +62,7 @@ require_once __DIR__ . '/templates/header.php';
               </picture>
             </div>
           </figure>
-          <div class="hero__content">
+          <div class="hero__content" data-reveal="hero" data-reveal-delay="0.3">
             <p class="hero__subtitle">
               Suivez nos équipes, préparez vos déplacements et vivez le club en temps réel avec des infos fiables et mises à
               jour.
@@ -77,7 +77,7 @@ require_once __DIR__ . '/templates/header.php';
 
       <section class="section section--story" aria-labelledby="story-title">
         <div class="container">
-          <div class="story__intro">
+          <div class="story__intro" data-reveal data-reveal-delay="0">
             <span class="section__eyebrow">Le club</span>
             <h2 class="section__title" id="story-title">Un écrin pour les verts et blancs</h2>
             <p class="section__subtitle">
@@ -85,9 +85,9 @@ require_once __DIR__ . '/templates/header.php';
               centre. Découvrez l'envers du décor <span style="font-weight: bold; color: #000000;">d'un club familial</span> qui cultive la performance.
             </p>
           </div>
-          <div class="story__layout">
+          <div class="story__layout" data-reveal data-reveal-delay="0.1">
             <div class="club-showcase" role="list">
-              <article class="club-showcase__item" role="listitem">
+              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.12">
                 <div class="club-showcase__content">
                   <h3 class="club-showcase__title">Tableau Classements</h3>
                   <p class="club-showcase__text">
@@ -126,7 +126,7 @@ require_once __DIR__ . '/templates/header.php';
                   </div>
                 </figure>
               </article>
-              <article class="club-showcase__item" role="listitem">
+              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.24">
                 <div class="club-showcase__content">
                   <h3 class="club-showcase__title">Bal du Foot</h3>
                   <p class="club-showcase__text">
@@ -161,7 +161,7 @@ require_once __DIR__ . '/templates/header.php';
                   </div>
                 </figure>
               </article>
-              <article class="club-showcase__item" role="listitem">
+              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.36">
                 <div class="club-showcase__content">
                   <h3 class="club-showcase__title">Ecole de Foot</h3>
                   <p class="club-showcase__text">
@@ -195,12 +195,12 @@ require_once __DIR__ . '/templates/header.php';
 
       <section class="section" aria-labelledby="events-title">
         <div class="container">
-          <div class="section__header">
+          <div class="section__header" data-reveal data-reveal-delay="0">
             <span class="section__eyebrow">Évènements</span>
             <h2 class="section__title" id="events-title">Les prochains rendez-vous</h2>
             <p class="section__subtitle">Matches, plateaux jeunes et animations organisés par le club.</p>
           </div>
-          <div class="home-scroll" data-component="home-events">
+          <div class="home-scroll" data-component="home-events" data-reveal data-reveal-delay="0.12">
             <button class="home-scroll__control" type="button" data-action="scroll-prev" aria-label="Voir les évènements précédents"></button>
             <div class="home-scroll__track" data-component="home-events-list" aria-live="polite"></div>
             <button class="home-scroll__control" type="button" data-action="scroll-next" aria-label="Voir les évènements suivants"></button>
@@ -210,14 +210,14 @@ require_once __DIR__ . '/templates/header.php';
 
       <section class="section section--alt" aria-labelledby="results-title">
         <div class="container">
-          <div class="section__header">
+          <div class="section__header" data-reveal data-reveal-delay="0">
             <span class="section__eyebrow">Performances</span>
             <h2 class="section__title" id="results-title">Derniers résultats du club</h2>
             <p class="section__subtitle" data-component="home-results-header">
               Chargement des dernières rencontres…
             </p>
           </div>
-          <div class="result-showcase" data-component="home-results">
+          <div class="result-showcase" data-component="home-results" data-reveal data-reveal-delay="0.12">
             <div class="result-showcase__gallery">
               <picture>
                 <source
@@ -246,14 +246,14 @@ require_once __DIR__ . '/templates/header.php';
 
       <section class="section" aria-labelledby="location-title">
         <div class="container">
-          <div class="section__header">
+          <div class="section__header" data-reveal data-reveal-delay="0">
             <span class="section__eyebrow">Notre stade</span>
             <h2 class="section__title" id="location-title">Retrouvez-nous à Chiché</h2>
             <p class="section__subtitle">
               Venez encourager les verts et blancs au complexe sportif. Buvette, tribunes couvertes et grand parking sont à votre disposition.
             </p>
           </div>
-          <div class="location">
+          <div class="location" data-reveal data-reveal-delay="0.12">
             <div class="location__map">
               <iframe
                 title="Localisation du FC Chiché"
@@ -282,12 +282,12 @@ require_once __DIR__ . '/templates/header.php';
 
       <section class="section section--alt" aria-labelledby="partners-title">
         <div class="container">
-          <div class="section__header">
+          <div class="section__header" data-reveal data-reveal-delay="0">
             <span class="section__eyebrow">Soutiens</span>
             <h2 class="section__title" id="partners-title">Nos partenaires</h2>
             <p class="section__subtitle">Un grand merci aux entreprises locales qui accompagnent le FC Chiché.</p>
           </div>
-          <div class="partner-carousel" data-component="partner-carousel">
+          <div class="partner-carousel" data-component="partner-carousel" data-reveal data-reveal-delay="0.12">
             <button
               type="button"
               class="partner-carousel__control partner-carousel__control--prev"

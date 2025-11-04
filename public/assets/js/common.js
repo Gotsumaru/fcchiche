@@ -85,6 +85,8 @@
     } else if (typeof desktopQuery.addListener === 'function') {
       desktopQuery.addListener(syncWithViewport);
     }
+
+    setupRevealAnimations();
   });
 
   function registerServiceWorker(bodyElement) {
@@ -112,5 +114,100 @@
       .catch((error) => {
         console.error('Service worker registration failed', error);
       });
+  }
+
+  function setupRevealAnimations() {
+    console.assert(typeof document.querySelectorAll === 'function', 'querySelectorAll must be supported');
+    const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    console.assert(typeof reduceMotionQuery.matches === 'boolean', 'Media query must return boolean matches');
+
+    const allReveals = document.querySelectorAll('[data-reveal]');
+    if (allReveals.length === 0) {
+      return;
+    }
+
+    if (reduceMotionQuery.matches || typeof window.IntersectionObserver !== 'function') {
+      applyReducedMotionReveal(allReveals);
+      return;
+    }
+
+    const heroReveals = document.querySelectorAll('[data-reveal="hero"]');
+    for (let index = 0; index < heroReveals.length; index += 1) {
+      const element = heroReveals[index];
+      if (element instanceof HTMLElement) {
+        scheduleHeroReveal(element, index);
+      }
+    }
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      console.assert(Array.isArray(entries) || typeof entries.length === 'number', 'Entries collection must be iterable');
+      for (let index = 0; index < entries.length; index += 1) {
+        const entry = entries[index];
+        if (!entry.isIntersecting) {
+          continue;
+        }
+        const target = entry.target;
+        if (target instanceof HTMLElement) {
+          const delay = parseRevealDelay(target) ?? 0;
+          revealWithDelay(target, delay);
+          obs.unobserve(target);
+        }
+      }
+    }, { threshold: 0.25, rootMargin: '0px 0px -10%' });
+
+    for (let index = 0; index < allReveals.length; index += 1) {
+      const element = allReveals[index];
+      if (!(element instanceof HTMLElement)) {
+        continue;
+      }
+      if (element.dataset.reveal === 'hero') {
+        continue;
+      }
+      observer.observe(element);
+    }
+  }
+
+  function scheduleHeroReveal(element, position) {
+    console.assert(element instanceof HTMLElement, 'Hero reveal element must be an HTMLElement');
+    console.assert(Number.isInteger(position) && position >= 0, 'Hero reveal index must be a non-negative integer');
+    const explicitDelay = parseRevealDelay(element);
+    const fallbackDelay = position * 0.15;
+    const delay = typeof explicitDelay === 'number' ? explicitDelay : fallbackDelay;
+    revealWithDelay(element, delay);
+  }
+
+  function parseRevealDelay(element) {
+    console.assert(element instanceof HTMLElement, 'Element is required to parse delay');
+    console.assert(typeof element.dataset === 'object', 'Dataset must be accessible on element');
+    const rawDelay = element.dataset.revealDelay;
+    if (typeof rawDelay !== 'string' || rawDelay.trim() === '') {
+      return null;
+    }
+    const parsedValue = Number.parseFloat(rawDelay);
+    if (!Number.isFinite(parsedValue) || parsedValue < 0) {
+      return null;
+    }
+    return parsedValue;
+  }
+
+  function revealWithDelay(element, delaySeconds) {
+    console.assert(element instanceof HTMLElement, 'Reveal target must be an HTMLElement');
+    console.assert(Number.isFinite(delaySeconds) && delaySeconds >= 0, 'Delay must be a finite positive number or zero');
+    element.style.setProperty('--reveal-delay', `${delaySeconds}s`);
+    window.setTimeout(() => {
+      element.classList.add('is-visible');
+    }, Math.round(delaySeconds * 1000));
+  }
+
+  function applyReducedMotionReveal(collection) {
+    console.assert(typeof collection.length === 'number', 'Reveal collection must expose a length');
+    console.assert(collection.length >= 0, 'Reveal collection length must be non-negative');
+    for (let index = 0; index < collection.length; index += 1) {
+      const element = collection[index];
+      if (element instanceof HTMLElement) {
+        element.classList.add('is-visible');
+        element.style.removeProperty('--reveal-delay');
+      }
+    }
   }
 })();
