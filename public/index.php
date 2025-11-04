@@ -86,127 +86,108 @@ require_once __DIR__ . '/templates/header.php';
             </p>
           </div>
           <div class="story__layout">
-            <div class="story__content">
-              <div class="story-points" role="list">
-                <article class="story-block" role="listitem">
-                  <span class="story-block__icon" aria-hidden="true">🏟</span>
-                  <div>
-                    <h3 class="story-block__title">Vestiaires premium</h3>
-                    <p class="story-block__text">
-                      Espaces remis à neuf avec zone de récupération, éclairage LED et sonorisation d'avant-match.
-                    </p>
+            <div class="club-showcase" role="list">
+              <article class="club-showcase__item" role="listitem">
+                <div class="club-showcase__content">
+                  <h3 class="club-showcase__title">Vestiaires premium</h3>
+                  <p class="club-showcase__text">
+                    Espaces remis à neuf avec zone de récupération, éclairage LED et sonorisation d'avant-match.
+                  </p>
+                  <p class="club-showcase__text">
+                    Des vestiaires pensés pour accueillir <strong>220+ licenciés</strong> tout au long de la saison.
+                  </p>
+                </div>
+                <figure class="club-showcase__media">
+                  <div class="club-showcase__media-frame">
+                    <picture>
+                      <source
+                        srcset="
+                          <?= $assetsBase ?>/images/premiere-480.webp 480w,
+                          <?= $assetsBase ?>/images/premiere-800.webp 800w,
+                          <?= $assetsBase ?>/images/premiere-1200.webp 1200w
+                        "
+                        type="image/webp"
+                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
+                      />
+                      <source
+                        srcset="<?= $assetsBase ?>/images/premiere.jpg 1200w"
+                        type="image/jpeg"
+                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
+                      />
+                      <img
+                        src="<?= $assetsBase ?>/images/premiere.jpg"
+                        width="1300"
+                        height="866"
+                        alt="Les nouveaux vestiaires du FC Chiché préparés avant un match"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
                   </div>
-                </article>
-                <article class="story-block" role="listitem">
-                  <span class="story-block__icon" aria-hidden="true">🎓</span>
-                  <div>
-                    <h3 class="story-block__title">École de foot labellisée</h3>
-                    <p class="story-block__text">
-                      Séances adaptées à chaque catégorie, éducateurs certifiés et suivi des progrès sur toute la saison.
-                    </p>
+                </figure>
+              </article>
+              <article class="club-showcase__item" role="listitem">
+                <div class="club-showcase__content">
+                  <h3 class="club-showcase__title">École de foot labellisée</h3>
+                  <p class="club-showcase__text">
+                    Séances adaptées à chaque catégorie, éducateurs certifiés et suivi des progrès sur toute la saison.
+                  </p>
+                  <p class="club-showcase__text">
+                    <strong>32 séances hebdomadaires</strong> pour transmettre nos valeurs et faire progresser chaque jeune.
+                  </p>
+                </div>
+                <figure class="club-showcase__media">
+                  <div class="club-showcase__media-frame">
+                    <picture>
+                      <source
+                        srcset="<?= $assetsBase ?>/images/entrainement.webp 1200w"
+                        type="image/webp"
+                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
+                      />
+                      <source
+                        srcset="<?= $assetsBase ?>/images/entrainement.jpg 1200w"
+                        type="image/jpeg"
+                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
+                      />
+                      <img
+                        src="<?= $assetsBase ?>/images/entrainement.jpg"
+                        width="1600"
+                        height="1067"
+                        alt="Séance d'entraînement des jeunes joueurs du FC Chiché"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
                   </div>
-                </article>
-                <article class="story-block" role="listitem">
-                  <span class="story-block__icon" aria-hidden="true">🍻</span>
-                  <div>
-                    <h3 class="story-block__title">Club-house vivant</h3>
-                    <p class="story-block__text">
-                      Espace restauration, retransmissions et terrasse panoramique pour vivre les matches autrement.
-                    </p>
+                </figure>
+              </article>
+              <article class="club-showcase__item" role="listitem">
+                <div class="club-showcase__content">
+                  <h3 class="club-showcase__title">Club-house vivant</h3>
+                  <p class="club-showcase__text">
+                    Espace restauration, retransmissions et terrasse panoramique pour vivre les matches autrement.
+                  </p>
+                  <p class="club-showcase__text">
+                    <strong>18 bénévoles mobilisés</strong> chaque jour de match pour offrir un accueil chaleureux.
+                  </p>
+                </div>
+                <figure class="club-showcase__media">
+                  <div class="club-showcase__media-frame">
+                    <picture>
+                      <source srcset="<?= $assetsBase ?>/images/buvette.webp" type="image/webp" />
+                      <source srcset="<?= $assetsBase ?>/images/buvette.jpg" type="image/jpeg" />
+                      <img
+                        src="<?= $assetsBase ?>/images/buvette.jpg"
+                        width="1792"
+                        height="1024"
+                        alt="Bénévoles du FC Chiché en service derrière la buvette"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
                   </div>
-                </article>
-              </div>
-              <div class="story-stats" role="list">
-                <div class="story-stat" role="listitem">
-                  <span class="story-stat__value">220+</span>
-                  <span class="story-stat__label">licenciés accompagnés chaque saison</span>
-                </div>
-                <div class="story-stat" role="listitem">
-                  <span class="story-stat__value">32</span>
-                  <span class="story-stat__label">séances hebdomadaires encadrées</span>
-                </div>
-                <div class="story-stat" role="listitem">
-                  <span class="story-stat__value">18 bénévoles</span>
-                  <span class="story-stat__label">mobilisés sur les jours de match</span>
-                </div>
-              </div>
-            </div>
-            <div class="story__media">
-              <figure class="story__visual story__visual--primary">
-                <div class="story__visual-media">
-                  <picture>
-                    <source
-                      srcset="
-                        <?= $assetsBase ?>/images/premiere-480.webp 480w,
-                        <?= $assetsBase ?>/images/premiere-800.webp 800w,
-                        <?= $assetsBase ?>/images/premiere-1200.webp 1200w
-                    "
-                    type="image/webp"
-                    sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 90vw"
-                  />
-                  <source
-                    srcset="<?= $assetsBase ?>/images/premiere.jpg 1200w"
-                    type="image/jpeg"
-                    sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 90vw"
-                  />
-                  <img
-                    src="<?= $assetsBase ?>/images/premiere.jpg"
-                    width="1300"
-                    height="866"
-                    alt="Ambiance nocturne au Pas des Biches"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </picture>
-                </div>
-                <figcaption class="story__visual-caption">Ambiance nocturne au Pas des Biches</figcaption>
-              </figure>
-              <figure class="story__visual story__visual--secondary">
-                <div class="story__visual-media">
-                  <picture>
-                    <source srcset="<?= $assetsBase ?>/images/buvette.webp" type="image/webp" />
-                    <source srcset="<?= $assetsBase ?>/images/buvette.jpg" type="image/jpeg" />
-                    <img
-                      src="<?= $assetsBase ?>/images/buvette.jpg"
-                      width="1792"
-                      height="1024"
-                      alt="Préparation du club-house avant le match"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </picture>
-                </div>
-                <figcaption class="story__visual-caption">450 repas servis au club-house cette saison</figcaption>
-              </figure>
-              <figure class="story__visual story__visual--tertiary">
-                <div class="story__visual-media">
-                  <picture>
-                    <source
-                      srcset="
-                        <?= $assetsBase ?>/images/Reserve-480.webp 480w,
-                        <?= $assetsBase ?>/images/Reserve-800.webp 800w,
-                        <?= $assetsBase ?>/images/Reserve-1200.webp 1200w
-                      "
-                      type="image/webp"
-                      sizes="(min-width: 72rem) 320px, (min-width: 48rem) 40vw, 80vw"
-                    />
-                    <source
-                      srcset="<?= $assetsBase ?>/images/Reserve.jpg 1200w"
-                      type="image/jpeg"
-                      sizes="(min-width: 72rem) 320px, (min-width: 48rem) 40vw, 80vw"
-                    />
-                    <img
-                      src="<?= $assetsBase ?>/images/Reserve.jpg"
-                      width="1200"
-                      height="800"
-                      alt="Échauffement collectif de l'équipe réserve"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </picture>
-                </div>
-                <figcaption class="story__visual-caption">Échauffement collectif de l'équipe réserve</figcaption>
-              </figure>
+                </figure>
+              </article>
             </div>
           </div>
         </div>
