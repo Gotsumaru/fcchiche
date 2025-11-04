@@ -43,7 +43,7 @@ body {
   position: relative;
 }
 
-section{
+.container {
   overflow: hidden;
 }
 
@@ -2271,8 +2271,7 @@ body {
 /* Contraindre les conteneurs principaux */
 .page-shell,
 .page-shell__content,
-.section,
-.container {
+.section {
   max-width: 100vw;
   overflow-x: hidden;
 }
