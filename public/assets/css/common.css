@@ -722,8 +722,8 @@ ul {
 .hero__content {
   display: grid;
   gap: clamp(1.75rem, 1.45rem + 1vw, 2.5rem);
-  justify-items: center;
-  text-align: center;
+  justify-items: left;
+  text-align: left;
 }
 
 .hero__support {
@@ -769,7 +769,7 @@ ul {
   font-size: clamp(1.08rem, 1.02rem + 0.5vw, 1.3rem);
   color: rgba(17, 17, 17, 0.7);
   margin: 0;
-  max-width: 34rem;
+  max-width: 50rem;
 }
 
 .hero__actions {

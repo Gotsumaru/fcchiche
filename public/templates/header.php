@@ -77,21 +77,6 @@ $navItems = [
   <div class="page-shell">
     <header class="app-header">
       <div class="app-header__inner">
-        <a class="app-brand" href="<?= $basePath ?>/">
-          <span class="app-brand__mark">
-            <img
-              src="<?= $assetsBase ?>/images/logo.svg"
-              width="56"
-              height="56"
-              alt="Logo du FC Chiché"
-              loading="lazy"
-            />
-          </span>
-          <span class="app-brand__text">
-            <span class="app-brand__title">FC Chiché</span>
-            <span class="app-brand__baseline">Depuis 1946</span>
-          </span>
-        </a>
 
         <nav id="main-navigation" class="app-nav" data-nav-menu>
           <ul class="app-nav__list">
