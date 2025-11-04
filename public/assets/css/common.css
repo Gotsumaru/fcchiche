@@ -624,7 +624,6 @@ ul {
   border-radius: clamp(2.75rem, 2.25rem + 1vw, 3.5rem);
   overflow: hidden;
   background: none;
-  box-shadow: 0 38px 90px rgba(12, 68, 34, 0.16);
   padding: 0;
 }
 
