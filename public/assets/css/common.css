@@ -204,9 +204,6 @@ ul {
   gap: clamp(1.6rem, 1.2rem + 1vw, 2.4rem);
   padding: clamp(1.8rem, 1.4rem + 1.2vw, 2.6rem);
   border-radius: clamp(1.6rem, 1.2rem + 1vw, 2.4rem);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(236, 248, 236, 0.85));
-  border: 1px solid rgba(17, 17, 17, 0.06);
-  box-shadow: 0 28px 68px -48px rgba(15, 23, 42, 0.32);
   opacity: 0;
   transform: translateY(2.5rem);
   animation: club-showcase-fade 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -262,7 +259,7 @@ ul {
 
 .club-showcase__media-frame {
   width: min(100%, 420px);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   border-radius: clamp(1.6rem, 1.2rem + 1vw, 2.4rem);
   overflow: hidden;
   box-shadow: 0 34px 88px -42px rgba(15, 23, 42, 0.42);

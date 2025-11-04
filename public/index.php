@@ -110,12 +110,12 @@ require_once __DIR__ . '/templates/header.php';
                         sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
                       />
                       <source
-                        srcset="<?= $assetsBase ?>/images/bal_du_foot.png 1200w"
+                        srcset="<?= $assetsBase ?>/images/fcchiche_tableau.jpg 1200w"
                         type="image/png"
                         sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
                       />
                       <img
-                        src="<?= $assetsBase ?>/images/concours_pallets.png"
+                        src="<?= $assetsBase ?>/images/fcchiche_tableau.jpg"
                         width="1300"
                         height="866"
                         alt="Les nouveaux vestiaires du FC Chiché préparés avant un match"
@@ -140,17 +140,17 @@ require_once __DIR__ . '/templates/header.php';
                   <div class="club-showcase__media-frame">
                     <picture>
                       <source
-                        srcset="<?= $assetsBase ?>/images/entrainement.webp 1200w"
-                        type="image/webp"
+                        srcset="<?= $assetsBase ?>/images/bal_du_foot.png 1200w"
+                        type="image/PNG"
                         sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
                       />
                       <source
-                        srcset="<?= $assetsBase ?>/images/entrainement.jpg 1200w"
-                        type="image/jpeg"
+                        srcset="<?= $assetsBase ?>/images/bal_du_foot.png 1200w"
+                        type="image/PNG"
                         sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
                       />
                       <img
-                        src="<?= $assetsBase ?>/images/entrainement.jpg"
+                        src="<?= $assetsBase ?>/images/bal_du_foot.png"
                         width="1600"
                         height="1067"
                         alt="Séance d'entraînement des jeunes joueurs du FC Chiché"
@@ -174,10 +174,10 @@ require_once __DIR__ . '/templates/header.php';
                 <figure class="club-showcase__media">
                   <div class="club-showcase__media-frame">
                     <picture>
-                      <source srcset="<?= $assetsBase ?>/images/buvette.webp" type="image/webp" />
-                      <source srcset="<?= $assetsBase ?>/images/buvette.jpg" type="image/jpeg" />
+                      <source srcset="<?= $assetsBase ?>/images/concours_pallets.png" type="image/webp" />
+                      <source srcset="<?= $assetsBase ?>/images/concours_pallets.png" type="image/jpeg" />
                       <img
-                        src="<?= $assetsBase ?>/images/buvette.jpg"
+                        src="<?= $assetsBase ?>/images/concours_pallets.png"
                         width="1792"
                         height="1024"
                         alt="Bénévoles du FC Chiché en service derrière la buvette"
