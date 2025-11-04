@@ -82,7 +82,7 @@ require_once __DIR__ . '/templates/header.php';
             <h2 class="section__title" id="story-title">Un écrin pour les verts et blancs</h2>
             <p class="section__subtitle">
               Des vestiaires à la buvette, nous mettons l'expérience <span style=" color: #008800;">de nos licenciés et de nos supporters</span> au
-              centre. Découvrez l'envers du décor <span style="font-weight: bold; color: #008800;">d'un club familial</span> qui cultive la performance.
+              centre. Découvrez l'envers du décor <span style="font-weight: bold;">d'un club familial</span> qui cultive la performance.
             </p>
           </div>
           <div class="story__layout">
