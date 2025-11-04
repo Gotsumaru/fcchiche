@@ -13,8 +13,20 @@ require_once __DIR__ . '/templates/header.php';
       <section class="hero" aria-labelledby="hero-title">
         <div class="container hero__container">
           <header class="hero__intro">
-            <span class="hero__eyebrow">Football Club Chiché</span>
-            <h1 class="hero__title" id="hero-title">Vibrez vert et blanc, chaque week-end</h1>
+            <h1 class="hero__title" id="hero-title">F.C. Chiché</h1>
+            <span class="hero__tagline" role="text">
+              <img
+                class="hero__tagline-logo"
+                src="<?= $assetsBase ?>/images/logo-fcc.svg"
+                width="40"
+                height="40"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="hero__tagline-text">Pour l'amour de maillot</span>
+            </span>
           </header>
           <figure class="hero__visual">
             <div class="hero__media">
