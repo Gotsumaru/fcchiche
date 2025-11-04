@@ -64,8 +64,7 @@ require_once __DIR__ . '/templates/header.php';
           </figure>
           <div class="hero__content" data-reveal="hero" data-reveal-delay="0.3">
             <p class="hero__subtitle">
-              Suivez nos équipes, préparez vos déplacements et vivez le club en temps réel avec des infos fiables et mises à
-              jour.
+              Ne manquez rien de la vie du club : résultats, matchs, événements et moments forts !
             </p>
             <div class="hero__actions" role="group" aria-label="Actions principales">
               <a class="btn btn--primary" href="<?= $basePath ?>/matchs">Voir le calendrier</a>
@@ -81,8 +80,7 @@ require_once __DIR__ . '/templates/header.php';
             <span class="section__eyebrow">Le club</span>
             <h2 class="section__title" id="story-title">Un écrin pour les verts et blancs</h2>
             <p class="section__subtitle">
-              Des vestiaires à la buvette, nous mettons l'expérience <span style="font-weight: bold; color: #000000;">de nos licenciés et de nos supporters</span> au
-              centre. Découvrez l'envers du décor <span style="font-weight: bold; color: #000000;">d'un club familial</span> qui cultive la performance.
+              Des vestiaires à la buvette, tout est pensé pour offrir le meilleur à <span style="font-weight: bold; color: #000000;">nos licenciés et nos supporters</span>. Entrez dans les coulisses <span style="font-weight: bold; color: #000000;">d’un club familial</span> où passion et performance vont de pair.
             </p>
           </div>
           <div class="story__layout" data-reveal data-reveal-delay="0.1">
