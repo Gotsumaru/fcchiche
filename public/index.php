@@ -174,10 +174,10 @@ require_once __DIR__ . '/templates/header.php';
                 <figure class="club-showcase__media">
                   <div class="club-showcase__media-frame">
                     <picture>
-                      <source srcset="<?= $assetsBase ?>/images/concours_pallets.png" type="image/webp" />
-                      <source srcset="<?= $assetsBase ?>/images/concours_pallets.png" type="image/jpeg" />
+                      <source srcset="<?= $assetsBase ?>/images/Ecole_de_foot.jpg" type="image/webp" />
+                      <source srcset="<?= $assetsBase ?>/images/Ecole_de_foot.jpg" type="image/jpeg" />
                       <img
-                        src="<?= $assetsBase ?>/images/concours_pallets.png"
+                        src="<?= $assetsBase ?>/images/Ecole_de_foot.jpg"
                         width="1792"
                         height="1024"
                         alt="Bénévoles du FC Chiché en service derrière la buvette"
