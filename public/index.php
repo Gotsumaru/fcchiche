@@ -191,8 +191,8 @@ require_once __DIR__ . '/templates/header.php';
         </div>
       </section>
 
-      <section class="section" aria-labelledby="events-title">
-        <div class="container_events">
+      <section class="section section--alt" aria-labelledby="events-title">
+        <div class="container">
           <div class="section__header" data-reveal data-reveal-delay="0">
             <h2 class="section__title" id="events-title">Les prochains matchs.</h2>
           </div>
