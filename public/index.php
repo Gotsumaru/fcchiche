@@ -194,9 +194,7 @@ require_once __DIR__ . '/templates/header.php';
       <section class="section" aria-labelledby="events-title">
         <div class="container_events">
           <div class="section__header" data-reveal data-reveal-delay="0">
-            <span class="section__eyebrow">Évènements</span>
-            <h2 class="section__title" id="events-title">Les prochains rendez-vous</h2>
-            <p class="section__subtitle">Matches, plateaux jeunes et animations organisés par le club.</p>
+            <h2 class="section__title" id="events-title">Les prochains matchs.</h2>
           </div>
           <div class="home-scroll" data-component="home-events" data-reveal data-reveal-delay="0.12">
             <div class="home-scroll__track" data-component="home-events-list" aria-live="polite"></div>
@@ -207,7 +205,6 @@ require_once __DIR__ . '/templates/header.php';
       <section class="section section--alt" aria-labelledby="results-title">
         <div class="container">
           <div class="section__header" data-reveal data-reveal-delay="0">
-            <span class="section__eyebrow">Performances</span>
             <h2 class="section__title" id="results-title">Derniers résultats du club</h2>
             <p class="section__subtitle" data-component="home-results-header">
               Chargement des dernières rencontres…

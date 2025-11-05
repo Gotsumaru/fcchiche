@@ -146,9 +146,10 @@ ul {
 }
 
 .container_events {
-  width: 90%;
+  width: 90%; 
   margin: 0;
   margin-left: 10%;
+  background-color: #f5f5f7 ;
 }
 
 .section {
@@ -161,8 +162,8 @@ ul {
 
 .section__header {
   max-width: 720px;
-  margin: 0 auto 3rem;
-  text-align: center;
+  margin: 0;
+  text-align: left;
 }
 
 .section__eyebrow {
