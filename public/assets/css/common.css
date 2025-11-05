@@ -978,12 +978,12 @@ ul {
   height: 12px;
   border-right: 2px solid var(--fc-green);
   border-top: 2px solid var(--fc-green);
-  transform: rotate(135deg);
+  transform: rotate(225deg);
   margin: 0 auto;
 }
 
 .home-scroll__control[data-action='scroll-next']::after {
-  transform: rotate(-45deg);
+  transform: rotate(45deg);
 }
 
 .home-scroll__control:hover,
