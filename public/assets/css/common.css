@@ -268,9 +268,7 @@ ul {
 }
 
 .club-showcase__media {
-  display: flex;
-  justify-content: center;
-  width: 100%;
+  margin: 0;
 }
 
 .club-showcase__media-frame {
