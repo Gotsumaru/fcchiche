@@ -1120,7 +1120,7 @@ ul {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(12, 18, 32, 0.7), rgba(12, 18, 32, 0.88));
+  background: linear-gradient(180deg, rgba(12, 18, 32, 0.7), rgba(12, 18, 32, 0.18));
   z-index: 1;
   pointer-events: none;
 }
@@ -1128,6 +1128,8 @@ ul {
 .match-card:hover,
 .match-card:focus-visible {
   transform: translateY(-6px);
+  background: linear-gradient(180deg, rgba(12, 18, 32, 0.7), rgba(12, 18, 32, 0));
+
 }
 
 .match-card:focus-visible {
