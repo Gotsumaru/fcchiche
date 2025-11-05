@@ -1172,7 +1172,7 @@ ul {
 .match-card:hover,
 .match-card:focus-visible {
   transform: translateY(-6px);
-  box-shadow: 0 24px 46px rgba(12, 18, 32, 0.24);
+  transition-duration: 1s;
 }
 
 .match-card:focus-visible {
