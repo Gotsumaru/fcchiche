@@ -1154,7 +1154,7 @@ ul {
   color: var(--fc-white);
   text-decoration: none;
   scroll-snap-align: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.8s ease;
 }
 
 .match-card::after {
@@ -1169,7 +1169,7 @@ ul {
 }
 .match-card:hover,
 .match-card:focus-visible {
-  transform: translateY(-6px);
+  transform: translateY(-10px);
 }
 
 .match-card:focus-visible {
