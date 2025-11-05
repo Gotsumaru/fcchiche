@@ -13,6 +13,7 @@ class MatchsModel
     private const TABLE_TERRAINS = 'pprod_terrains';
     private const TABLE_CLUBS_CACHE = 'pprod_clubs_cache';
     private const TABLE_EQUIPES = 'pprod_equipes';
+    private const TABLE_CLUB = 'pprod_club';
 
     /**
      * Cache local pour éviter des requêtes répétées
@@ -20,6 +21,8 @@ class MatchsModel
      * @var array<string, array<int, int|null>>
      */
     private array $teamCodeCache = [];
+
+    private ?int $clubInternalId = null;
 
     public function __construct(PDO $pdo)
     {
@@ -93,12 +96,18 @@ class MatchsModel
             return $cached === null ? null : (int)$cached;
         }
 
+        $clubInternalId = $this->getClubInternalId();
+        if ($clubInternalId === null) {
+            $this->teamCodeCache[$categoryKey][$number] = null;
+            return null;
+        }
+
         $sql = 'SELECT code FROM ' . self::TABLE_EQUIPES . ' 
                 WHERE club_id = :club_id AND category_code = :category AND number = :number
                 ORDER BY season DESC LIMIT 1';
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            'club_id' => (int)API_FFF_CLUB_ID,
+            'club_id' => $clubInternalId,
             'category' => $categoryKey,
             'number' => $number,
         ]);
@@ -106,6 +115,23 @@ class MatchsModel
         $code = $row !== false && isset($row['code']) ? (int)$row['code'] : null;
         $this->teamCodeCache[$categoryKey][$number] = $code;
         return $code;
+    }
+
+    private function getClubInternalId(): ?int
+    {
+        if ($this->clubInternalId !== null) {
+            return $this->clubInternalId;
+        }
+
+        $stmt = $this->pdo->prepare('SELECT id FROM ' . self::TABLE_CLUB . ' WHERE cl_no = :cl_no LIMIT 1');
+        $stmt->execute(['cl_no' => (int)API_FFF_CLUB_ID]);
+        $id = $stmt->fetchColumn();
+        if ($id === false) {
+            $this->clubInternalId = null;
+        } else {
+            $this->clubInternalId = (int)$id;
+        }
+        return $this->clubInternalId;
     }
 
     /**
