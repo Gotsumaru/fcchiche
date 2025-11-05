@@ -639,7 +639,7 @@
       }
     }
 
-    return buildAssetPath('galeries/684399bd8f6dc425b7441f37e5b6ce36.jpg');
+    return buildAssetPath('rencontre.png');
   }
 
   function buildMatchLink(page, matchId) {
