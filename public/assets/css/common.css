@@ -1108,7 +1108,6 @@ ul {
   flex: 0 0 clamp(18rem, 56vw, 24rem);
   padding: clamp(1.75rem, 4vw, 2.5rem);
   border-radius: var(--fc-radius-lg);
-  background: linear-gradient(180deg, rgba(12, 18, 32, 0.7), rgba(12, 18, 32, 0.18));
   overflow: hidden;
   color: var(--fc-white);
   text-decoration: none;
@@ -1119,11 +1118,16 @@ ul {
 .match-card::after {
   content: '';
   position: absolute;
+  background: linear-gradient(180deg, rgba(12, 18, 32, 0.3), rgba(12, 18, 32, 0.18));
   inset: 0;
   z-index: 1;
   pointer-events: none;
 }
 
+.match-card::after:hover {
+  background: linear-gradient(180deg, rgba(12, 18, 32, 0), rgba(12, 18, 32, 0));
+
+}
 .match-card:hover,
 .match-card:focus-visible {
   transform: translateY(-6px);
