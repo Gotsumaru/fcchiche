@@ -191,13 +191,27 @@ require_once __DIR__ . '/templates/header.php';
         </div>
       </section>
 
-      <section class="section section--alt" aria-labelledby="events-title">
+      <section class="section section--alt section--events" aria-labelledby="events-title">
         <div class="container_events">
           <div class="section__header" data-reveal data-reveal-delay="0">
             <h2 class="section__title section__title-events" id="events-title">Les prochains matchs.</h2>
           </div>
-          <div class="home-scroll" data-component="home-events" data-reveal data-reveal-delay="0.12">
+          <div class="home-scroll home-scroll--events" data-component="home-events" data-reveal data-reveal-delay="0.12">
             <div class="home-scroll__track home-scroll__track-events" data-component="home-events-list" aria-live="polite"></div>
+            <div class="home-scroll__controls">
+              <button
+                type="button"
+                class="home-scroll__control"
+                data-action="scroll-prev"
+                aria-label="Voir les matchs précédents"
+              ></button>
+              <button
+                type="button"
+                class="home-scroll__control"
+                data-action="scroll-next"
+                aria-label="Voir les prochains matchs"
+              ></button>
+            </div>
           </div>
         </div>
       </section>
