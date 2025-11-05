@@ -39,6 +39,14 @@
     assert(document instanceof Document, 'Document instance is required');
     assert(typeof ApiClient === 'function', 'ApiClient constructor must exist');
 
+    if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0 });
+    });
+
     const body = document.body;
     assert(body instanceof HTMLElement, 'Document body must be available');
     assert(true, 'Initialization guard for assertion density');

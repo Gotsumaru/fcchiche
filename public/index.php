@@ -195,6 +195,7 @@ require_once __DIR__ . '/templates/header.php';
         <div class="container_events">
           <div class="section__header" data-reveal data-reveal-delay="0">
             <h2 class="section__title section__title-events" id="events-title">Les prochains matchs.</h2>
+            <a class="section__action" href="<?= $basePath ?>/matchs">Voir le calendrier</a>
           </div>
           <div class="home-scroll home-scroll--events" data-component="home-events" data-reveal data-reveal-delay="0.12">
             <div class="home-scroll__track home-scroll__track-events" data-component="home-events-list" aria-live="polite"></div>
@@ -243,6 +244,7 @@ require_once __DIR__ . '/templates/header.php';
               </picture>
             </div>
             <div class="result-showcase__stream">
+              <p class="result-showcase__hint">Résumés récents</p>
               <div class="home-scroll home-scroll--compact">
                 <div class="home-scroll__track home-scroll__track--compact" data-component="home-results-list" aria-live="polite"></div>
               </div>
