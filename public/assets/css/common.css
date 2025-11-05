@@ -15,7 +15,7 @@
   --fc-radius-lg: 24px;
   --fc-radius-pill: 999px;
   --fc-blur: blur(12px);
-  --fc-transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --fc-transition: 0.5s cubic-bezier(0.3, 0, 0.2, 1);
   --fc-container-max: 1200px;
 }
 
@@ -969,19 +969,16 @@ ul {
   display: grid;
   border-radius: var(--fc-radius-lg);
   background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 24px 40px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   min-width: 300px;
   max-width: 360px;
   scroll-snap-align: center;
-  transition: transform var(--fc-transition), box-shadow var(--fc-transition);
+  transition: transform var(--fc-transition);
 }
 
 .media-card:hover,
 .media-card:focus-within {
-  transform: translateY(-6px);
-  box-shadow: 0 32px 48px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
 }
 
 .media-card__visual {
