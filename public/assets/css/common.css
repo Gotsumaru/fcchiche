@@ -15,7 +15,7 @@
   --fc-radius-lg: 24px;
   --fc-radius-pill: 999px;
   --fc-blur: blur(12px);
-  --fc-transition: 1.5s cubic-bezier(0.3, 0, 0.2, 1);
+  --fc-transition: 0.3s cubic-bezier(0.3, 0, 0.2, 1) ease;
   --fc-container-max: 1200px;
 }
 
@@ -988,7 +988,6 @@ ul {
 .home-scroll__control:hover,
 .home-scroll__control:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.18);
 }
 
 .home-scroll__control[disabled] {
