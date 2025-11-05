@@ -197,7 +197,7 @@ require_once __DIR__ . '/templates/header.php';
             <h2 class="section__title section__title-events" id="events-title">Les prochains matchs.</h2>
           </div>
           <div class="home-scroll" data-component="home-events" data-reveal data-reveal-delay="0.12">
-            <div class="home-scroll__track" data-component="home-events-list" aria-live="polite"></div>
+            <div class="home-scroll__track home-scroll__track-events" data-component="home-events-list" aria-live="polite"></div>
           </div>
         </div>
       </section>
