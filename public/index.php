@@ -86,15 +86,6 @@ require_once __DIR__ . '/templates/header.php';
           <div class="story__layout" data-reveal data-reveal-delay="0.1">
             <div class="club-showcase" role="list">
               <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.12">
-                <div class="club-showcase__content">
-                  <h3 class="club-showcase__title">Tableau Classements</h3>
-                  <p class="club-showcase__text">
-                    Nouveau tableau de classement sponsorisé par la <strong>Carrière de Luche</strong>, merci à eux !
-                  </p>
-                  <p class="club-showcase__text">
-                    Il nous permet d'afficher <strong>les rencontres et les classements</strong> pour nos trois équipes séniors.
-                  </p>
-                </div>
                 <figure class="club-showcase__media">
                   <div class="club-showcase__media-frame">
                     <picture>
@@ -123,17 +114,17 @@ require_once __DIR__ . '/templates/header.php';
                     </picture>
                   </div>
                 </figure>
-              </article>
-              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.24">
                 <div class="club-showcase__content">
-                  <h3 class="club-showcase__title">Bal du Foot</h3>
+                  <h3 class="club-showcase__title">Tableau Classements</h3>
                   <p class="club-showcase__text">
-                    Le Football Club de Chiche organise un dinner dansant, avec traiteur, serveurs, un orchestre et de la bonne ambiance.
+                    Nouveau tableau de classement sponsorisé par la <strong>Carrière de Luche</strong>, merci à eux !
                   </p>
                   <p class="club-showcase__text">
-                    Il a lieu tous les ans le 10 Novembre pour accueil <strong>300+ personnes</strong>.
+                    Il nous permet d'afficher <strong>les rencontres et les classements</strong> pour nos trois équipes séniors.
                   </p>
                 </div>
+              </article>
+              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.24">
                 <figure class="club-showcase__media">
                   <div class="club-showcase__media-frame">
                     <picture>
@@ -158,17 +149,17 @@ require_once __DIR__ . '/templates/header.php';
                     </picture>
                   </div>
                 </figure>
-              </article>
-              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.36">
                 <div class="club-showcase__content">
-                  <h3 class="club-showcase__title">Ecole de Foot</h3>
+                  <h3 class="club-showcase__title">Bal du Foot</h3>
                   <p class="club-showcase__text">
-                    Recrutement d'un alternant pour la gestion de nos effectifs jeunes.
+                    Le Football Club de Chiche organise un dinner dansant, avec traiteur, serveurs, un orchestre et de la bonne ambiance.
                   </p>
                   <p class="club-showcase__text">
-                    Avec <strong>50+ licenciés jeunes</strong> et une équipe évoluant dans chaque catégorie allant de <strong>U6 à U17</strong>.
+                    Il a lieu tous les ans le 10 Novembre pour accueil <strong>300+ personnes</strong>.
                   </p>
                 </div>
+              </article>
+              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.36">
                 <figure class="club-showcase__media">
                   <div class="club-showcase__media-frame">
                     <picture>
@@ -185,6 +176,15 @@ require_once __DIR__ . '/templates/header.php';
                     </picture>
                   </div>
                 </figure>
+                <div class="club-showcase__content">
+                  <h3 class="club-showcase__title">Ecole de Foot</h3>
+                  <p class="club-showcase__text">
+                    Recrutement d'un alternant pour la gestion de nos effectifs jeunes.
+                  </p>
+                  <p class="club-showcase__text">
+                    Avec <strong>50+ licenciés jeunes</strong> et une équipe évoluant dans chaque catégorie allant de <strong>U6 à U17</strong>.
+                  </p>
+                </div>
               </article>
             </div>
           </div>

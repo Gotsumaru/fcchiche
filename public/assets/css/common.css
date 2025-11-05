@@ -225,28 +225,32 @@ ul {
 
 .club-showcase {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+}
+
+@media (min-width: 64rem) {
+  .club-showcase {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .club-showcase__item {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: clamp(1.6rem, 1.2rem + 1vw, 2.4rem);
-  padding: clamp(1.8rem, 1.4rem + 1.2vw, 2.6rem);
+  gap: clamp(1.2rem, 0.8rem + 0.8vw, 1.8rem);
+  padding: clamp(1.4rem, 1rem + 1vw, 2rem);
   border-radius: clamp(1.6rem, 1.2rem + 1vw, 2.4rem);
   overflow: hidden;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform var(--fc-transition), box-shadow var(--fc-transition);
 }
 
-@media (min-width: 56rem) {
-  .club-showcase__item {
-    flex-direction: row;
-    align-items: center;
-    gap: clamp(2.2rem, 1.4rem + 1.6vw, 3rem);
-  }
-
-  .club-showcase__media {
-    justify-content: flex-end;
-  }
+.club-showcase__item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .club-showcase__content {
