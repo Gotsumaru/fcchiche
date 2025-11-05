@@ -172,44 +172,36 @@
     assert('date' in match || 'journee_label' in match, 'Match must include schedule information');
 
     const article = document.createElement('article');
-    article.className = 'media-card media-card--event';
+    article.className = 'media-card media-card--event match-card';
 
     const visual = document.createElement('div');
-    visual.className = 'media-card__visual';
+    visual.className = 'media-card__visual match-card__background';
     visual.appendChild(createImageElement(resolveMatchImage(match), `Affiche du match ${buildMatchTitle(match)}`));
     article.appendChild(visual);
 
     const body = document.createElement('div');
-    body.className = 'media-card__body event-card';
+    body.className = 'media-card__body match-card__body';
 
-    const header = document.createElement('div');
-    header.className = 'event-card__header';
-
-    const badge = document.createElement('span');
-    badge.className = 'section__eyebrow';
-    badge.textContent = resolveCompetition(match);
-    header.appendChild(badge);
-
-    const date = document.createElement('span');
-    date.className = 'event-card__date';
-    date.textContent = formatDate(match.date ?? match.match_date);
-    header.appendChild(date);
-
-    body.appendChild(header);
-
-    const teams = document.createElement('div');
-    teams.className = 'event-card__teams';
-    teams.textContent = buildMatchTitle(match);
-    body.appendChild(teams);
+    const layout = document.createElement('div');
+    layout.className = 'match-card__grid';
+    layout.appendChild(buildTeamBadge(match, true));
+    layout.appendChild(buildMatchCenter(match));
+    layout.appendChild(buildTeamBadge(match, false));
+    body.appendChild(layout);
 
     const meta = document.createElement('div');
-    meta.className = 'event-card__meta';
-    meta.appendChild(createMetaLine('Horaire', formatTime(match.time)));
+    meta.className = 'match-card__meta';
     meta.appendChild(createMetaLine('Lieu', resolveLocation(match)));
+
+    const categoryLabel = resolveCategoryLabel(match);
+    if (categoryLabel !== null) {
+      meta.appendChild(createMetaLine('Catégorie', categoryLabel));
+    }
+
     body.appendChild(meta);
 
     const cta = document.createElement('a');
-    cta.className = 'event-card__cta';
+    cta.className = 'event-card__cta match-card__cta';
     cta.href = buildMatchLink('matchs', match.id);
     cta.textContent = 'Détails du match';
     body.appendChild(cta);
@@ -311,6 +303,140 @@
     const span = document.createElement('span');
     span.textContent = `${label} · ${value}`;
     return span;
+  }
+
+  function buildTeamBadge(match, isHome) {
+    assert(typeof match === 'object' && match !== null, 'Match object required for team badge');
+    assert(typeof isHome === 'boolean', 'isHome flag must be boolean for team badge');
+
+    const container = document.createElement('div');
+    container.className = `match-card__team ${isHome ? 'match-card__team--home' : 'match-card__team--away'}`;
+
+    const logoWrapper = document.createElement('div');
+    logoWrapper.className = 'match-card__logo-frame';
+
+    const logo = document.createElement('img');
+    logo.className = 'match-card__logo';
+    logo.src = resolveTeamLogo(match, isHome);
+    logo.alt = `Logo ${resolveTeamName(match, isHome)}`;
+    logo.loading = 'lazy';
+    logo.decoding = 'async';
+    logoWrapper.appendChild(logo);
+
+    container.appendChild(logoWrapper);
+
+    const name = document.createElement('span');
+    name.className = 'match-card__team-name';
+    name.textContent = resolveTeamName(match, isHome);
+    container.appendChild(name);
+
+    const role = document.createElement('span');
+    role.className = 'match-card__team-role';
+    role.textContent = resolveTeamRole(isHome);
+    container.appendChild(role);
+
+    return container;
+  }
+
+  function buildMatchCenter(match) {
+    assert(typeof match === 'object' && match !== null, 'Match object required for center block');
+
+    const container = document.createElement('div');
+    container.className = 'match-card__center';
+
+    const badge = document.createElement('span');
+    badge.className = 'section__eyebrow match-card__competition';
+    badge.textContent = resolveCompetition(match);
+    container.appendChild(badge);
+
+    const versus = document.createElement('span');
+    versus.className = 'match-card__versus';
+    versus.textContent = 'VS';
+    container.appendChild(versus);
+
+    const date = document.createElement('span');
+    date.className = 'match-card__date';
+    date.textContent = formatDate(match.date ?? match.match_date);
+    container.appendChild(date);
+
+    const time = document.createElement('span');
+    time.className = 'match-card__time';
+    time.textContent = formatTime(match.time);
+    container.appendChild(time);
+
+    return container;
+  }
+
+  function resolveCategoryLabel(match) {
+    assert(typeof match === 'object' && match !== null, 'Match object required for category label');
+
+    const candidates = [
+      match.category_label,
+      match.home_team_category,
+      match.category_code,
+      match.type_label
+    ];
+
+    for (const candidate of candidates) {
+      if (typeof candidate === 'string' && candidate.trim() !== '') {
+        return candidate;
+      }
+    }
+
+    if (match.poule_journee_number !== undefined && match.poule_journee_number !== null) {
+      const journeeNumber = Number(match.poule_journee_number);
+      if (!Number.isNaN(journeeNumber) && journeeNumber > 0) {
+        return `Journée ${journeeNumber}`;
+      }
+    }
+
+    return null;
+  }
+
+  function resolveTeamLogo(match, isHome) {
+    assert(typeof match === 'object' && match !== null, 'Match object required for logo resolution');
+    assert(typeof isHome === 'boolean', 'isHome flag must be boolean for logo resolution');
+
+    const candidate = isHome ? match.home_logo : match.away_logo;
+    if (typeof candidate === 'string' && candidate !== '') {
+      return candidate;
+    }
+
+    const opponentLogo = typeof match.opponent_logo === 'string' && match.opponent_logo !== '' ? match.opponent_logo : null;
+    if (opponentLogo !== null) {
+      if ((isHome && match.is_home === false) || (!isHome && match.is_home === true)) {
+        return opponentLogo;
+      }
+    }
+
+    return `${getAssetsBase()}/images/logo.svg`;
+  }
+
+  function resolveTeamName(match, isHome) {
+    assert(typeof match === 'object' && match !== null, 'Match object required for team name resolution');
+    assert(typeof isHome === 'boolean', 'isHome flag must be boolean for team name resolution');
+
+    const candidate = isHome ? match.home_name ?? match.home_team_name : match.away_name ?? match.away_team_name;
+    if (typeof candidate === 'string' && candidate.trim() !== '') {
+      return candidate;
+    }
+
+    return isHome ? 'Equipe domicile' : 'Equipe visiteur';
+  }
+
+  function resolveTeamRole(isHome) {
+    assert(typeof isHome === 'boolean', 'Match role flag must be boolean');
+    return isHome ? 'Domicile' : 'Extérieur';
+  }
+
+  function getAssetsBase() {
+    const base = typeof state.assetsBase === 'string' ? state.assetsBase : '';
+    return base.endsWith('/') ? base.slice(0, -1) : base;
+  }
+
+  function buildAssetPath(fileName) {
+    assert(typeof fileName === 'string' && fileName !== '', 'Filename must be provided for asset path');
+    return `${getAssetsBase()}/images/${fileName}`;
   }
 
   function buildEmptyCard(message) {
@@ -505,13 +631,6 @@
   function resolveMatchImage(match) {
     assert(typeof match === 'object' && match !== null, 'Match object required for image');
     assert(true, 'Image resolution guard');
-
-    const base = state.assetsBase || '';
-    const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
-    const buildAssetPath = (fileName) => {
-      assert(typeof fileName === 'string' && fileName !== '', 'Filename must be provided for asset path');
-      return `${normalizedBase}/images/${fileName}`;
-    };
 
     const descriptorParts = [
       match.competition_name,

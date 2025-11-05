@@ -95,17 +95,20 @@ class MatchsModel
                     t.name as terrain_name,
                     t.address as terrain_address,
                     t.city as terrain_city,
-                    cc.name as opponent_name,
-                    cc.short_name as opponent_short_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.name as home_club_name,
+                    cc_home.short_name as home_club_short_name,
+                    cc_home.logo_url as home_logo,
+                    cc_away.name as away_club_name,
+                    cc_away.short_name as away_club_short_name,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no";
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no";
         
         if ($isResult !== null) {
             $sql .= " WHERE m.is_result = :is_result";
@@ -186,17 +189,20 @@ class MatchsModel
                     t.city as terrain_city,
                     t.latitude as terrain_latitude,
                     t.longitude as terrain_longitude,
-                    cc.name as opponent_name,
-                    cc.short_name as opponent_short_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.name as home_club_name,
+                    cc_home.short_name as home_club_short_name,
+                    cc_home.logo_url as home_logo,
+                    cc_away.name as away_club_name,
+                    cc_away.short_name as away_club_short_name,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.id = :id
                 LIMIT 1";
         
@@ -232,16 +238,15 @@ class MatchsModel
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.ma_no = :ma_no
                 LIMIT 1";
         
@@ -276,16 +281,16 @@ class MatchsModel
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.competition_id = :competition_id";
         
         if ($isResult !== null) {
@@ -340,16 +345,16 @@ class MatchsModel
                     c.name as competition_name,
                     c.type as competition_type,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE (
                     (m.home_club_id = :club_id AND m.home_team_category = :category)
                     OR (m.away_club_id = :club_id AND m.away_team_category = :category)
@@ -397,12 +402,16 @@ class MatchsModel
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    cc_away.name as opponent_name,
+                    cc_away.short_name as opponent_short_name,
+                    cc_away.logo_url as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON m.away_club_id = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.home_club_id = :club_id";
         
         if ($isResult !== null) {
@@ -446,12 +455,16 @@ class MatchsModel
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    cc_home.name as opponent_name,
+                    cc_home.short_name as opponent_short_name,
+                    cc_home.logo_url as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON m.home_club_id = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.away_club_id = :club_id";
         
         if ($isResult !== null) {
@@ -526,16 +539,16 @@ class MatchsModel
                     c.name as competition_name,
                     c.type as competition_type,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = :club_id_case THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = :club_id_case THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = :club_id_case THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON
-                    (CASE
-                        WHEN m.home_club_id != :club_id_case THEN m.home_club_id
-                        ELSE m.away_club_id
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE (
                     (m.home_club_id = :club_id_home AND m.home_team_category = :home_category AND m.home_team_number = :home_team_number)
                     OR (m.away_club_id = :club_id_away AND m.away_team_category = :away_category AND m.away_team_number = :away_team_number)
@@ -607,16 +620,16 @@ class MatchsModel
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.poule_journee_number = :journee_number 
                 AND m.competition_id = :competition_id
                 ORDER BY m.date ASC";
@@ -651,16 +664,16 @@ class MatchsModel
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = :club_id THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.date BETWEEN :date_start AND :date_end";
         
         if ($isResult !== null) {
