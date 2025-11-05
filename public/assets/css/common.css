@@ -1009,6 +1009,7 @@ ul {
 
 .home-scroll__track-events {
   padding-left: 10vw;
+  padding-right: 10vw;
 }
 
 .home-scroll__track--compact {
@@ -2240,6 +2241,11 @@ ul {
 
   .section {
     padding: 3.25rem 0;
+  }
+
+  .container_events{
+    width: 100%;
+    margin: 0;
   }
 
   .home-scroll,
