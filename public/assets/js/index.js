@@ -342,7 +342,6 @@
 
     const versus = document.createElement('span');
     versus.className = 'match-card__versus';
-    versus.textContent = 'VS';
     container.appendChild(versus);
 
     const date = document.createElement('span');
