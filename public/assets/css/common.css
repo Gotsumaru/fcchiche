@@ -243,8 +243,6 @@ ul {
   padding: clamp(1.4rem, 1rem + 1vw, 2rem);
   border-radius: clamp(1.6rem, 1.2rem + 1vw, 2.4rem);
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.05);
   transition: transform var(--fc-transition), box-shadow var(--fc-transition);
 }
 
@@ -270,17 +268,23 @@ ul {
 }
 
 .club-showcase__media {
-  flex: 1;
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 .club-showcase__media-frame {
-  width: min(100%);
-  aspect-ratio: 16 / 9;
-  border-radius: clamp(1.6rem, 1.2rem + 1vw, 2.4rem);
+  width: 100%;
+  height: 240px;
+  border-radius: 1rem;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.02);
+}
+
+@media (min-width: 64rem) {
+  .club-showcase__media-frame {
+    height: 280px;
+  }
 }
 
 .club-showcase__media-frame picture,
