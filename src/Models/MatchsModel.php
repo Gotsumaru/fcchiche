@@ -111,11 +111,21 @@ class MatchsModel
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
                 LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
                 LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no";
-        
+
+        $conditions = [];
+
         if ($isResult !== null) {
-            $sql .= " WHERE m.is_result = :is_result";
+            $conditions[] = 'm.is_result = :is_result';
         }
-        
+
+        if ($isResult === false) {
+            $conditions[] = 'm.date >= CURDATE()';
+        }
+
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
         $sql .= " ORDER BY m.date " . ($isResult === true ? 'DESC' : 'ASC');
         
         if ($limit !== null && $limit > 0) {

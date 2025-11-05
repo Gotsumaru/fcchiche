@@ -209,7 +209,7 @@ $count = $models['equipes']->countEquipes();
 ### Méthodes principales
 
 ```php
-// CALENDRIER (matchs à venir)
+// CALENDRIER (matchs à venir — dates >= aujourd'hui)
 $prochains = $models['matchs']->getUpcomingMatchs(10);
 $calendrier = $models['matchs']->getAllMatchs(false, 20);
 

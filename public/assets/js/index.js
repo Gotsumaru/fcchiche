@@ -171,44 +171,45 @@
     assert(typeof match === 'object' && match !== null, 'Match object required');
     assert('date' in match || 'journee_label' in match, 'Match must include schedule information');
 
-    const article = document.createElement('article');
-    article.className = 'media-card media-card--event match-card';
+    const card = document.createElement('a');
+    card.className = 'match-card';
+    card.href = buildMatchLink('matchs', match.id);
+    card.dataset.matchId = String(match.id ?? '');
+    card.setAttribute('aria-label', `Match ${buildMatchTitle(match)} le ${formatDate(match.date ?? match.match_date)}`);
 
-    const visual = document.createElement('div');
-    visual.className = 'media-card__visual match-card__background';
-    visual.appendChild(createImageElement(resolveMatchImage(match), `Affiche du match ${buildMatchTitle(match)}`));
-    article.appendChild(visual);
+    const background = document.createElement('div');
+    background.className = 'match-card__background';
+    const backgroundImage = document.createElement('img');
+    backgroundImage.src = resolveMatchImage(match);
+    backgroundImage.alt = '';
+    backgroundImage.loading = 'lazy';
+    backgroundImage.decoding = 'async';
+    backgroundImage.setAttribute('aria-hidden', 'true');
+    background.appendChild(backgroundImage);
+    card.appendChild(background);
 
-    const body = document.createElement('div');
-    body.className = 'media-card__body match-card__body';
+    const overlay = document.createElement('div');
+    overlay.className = 'match-card__overlay';
+    card.appendChild(overlay);
 
-    const layout = document.createElement('div');
-    layout.className = 'match-card__grid';
-    layout.appendChild(buildTeamBadge(match, true));
-    layout.appendChild(buildMatchCenter(match));
-    layout.appendChild(buildTeamBadge(match, false));
-    body.appendChild(layout);
+    const homeBadge = buildTeamBadge(match, true);
+    homeBadge.classList.add('match-card__team--home');
+    card.appendChild(homeBadge);
 
-    const meta = document.createElement('div');
-    meta.className = 'match-card__meta';
-    meta.appendChild(createMetaLine('Lieu', resolveLocation(match)));
+    const awayBadge = buildTeamBadge(match, false);
+    awayBadge.classList.add('match-card__team--away');
+    card.appendChild(awayBadge);
 
-    const categoryLabel = resolveCategoryLabel(match);
-    if (categoryLabel !== null) {
-      meta.appendChild(createMetaLine('Catégorie', categoryLabel));
-    }
+    const categoryLabel = resolveCategoryLabel(match) ?? resolveCompetition(match);
+    const category = document.createElement('span');
+    category.className = 'match-card__category';
+    category.textContent = categoryLabel;
+    card.appendChild(category);
 
-    body.appendChild(meta);
+    const centerBlock = buildMatchCenter(match);
+    card.appendChild(centerBlock);
 
-    const cta = document.createElement('a');
-    cta.className = 'event-card__cta match-card__cta';
-    cta.href = buildMatchLink('matchs', match.id);
-    cta.textContent = 'Détails du match';
-    body.appendChild(cta);
-
-    article.appendChild(body);
-
-    return article;
+    return card;
   }
 
   function buildResultCard(match, isFeature) {
@@ -310,7 +311,7 @@
     assert(typeof isHome === 'boolean', 'isHome flag must be boolean for team badge');
 
     const container = document.createElement('div');
-    container.className = `match-card__team ${isHome ? 'match-card__team--home' : 'match-card__team--away'}`;
+    container.className = 'match-card__team';
 
     const logoWrapper = document.createElement('div');
     logoWrapper.className = 'match-card__logo-frame';
@@ -330,11 +331,6 @@
     name.textContent = resolveTeamName(match, isHome);
     container.appendChild(name);
 
-    const role = document.createElement('span');
-    role.className = 'match-card__team-role';
-    role.textContent = resolveTeamRole(isHome);
-    container.appendChild(role);
-
     return container;
   }
 
@@ -342,12 +338,7 @@
     assert(typeof match === 'object' && match !== null, 'Match object required for center block');
 
     const container = document.createElement('div');
-    container.className = 'match-card__center';
-
-    const badge = document.createElement('span');
-    badge.className = 'section__eyebrow match-card__competition';
-    badge.textContent = resolveCompetition(match);
-    container.appendChild(badge);
+    container.className = 'match-card__center-block';
 
     const versus = document.createElement('span');
     versus.className = 'match-card__versus';
@@ -422,11 +413,6 @@
     }
 
     return isHome ? 'Equipe domicile' : 'Equipe visiteur';
-  }
-
-  function resolveTeamRole(isHome) {
-    assert(typeof isHome === 'boolean', 'Match role flag must be boolean');
-    return isHome ? 'Domicile' : 'Extérieur';
   }
 
   function getAssetsBase() {
