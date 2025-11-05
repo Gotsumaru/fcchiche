@@ -473,7 +473,6 @@ ul {
 .btn--primary {
   background: linear-gradient(135deg, var(--fc-green), #0ca50c);
   color: var(--fc-white);
-  box-shadow: 0 20px 40px rgba(0, 136, 0, 0.2);
 }
 
 .btn--outline {
