@@ -691,6 +691,7 @@ ul {
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
+  margin: 10px 0;
 }
 
 .hero__details {
