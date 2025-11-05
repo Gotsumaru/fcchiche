@@ -225,11 +225,7 @@
 
     const article = document.createElement('article');
     article.className = 'media-card media-card--result';
-    if (isFeature === true) {
-      article.classList.add('media-card--feature');
-    } else {
-      article.classList.add('media-card--compact');
-    }
+    article.classList.add('media-card--compact');
 
     const visual = document.createElement('div');
     visual.className = 'media-card__visual';

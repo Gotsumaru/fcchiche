@@ -225,7 +225,6 @@ ul {
 
 .club-showcase {
   display: grid;
-  gap: clamp(2.6rem, 1.6rem + 3vw, 4.6rem);
 }
 
 .club-showcase__item {
@@ -273,7 +272,7 @@ ul {
 }
 
 .club-showcase__media-frame {
-  width: min(100%, 420px);
+  width: min(100%);
   aspect-ratio: 16 / 9;
   border-radius: clamp(1.6rem, 1.2rem + 1vw, 2.4rem);
   overflow: hidden;
@@ -544,8 +543,8 @@ ul {
 .hero__container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: clamp(2.75rem, 2.25rem + 1.5vw, 3.5rem);
+  align-items: center;
+  gap: 1rem;
 }
 
 .hero__intro {
