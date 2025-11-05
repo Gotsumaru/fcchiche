@@ -202,7 +202,7 @@ require_once __DIR__ . '/templates/header.php';
         </div>
       </section>
 
-      <section class="section section--alt" aria-labelledby="results-title">
+      <section class="section" aria-labelledby="results-title">
         <div class="container">
           <div class="section__header" data-reveal data-reveal-delay="0">
             <h2 class="section__title" id="results-title">Derniers résultats du club</h2>
