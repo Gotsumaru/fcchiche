@@ -192,7 +192,7 @@ require_once __DIR__ . '/templates/header.php';
       </section>
 
       <section class="section section--alt" aria-labelledby="events-title">
-        <div class="container">
+        <div class="container_events">
           <div class="section__header" data-reveal data-reveal-delay="0">
             <h2 class="section__title" id="events-title">Les prochains matchs.</h2>
           </div>
