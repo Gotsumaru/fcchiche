@@ -91,8 +91,8 @@ li {
 [data-reveal] {
   opacity: 0;
   transform: translate3d(0, 2rem, 0);
-  transition: opacity 0.95s cubic-bezier(0.22, 0.61, 0.36, 1),
-    transform 0.95s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: opacity 0.95s cubic-bezier(0.22, 0.61, 0.36, 1) ease,
+    transform 0.95s cubic-bezier(0.22, 0.61, 0.36, 1) ease;
   transition-delay: var(--reveal-delay, 0s);
   will-change: opacity, transform;
 }
@@ -985,8 +985,7 @@ ul {
   border: 1px solid rgba(0, 0, 0, 0.18);
   background: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  transition: transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1),
-    box-shadow 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) ease;
 }
 
 .home-scroll__control::after {
