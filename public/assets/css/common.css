@@ -15,7 +15,7 @@
   --fc-radius-lg: 24px;
   --fc-radius-pill: 999px;
   --fc-blur: blur(12px);
-  --fc-transition: 0.3s cubic-bezier(0.3, 0, 0.2, 1) ease;
+  --fc-transition: 0.3s ease;
   --fc-container-max: 1200px;
 }
 
@@ -90,9 +90,8 @@ li {
 
 [data-reveal] {
   opacity: 0;
-  transform: translate3d(0, 2rem, 0);
-  transition: opacity 0.95s cubic-bezier(0.22, 0.61, 0.36, 1) ease,
-    transform 0.95s cubic-bezier(0.22, 0.61, 0.36, 1) ease;
+  transform: translate3d(0, 1.5rem, 0);
+  transition: opacity 0.65s ease-out, transform 0.65s ease-out;
   transition-delay: var(--reveal-delay, 0s);
   will-change: opacity, transform;
 }
@@ -984,7 +983,7 @@ ul {
   border: 1px solid rgba(0, 0, 0, 0.18);
   background: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) ease;
+  transition: transform 0.3s ease;
 }
 
 .home-scroll__control::after {
