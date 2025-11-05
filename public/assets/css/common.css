@@ -171,7 +171,15 @@ ul {
   margin-bottom: clamp(2.5rem, 4vw, 4rem);
 }
 
+/* Default section header (used by most sections) */
 .section__header {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Events section uses a left-aligned header layout */
+.section--events .section__header {
   max-width: 950px;
   margin: 0;
   text-align: left;
@@ -990,6 +998,11 @@ ul {
   transform: translateY(-2px);
 }
 
+/* Subtle press effect on navigation click */
+.section--events .home-scroll__control:active {
+  transform: translateY(-1px) scale(0.96);
+}
+
 .home-scroll__control[disabled] {
   opacity: 0.4;
   cursor: not-allowed;
@@ -1017,6 +1030,22 @@ ul {
 
 .home-scroll__track::-webkit-scrollbar {
   display: none;
+}
+
+/* Gentle visual feedback while sliding via controls */
+.section--events .home-scroll__track.is-sliding {
+  transition: opacity 220ms ease;
+  opacity: 0.96;
+}
+
+/* Tiny directional nudge for cards during slide */
+.section--events .home-scroll__track.is-sliding[data-dir='1'] .match-card {
+  transition: transform 220ms ease;
+  transform: translateX(-6px);
+}
+.section--events .home-scroll__track.is-sliding[data-dir='-1'] .match-card {
+  transition: transform 220ms ease;
+  transform: translateX(6px);
 }
 
 .media-card {

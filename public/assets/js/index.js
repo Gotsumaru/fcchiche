@@ -486,6 +486,17 @@
     const scrollByStep = (direction) => {
       assert(direction === -1 || direction === 1, 'Direction must be -1 or 1');
       assert(track instanceof HTMLElement, 'Track must exist to scroll');
+      // Add a short visual hint while scrolling
+      try {
+        track.classList.add('is-sliding');
+        track.dataset.dir = String(direction);
+        window.setTimeout(() => {
+          track.classList.remove('is-sliding');
+          delete track.dataset.dir;
+        }, 280);
+      } catch (e) {
+        // no-op: visual hint is optional
+      }
       track.scrollBy({ left: direction * SCROLL_STEP, behavior: 'smooth' });
     };
 

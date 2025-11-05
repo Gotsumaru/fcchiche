@@ -48,6 +48,22 @@ class MatchsModel
         assert(isset($match['home_name']), 'Home name must be defined');
         assert(isset($match['away_name']), 'Away name must be defined');
 
+        // Expose a human-readable category label for the FC Chiché team
+        // Requirement: for Seniors Masculins (SEM), display "Senior {code}" where code/number is the team number.
+        // We compute this at retrieval time (PHP), not in SQL nor DB.
+        $isHomeSide = (bool)$match['is_home'];
+        $sidePrefix = $isHomeSide ? 'home' : 'away';
+        $teamCategory = $match[$sidePrefix . '_team_category'] ?? null;
+        $teamNumber = $match[$sidePrefix . '_team_number'] ?? null;
+
+        if (is_string($teamCategory) && strtoupper(trim($teamCategory)) === 'SEM' && $teamNumber !== null) {
+            $num = (int)$teamNumber;
+            if ($num > 0) {
+                // Front-end prefers category_label first when present
+                $match['category_label'] = 'Senior ' . $num;
+            }
+        }
+
         return $match;
     }
 
