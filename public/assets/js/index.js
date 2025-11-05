@@ -6,12 +6,12 @@
   const SCROLL_STEP = 320;
 
   const MATCH_VISUAL_RULES = Object.freeze([
-    { pattern: /(champ|phase|d[0-9])/i, asset: 'calendrier.jpg' },
-    { pattern: /(coupe|challenge|cp)/i, asset: 'convocation.jpg' },
-    { pattern: /(plateau|tournoi|festival)/i, asset: 'galeries/0344a63bc84ae9c3f7ebcfc1cde08d16.jpg' },
-    { pattern: /(u1|u13|u15|u17|jeune|formation)/i, asset: 'galeries/76ac98b24fbd9dcea187ba544db6e770.jpg' },
-    { pattern: /(femi|fémi|dames)/i, asset: 'galeries/445351737_943464437577562_900514706040850129_n.jpg' },
-    { pattern: /(loisir|vétéran|veteran|amical|prépa|prepa)/i, asset: 'terrain.jpg' }
+    { pattern: /(champ|phase|d[0-9])/i, asset: 'rencontre.png' },
+    { pattern: /(coupe|challenge|cp)/i, asset: 'rencontre.png' },
+    { pattern: /(plateau|tournoi|festival)/i, asset: 'rencontre.png' },
+    { pattern: /(u1|u13|u15|u17|jeune|formation)/i, asset: 'rencontre.png' },
+    { pattern: /(femi|fémi|dames)/i, asset: 'rencontre.png' },
+    { pattern: /(loisir|vétéran|veteran|amical|prépa|prepa)/i, asset: 'rencontre.png' }
   ]);
 
   const state = {
