@@ -12,6 +12,14 @@ class MatchsModel
     private const TABLE_COMPETITIONS = 'pprod_competitions';
     private const TABLE_TERRAINS = 'pprod_terrains';
     private const TABLE_CLUBS_CACHE = 'pprod_clubs_cache';
+    private const TABLE_EQUIPES = 'pprod_equipes';
+
+    /**
+     * Cache local pour éviter des requêtes répétées
+     * [category][number] => code
+     * @var array<string, array<int, int|null>>
+     */
+    private array $teamCodeCache = [];
 
     public function __construct(PDO $pdo)
     {
@@ -59,12 +67,45 @@ class MatchsModel
         if (is_string($teamCategory) && strtoupper(trim($teamCategory)) === 'SEM' && $teamNumber !== null) {
             $num = (int)$teamNumber;
             if ($num > 0) {
-                // Front-end prefers category_label first when present
-                $match['category_label'] = 'Senior ' . $num;
+                $code = $this->resolveTeamCodeForClubCategoryNumber($teamCategory, $num);
+                if ($code !== null && $code > 0) {
+                    // Front-end prefers category_label first when present
+                    $match['category_label'] = 'Senior ' . $code;
+                }
             }
         }
 
         return $match;
+    }
+
+    /**
+     * Récupère le code d'équipe (pprod_equipes.code) pour la catégorie + number fournis
+     * du FC Chiché (club id constant). Mis en cache par requête.
+     */
+    private function resolveTeamCodeForClubCategoryNumber(string $category, int $number): ?int
+    {
+        $categoryKey = strtoupper(trim($category));
+        if (!isset($this->teamCodeCache[$categoryKey])) {
+            $this->teamCodeCache[$categoryKey] = [];
+        }
+        if (array_key_exists($number, $this->teamCodeCache[$categoryKey])) {
+            $cached = $this->teamCodeCache[$categoryKey][$number];
+            return $cached === null ? null : (int)$cached;
+        }
+
+        $sql = 'SELECT code FROM ' . self::TABLE_EQUIPES . ' 
+                WHERE club_id = :club_id AND category_code = :category AND number = :number
+                ORDER BY season DESC LIMIT 1';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'club_id' => (int)API_FFF_CLUB_ID,
+            'category' => $categoryKey,
+            'number' => $number,
+        ]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $code = $row !== false && isset($row['code']) ? (int)$row['code'] : null;
+        $this->teamCodeCache[$categoryKey][$number] = $code;
+        return $code;
     }
 
     /**
