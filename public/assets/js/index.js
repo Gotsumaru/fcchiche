@@ -228,11 +228,6 @@
     article.className = 'media-card media-card--result';
     article.classList.add('media-card--compact');
 
-    const visual = document.createElement('div');
-    visual.className = 'media-card__visual';
-    visual.appendChild(createImageElement(resolveMatchImage(match), `Illustration du match ${buildMatchTitle(match)}`));
-    article.appendChild(visual);
-
     const body = document.createElement('div');
     body.className = 'media-card__body result-card';
 
@@ -250,15 +245,45 @@
 
     body.appendChild(header);
 
-    const score = document.createElement('p');
-    score.className = 'result-card__score';
-    score.textContent = formatScore(match);
-    body.appendChild(score);
+    const matchDisplay = document.createElement('div');
+    matchDisplay.className = 'result-card__match-display';
 
-    const teams = document.createElement('div');
-    teams.className = 'result-card__teams';
-    teams.textContent = buildMatchTitle(match);
-    body.appendChild(teams);
+    const homeBlock = document.createElement('div');
+    homeBlock.className = 'result-card__team-block';
+    const homeLogo = document.createElement('img');
+    homeLogo.className = 'result-card__team-logo';
+    homeLogo.src = resolveTeamLogo(match, true);
+    homeLogo.alt = `Logo ${resolveTeamName(match, true)}`;
+    homeLogo.loading = 'lazy';
+    homeLogo.decoding = 'async';
+    homeBlock.appendChild(homeLogo);
+    const homeName = document.createElement('div');
+    homeName.className = 'result-card__team-name';
+    homeName.textContent = resolveTeamName(match, true);
+    homeBlock.appendChild(homeName);
+    matchDisplay.appendChild(homeBlock);
+
+    const scoreBlock = document.createElement('div');
+    scoreBlock.className = 'result-card__score';
+    scoreBlock.textContent = formatScore(match);
+    matchDisplay.appendChild(scoreBlock);
+
+    const awayBlock = document.createElement('div');
+    awayBlock.className = 'result-card__team-block';
+    const awayLogo = document.createElement('img');
+    awayLogo.className = 'result-card__team-logo';
+    awayLogo.src = resolveTeamLogo(match, false);
+    awayLogo.alt = `Logo ${resolveTeamName(match, false)}`;
+    awayLogo.loading = 'lazy';
+    awayLogo.decoding = 'async';
+    awayBlock.appendChild(awayLogo);
+    const awayName = document.createElement('div');
+    awayName.className = 'result-card__team-name';
+    awayName.textContent = resolveTeamName(match, false);
+    awayBlock.appendChild(awayName);
+    matchDisplay.appendChild(awayBlock);
+
+    body.appendChild(matchDisplay);
 
     const meta = document.createElement('div');
     meta.className = 'result-card__meta';
