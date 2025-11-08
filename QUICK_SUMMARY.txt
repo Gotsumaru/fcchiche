@@ -1,0 +1,81 @@
+FC CHICHE - RÉSUMÉ ARCHITECTURE RAPIDE
+======================================
+
+STRUCTURE GLOBALE
+- config/    Configuration BDD, API FFF, environnement
+- src/       Code métier (Models, API client, Sync, Utils)
+- public/    Pages web + 14 endpoints API REST
+- cron/      Synchronisation automatique (2x/jour)
+- sql/       Schéma BDD normalisé
+- templates/ HTML partagées
+
+FRONTEND (Zéro dépendances)
+- HTML: 2 fichiers (index.html SPA 1760L + docs.html)
+- CSS: 2 fichiers (design system + page-specific)
+- JS: 7 fichiers (ApiClient, nav, animations, pages)
+- Tech: 100% vanilla (fetch, localStorage, Service Worker)
+
+API ENDPOINTS (14 endpoints)
+- GET /api/matchs, /api/classements, /api/equipes, /api/competitions
+- GET /api/club, /api/engagements, /api/terrains, /api/membres
+- GET /api/clubs-cache, /api/sync-logs, /api/config
+- POST /api/auth (authentification)
+- POST/PUT/DELETE /api/matchs (CRUD authentifiés)
+
+DÉPENDANCES
+Backend: PHP 8.1 vanilla + PDO + MySQL
+Frontend: ZÉRO npm (fetch API natif)
+Externes: API FFF, Google Fonts, OVH CRON
+
+PAGES/ROUTES PRINCIPALES
+/ (accueil), /matchs (calendrier), /resultats, /classements
+/contact, /galerie, /partenaires, /equipes/{name}
+
+BACKEND PHP
+- 11 Models: Matchs, Classements, Equipes, Competitions, Engagements, Club, Terrains, Membres, Config, SyncLogs, ClubsCache
+- Sync.php: Orchestration synchronisation CRON (syncAll, syncClub, syncEquipes, syncMatchs, etc)
+- FFFApiClient.php: Wrapper API FFF (getClubInfo, getEquipes, getMatchs, getAllClassements)
+
+BASE DE DONNÉES (11 tables, prefix pprod_)
+pprod_club, pprod_equipes, pprod_competitions, pprod_engagements
+pprod_matchs (50+ colonnes), pprod_classements, pprod_terrains
+pprod_membres, pprod_sync_logs, pprod_config, pprod_clubs_cache
+Normalisation 3NF, indexes optimisés
+
+FLUX SYNCHRONISATION
+CRON (2x/jour: 8h, 20h) → sync_data.php → FFFApiClient fetch
+→ Transform → Models → INSERT/UPDATE/DELETE MySQL → logs
+
+POINTS FORTS
+✅ Architecture propre (models/API/sync séparés)
+✅ Zéro dépendances (maintenance easy)
+✅ PDO prepared statements (sécurité)
+✅ Logging complet (traçabilité)
+✅ Frontend moderne (design system, animations)
+✅ PWA-ready (Service Worker, manifest)
+✅ API REST claire (OpenAPI docs)
+✅ DB 3NF (pas de redondances)
+✅ Git auto-deploy (push main → production)
+
+POINTS À AMÉLIORER
+⚠️ Assertions insuffisantes (NASA Power of 10: 2+ assertions/fonction)
+⚠️ Fonctions trop longues (syncClassements 190L, syncMatchs 90L)
+⚠️ Requête SQL non préparée (syncMembres exec() + interpolation)
+⚠️ Validations API manquantes (structures non vérifiées)
+⚠️ Wrappers sans assertions (Logger::info ne valide pas)
+
+DÉPLOIEMENT
+OVH mutualisé, CRON automatisé, Git webhook, logs rotationnés 10MB
+
+PHASE ACTUELLE
+Phase 1: ✅ Backend complet
+Phase 2: ⏳ Refonte design accueil
+Phases 3-5: ⏳ PWA, backoffice admin
+
+CONCLUSION
+Application PHP 8.1 vanilla performante et maintenable. Architecture claire, zéro dépendances, synchronisation FFF automatisée, API REST simple, frontend moderne. Prête pour production ou migration progressive React/Vue.
+
+DOCUMENTS DÉTAILLÉS
+- ARCHITECTURE_ANALYSIS.md   Analyse détaillée complète
+- REVIEW.md                  Audit conformité code
+- README.md                  Installation et déploiement
