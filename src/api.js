@@ -2,7 +2,10 @@
  * API Client - Communicates with PHP backend
  */
 
+import { mockMatches } from './mockData'
+
 const API_BASE = '/api'
+const USE_MOCK_DATA = import.meta.env.DEV // Use mock data in development
 
 class ApiClient {
   async request(endpoint, options = {}) {
@@ -24,11 +27,21 @@ class ApiClient {
 
   // Match data
   async getUpcomingMatches(limit = 6) {
+    if (USE_MOCK_DATA) {
+      return new Promise(resolve => {
+        setTimeout(() => resolve(mockMatches.upcoming.slice(0, limit)), 300)
+      })
+    }
     const result = await this.request('/matchs.php?is_result=false&limit=' + limit)
     return result.data || []
   }
 
   async getLatestResults(limit = 6) {
+    if (USE_MOCK_DATA) {
+      return new Promise(resolve => {
+        setTimeout(() => resolve(mockMatches.results.slice(0, limit)), 300)
+      })
+    }
     const result = await this.request('/matchs.php?is_result=true&limit=' + limit)
     return result.data || []
   }
