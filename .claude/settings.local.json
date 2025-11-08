@@ -12,7 +12,8 @@
       "Bash(dir \"C:\\Développement\\fcchiche\")",
       "Bash(dir \"C:\\Développement\\fcchiche\\config\")",
       "Bash(dir:*)",
-      "Bash(npm init -y)"
+      "Bash(npm init -y)",
+      "Bash(ls -lah \"C:\\Développement\\fcchiche\\public\\dist\\assets\"\" 2>/dev/null | tail -10 || echo \"Build successful - files ready \")"
     ],
     "deny": [],
     "ask": []
