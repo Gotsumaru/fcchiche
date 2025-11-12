@@ -1,216 +1,400 @@
-# FC Chiche - Refonte Site Web
+# ⚽ FC Chichè - Site officiel
 
-## Architecture
-
-### Stack Technique
-- **Backend** : PHP 8.1 (vanilla)
-- **Base de données** : MySQL/MariaDB avec PDO
-- **API** : FFF API (api-dofa.fff.fr)
-- **Hébergement** : OVH (infrastructure mutualisée)
-- **Déploiement** : Dépôt Git OVH avec auto-déploiement continu (push = publication)
-
-### Fonctionnalités
-- Synchronisation automatique données API FFF (2x/jour : 8h et 20h)
-- Stockage BDD avec relations normalisées
-- Logging complet (API, sync, erreurs)
-- Gestion historique/archivage automatique
-
-## Installation
-
-### 1. Prérequis
-- PHP 8.1+
-- MySQL 5.7+ ou MariaDB 10.3+
-- Accès CRON
-- Extension PHP : PDO, PDO_MySQL, JSON
-
-### 2. Configuration Base de Données
-
-```bash
-# 1. Importer le schéma
-mysql -u votre_user -p votre_base < sql/database_schema.sql
-
-# 2. Vérifier les tables créées
-mysql -u votre_user -p votre_base -e "SHOW TABLES LIKE 'pprod_%'"
-```
-
-### 3. Configuration Application
-
-Éditer `config/config.php` :
-
-```php
-// Base de données
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'votre_base');
-define('DB_USER', 'votre_user');
-define('DB_PASS', 'votre_password');
-
-// API FFF
-define('API_FFF_CLUB_ID', 5403); // ID club Chiche
-
-// Environnement
-define('ENV', 'production'); // Passer en production après tests
-```
-
-### 4. Permissions Fichiers
-
-```bash
-# Permissions répertoires
-chmod 755 config/ src/ cron/ public/
-chmod 775 logs/
-
-# Permissions fichiers
-chmod 644 config/*.php src/**/*.php cron/*.php
-chmod 755 cron/sync_data.php
-```
-
-### 5. Configuration CRON
-
-Ajouter dans crontab (`crontab -e`) :
-
-```bash
-# Synchronisation FC Chiche - 8h et 20h
-0 8,20 * * * /usr/bin/php /chemin/complet/fcchiche-refonte/cron/sync_data.php >> /chemin/complet/fcchiche-refonte/logs/cron.log 2>&1
-```
-
-Vérifier chemin PHP : `which php`
-
-### 6. Test Manuel Synchronisation
-
-```bash
-# Test script synchronisation
-php cron/sync_data.php
-
-# Vérifier logs
-tail -f logs/sync.log
-tail -f logs/cron.log
-```
-
-### 7. Vérification Données
-
-```sql
--- Vérifier club synchronisé
-SELECT * FROM pprod_club;
-
--- Vérifier équipes
-SELECT * FROM pprod_equipes;
-
--- Vérifier matchs à venir
-SELECT * FROM pprod_matchs WHERE is_result = 0 ORDER BY date ASC LIMIT 5;
-
--- Vérifier derniers résultats
-SELECT * FROM pprod_matchs WHERE is_result = 1 ORDER BY date DESC LIMIT 5;
-
--- Vérifier dernière synchronisation
-SELECT * FROM pprod_config WHERE config_key LIKE 'last_sync_%';
-
--- Logs synchronisation
-SELECT * FROM pprod_sync_logs ORDER BY created_at DESC LIMIT 10;
-```
-
-## Déploiement OVH via Git Auto
-
-- **Workflow** : chaque push sur la branche `main` du dépôt OVH déclenche l'auto-déploiement côté hébergement mutualisé.
-- **Préparation locale** : `git pull` pour rester aligné, développement en feature branch, puis merge propre sur `main`.
-- **Déclenchement** : `git push ovh main` (ou remote `production`) publie immédiatement l'application.
-- **Post-déploiement** : vérifier `public/` en HTTPS, consulter `logs/cron.log` et `logs/sync.log`.
-- **Fallback** : en cas de rollback, re-pusher un tag précédent (`git push ovh v1.2.3:main`).
-
-## Structure Projet
-
-```
-fcchiche-refonte/
-├── config/
-│   ├── config.php          # Configuration principale
-│   └── database.php        # Connexion PDO
-├── src/
-│   ├── API/
-│   │   └── FFFApiClient.php    # Client API FFF
-│   ├── Database/
-│   │   └── Sync.php            # Synchronisation
-│   └── Utils/
-│       └── Logger.php          # Gestion logs
-├── cron/
-│   └── sync_data.php       # Script CRON
-├── public/
-│   └── index.php           # Page accueil (à venir)
-├── sql/
-│   └── database_schema.sql # Schéma BDD
-├── logs/                   # Logs (générés auto)
-└── README.md
-```
-
-## Tables BDD (prefix pprod_)
-
-- `pprod_club` : Informations club
-- `pprod_terrains` : Terrains du club
-- `pprod_membres` : Membres du bureau
-- `pprod_competitions` : Toutes les compétitions
-- `pprod_equipes` : Équipes du club
-- `pprod_engagements` : Pivot équipes-compétitions
-- `pprod_matchs` : Calendrier + résultats
-- `pprod_sync_logs` : Logs synchronisation
-- `pprod_config` : Configuration système
-
-## Maintenance
-
-### Monitoring
-
-```bash
-# Surveiller logs temps réel
-tail -f logs/sync.log
-
-# Vérifier taille logs
-du -h logs/
-
-# Logs cron
-tail -f logs/cron.log
-```
-
-### Rotation Logs
-
-Les logs sont automatiquement rotationnés à 10 MB (5 fichiers conservés).
-
-### Troubleshooting
-
-**Synchronisation échoue**
-```bash
-# Vérifier connectivité API
-curl -I https://api-dofa.fff.fr/api/clubs/5403
-
-# Tester manuellement
-php cron/sync_data.php
-
-# Consulter logs erreurs
-grep -i error logs/sync.log
-```
-
-**CRON ne s'exécute pas**
-```bash
-# Vérifier cron actif
-service cron status
-
-# Vérifier logs système
-grep CRON /var/log/syslog
-
-# Tester chemin PHP
-which php
-```
-
-## Prochaines Étapes
-
-1. ✅ Phase 1 : Backend/BDD/Synchronisation (TERMINÉ)
-2. ⏳ Phase 2 : Page d'accueil
-3. ⏳ Phase 3 : Pages calendrier/résultats
-4. ⏳ Phase 4 : PWA + Design responsive
-5. ⏳ Phase 5 : Backoffice administration
-
-## Support
-
-- Logs détaillés : `logs/`
-- Configuration API : `config/config.php`
-- Documentation API FFF : https://api-dofa.fff.fr
+Gestion des matchs, équipes, classements et résultats en temps réel.
 
 ---
 
-**Version** : 1.0.0 - Phase 1 Backend  
-**Dernière mise à jour** : Octobre 2025
+## 📋 Vue d'ensemble
+
+| Aspect | Detail |
+|--------|--------|
+| **Frontend** | React 19 + Vite 7 |
+| **Backend** | PHP 8.2 + MySQL/PDO |
+| **Base de données** | OVH mutualisé |
+| **APIs** | 13 endpoints REST PHP |
+| **Dépôt** | GitHub (branch preprod) |
+| **Déploiement** | Automatique OVH |
+
+---
+
+## 🚀 Démarrage rapide
+
+### Installation
+
+```bash
+# 1. Cloner et installer
+git clone https://github.com/Gotsumaru/fcchiche.git
+cd fcchiche && npm install
+
+# 2. Créer configuration locale
+cp .env.local.example .env.local
+# Éditer .env.local avec infos OVH:
+#   DB_HOST=fcchice79.mysql.db
+#   DB_NAME=fcchice79
+#   DB_USER=fcchice79
+#   DB_PASS=votre_password_ovh
+```
+
+### Développement
+
+```bash
+# Mode UI rapide (données mock)
+npm run dev
+
+# Mode complet (vraies données OVH + Docker)
+npm run test:complete
+
+# Builder pour production
+npm run build
+
+# Tester le build
+npm run preview
+```
+
+---
+
+## 🏗️ Architecture
+
+### Frontend (React)
+```
+src/ → Vite build → public/dist/
+  ├── components/      React components
+  ├── pages/           Pages
+  ├── hooks/           Custom hooks
+  ├── api.js           Client API REST
+  └── mockData.js      Données mock (dev)
+```
+
+### Backend (PHP)
+```
+public/api/           13 endpoints REST
+  ├── matchs.php       🔴 Calendrier + résultats
+  ├── equipes.php      Équipes du club
+  ├── classements.php  Classements FFF
+  └── [10 autres]      Config, auth, etc.
+
+config/               Configuration
+  ├── config.php       Charge secrets via .env.local
+  ├── loadenv.php      Parse .env.local
+  └── database.php     PDO MySQL
+```
+
+### Base de données
+- **Host:** fcchice79.mysql.db (OVH)
+- **Driver:** PDO MySQL
+- **Tables:** pprod_matchs, pprod_equipes, pprod_classements, etc.
+- **Sync:** API FFF (quotidienne)
+
+---
+
+## 🔐 Sécurité
+
+### Secrets management
+
+**Jamais en git:**
+- `.env.local` (credentials BD)
+- Fichiers Dockerfile (dev local)
+
+**En git:**
+- `.env.example` (template public)
+- `.env.local.example` (template secrets)
+- `config/config.php.example` (template)
+- `config/loadenv.php` (code qui charge secrets)
+
+### Configuration
+
+1. **Localement:** Créer `.env.local`
+   ```bash
+   cp .env.local.example .env.local
+   # Remplir avec infos OVH
+   ```
+
+2. **Sur OVH:** Créer `.env.local` via FTP/panel
+   ```
+   ENV=production
+   DB_HOST=fcchice79.mysql.db
+   DB_NAME=fcchice79
+   DB_USER=fcchice79
+   DB_PASS=votre_password
+   ```
+
+⚠️ **Important:** Mot de passe BD doit être changé sur panel OVH (ancien était en git)
+
+---
+
+## 📦 Déploiement OVH
+
+### Configuration automatique (déjà faite)
+
+OVH déploie automatiquement quand vous pushez sur GitHub:
+
+```bash
+# Développer en local
+npm run dev
+
+# Tester
+npm run test:complete
+
+# Builder
+npm run build
+
+# Pousser sur GitHub
+git add src/ config/ *.md
+git commit -m "feat: Description"
+git push origin preprod
+```
+
+**OVH exécute automatiquement:**
+1. `git pull`
+2. `npm install`
+3. `npm run build`
+4. Publie sur https://fcchiche.fr
+
+### Configuration manuelle `.env.local` sur OVH
+
+```bash
+# Via FTP ou panel OVH, créer .env.local avec:
+ENV=production
+DB_HOST=fcchice79.mysql.db
+DB_NAME=fcchice79
+DB_USER=fcchice79
+DB_PASS=VOTRE_PASSWORD_OVH
+```
+
+### Vérifier le déploiement
+
+```bash
+# Tester les APIs
+curl https://fcchiche.fr/api/matchs.php
+# Doit retourner JSON avec matchs
+
+# Ouvrir dans navigateur
+https://fcchiche.fr
+# Doit afficher le site avec données réelles
+```
+
+---
+
+## 🛠️ Scripts npm
+
+```bash
+# Développement
+npm run dev              # Dev server (port 5174)
+npm run test:ui          # UI rapide (mock data)
+npm run test:complete    # Test complet (Docker + BD OVH)
+
+# Production
+npm run build            # Build React optimisé
+npm run preview          # Tester le build
+
+# Docker (local)
+npm run docker:build     # Construire image
+npm run docker:up        # Démarrer conteneur
+npm run docker:down      # Arrêter conteneur
+npm run docker:logs      # Voir logs PHP
+```
+
+---
+
+## 🐳 Développement local avec Docker
+
+Tester complètement en local avec BD OVH:
+
+```bash
+# 1. Créer .env.local
+cp .env.local.example .env.local
+# Éditer avec infos OVH
+
+# 2. Lancer test complet
+npm run test:complete
+# Lance Docker PHP + Vite React
+
+# 3. Ouvrir navigateur
+http://localhost:5174
+# Vérifier que matchs apparaissent
+```
+
+**Détails complets:** Voir `DOCKER_TESTING.md`
+
+---
+
+## 🐛 Troubleshooting
+
+### Erreur: "Cannot connect to database"
+
+```bash
+# Vérifier .env.local existe
+ls -la .env.local
+
+# Vérifier credentials
+cat .env.local | grep DB_
+
+# Tester localement
+npm run test:complete
+```
+
+Si erreur BD:
+- Vérifier mot de passe OVH (changé depuis ancien exposé en git?)
+- Vérifier IP whitelistée chez OVH
+- Tester connexion OVH: `nc -zv fcchice79.mysql.db 3306`
+
+### Erreur: "Build failed"
+
+```bash
+# Voir le détail
+npm run build
+
+# Si erreurs compilation React:
+# Vérifier src/*.jsx
+# Vérifier imports
+
+# Rebuilder
+npm run build
+```
+
+### Site blank sur OVH
+
+```bash
+# Vérifier que public/dist/ existe sur OVH
+# Vérifier .htaccess (rewrite rules)
+# Vérifier logs OVH (panel)
+```
+
+### APIs ne répondent pas
+
+```bash
+# Vérifier .env.local sur OVH
+# Vérifier permissions: chmod 644 config/*.php
+# Vérifier logs PHP: Panel OVH
+```
+
+---
+
+## 📂 Structure fichiers
+
+```
+fcchiche/
+├── README.md                 ← Vous êtes ici
+├── DOCKER_TESTING.md         ← Guide Docker local
+├── DEPLOYMENT_GUIDE.md       ← Guide OVH (si déploiement manuel)
+│
+├── src/                      React sources
+├── config/                   Configuration PHP
+├── public/api/               APIs REST PHP
+├── public/assets/            Images + CSS
+│
+├── package.json              Dépendances npm
+├── vite.config.js            Config Vite
+├── index.html                Template React
+│
+├── .env.example              Template vars publiques
+├── .env.local.example        Template secrets
+├── .gitignore                Fichiers ignorés git
+│
+├── Dockerfile                PHP-Apache (dev local)
+├── docker-compose.yml        Orchestration Docker
+└── docker/                   Config Docker
+```
+
+**NE PAS en git:**
+- `.env.local` (secrets)
+- `public/dist/` (build généré)
+- `node_modules/` (dépendances)
+
+---
+
+## 📊 Performance
+
+| Métrique | Taille |
+|----------|--------|
+| Build React | ~50 KB (gzipped) |
+| Images | 150 MB (WebP) |
+| APIs | <1 KB par requête |
+| DB queries | <100ms (OVH) |
+
+**Optimisations:**
+- ✅ Images WebP (compression)
+- ✅ JavaScript minifié + split chunks
+- ✅ CSS minifié
+- ✅ Gzip enabled (Apache)
+
+---
+
+## 🔄 Workflow développement
+
+```
+1. Développer
+   npm run dev  (ou npm run test:complete)
+
+2. Tester
+   npm run preview
+   F12 → Network → vérifier APIs
+
+3. Commiter
+   git add src/ config/ package.json *.md
+   git commit -m "feat: ..."
+   git push origin preprod
+
+4. OVH déploie automatiquement (2-5 min)
+
+5. Vérifier
+   curl https://fcchiche.fr/api/matchs.php
+   https://fcchiche.fr
+```
+
+---
+
+## 🎯 Points clés
+
+✅ **Secrets jamais en git** → Chargés via `.env.local`
+✅ **Build local uniquement** → `npm run build`
+✅ **OVH déploie auto** → Push sur GitHub = deployment
+✅ **Test local complet** → Docker + BD OVH
+✅ **13 APIs PHP actives** → JSON REST
+✅ **React 19 + Vite** → Dev rapide
+
+---
+
+## 📚 Documentation
+
+| Fichier | Contenu | Durée |
+|---------|---------|-------|
+| **README.md** | Vue d'ensemble (vous êtes ici) | 10 min |
+| **DOCKER_TESTING.md** | Tester en local avec Docker | 10 min |
+| **DEPLOYMENT_GUIDE.md** | Guide OVH (optionnel) | 5 min |
+
+---
+
+## 🆘 Besoin d'aide?
+
+- **Dev local:** Voir `DOCKER_TESTING.md`
+- **OVH déploiement:** Voir `DEPLOYMENT_GUIDE.md`
+- **Code:** Voir structure ci-dessus
+- **Erreurs:** Voir Troubleshooting
+
+---
+
+## 📈 Prochaines étapes
+
+```bash
+# 1. Installer
+npm install
+
+# 2. Créer .env.local
+cp .env.local.example .env.local
+
+# 3. Tester en local
+npm run test:complete
+
+# 4. Développer
+npm run dev
+
+# 5. Push → OVH déploie automatiquement
+git push origin preprod
+```
+
+---
+
+**Projet prêt pour production!** 🚀
+
+Créé: 2025-11-12 | Version: 1.0

@@ -12,6 +12,17 @@ class MatchsModel
     private const TABLE_COMPETITIONS = 'pprod_competitions';
     private const TABLE_TERRAINS = 'pprod_terrains';
     private const TABLE_CLUBS_CACHE = 'pprod_clubs_cache';
+    private const TABLE_EQUIPES = 'pprod_equipes';
+    private const TABLE_CLUB = 'pprod_club';
+
+    /**
+     * Cache local pour éviter des requêtes répétées
+     * [category][number] => code
+     * @var array<string, array<int, int|null>>
+     */
+    private array $teamCodeCache = [];
+
+    private ?int $clubInternalId = null;
 
     public function __construct(PDO $pdo)
     {
@@ -48,7 +59,79 @@ class MatchsModel
         assert(isset($match['home_name']), 'Home name must be defined');
         assert(isset($match['away_name']), 'Away name must be defined');
 
+        // Expose a human-readable category label for the FC Chiché team
+        // Requirement: for Seniors Masculins (SEM), display "Senior {code}" where code/number is the team number.
+        // We compute this at retrieval time (PHP), not in SQL nor DB.
+        $isHomeSide = (bool)$match['is_home'];
+        $sidePrefix = $isHomeSide ? 'home' : 'away';
+        $teamCategory = $match[$sidePrefix . '_team_category'] ?? null;
+        $teamNumber = $match[$sidePrefix . '_team_number'] ?? null;
+
+        if (is_string($teamCategory) && strtoupper(trim($teamCategory)) === 'SEM' && $teamNumber !== null) {
+            $num = (int)$teamNumber;
+            if ($num > 0) {
+                $code = $this->resolveTeamCodeForClubCategoryNumber($teamCategory, $num);
+                if ($code !== null && $code > 0) {
+                    // Front-end prefers category_label first when present
+                    $match['category_label'] = 'Senior ' . $code;
+                }
+            }
+        }
+
         return $match;
+    }
+
+    /**
+     * Récupère le code d'équipe (pprod_equipes.code) pour la catégorie + number fournis
+     * du FC Chiché (club id constant). Mis en cache par requête.
+     */
+    private function resolveTeamCodeForClubCategoryNumber(string $category, int $number): ?int
+    {
+        $categoryKey = strtoupper(trim($category));
+        if (!isset($this->teamCodeCache[$categoryKey])) {
+            $this->teamCodeCache[$categoryKey] = [];
+        }
+        if (array_key_exists($number, $this->teamCodeCache[$categoryKey])) {
+            $cached = $this->teamCodeCache[$categoryKey][$number];
+            return $cached === null ? null : (int)$cached;
+        }
+
+        $clubInternalId = $this->getClubInternalId();
+        if ($clubInternalId === null) {
+            $this->teamCodeCache[$categoryKey][$number] = null;
+            return null;
+        }
+
+        $sql = 'SELECT code FROM ' . self::TABLE_EQUIPES . ' 
+                WHERE club_id = :club_id AND category_code = :category AND number = :number
+                ORDER BY season DESC LIMIT 1';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'club_id' => $clubInternalId,
+            'category' => $categoryKey,
+            'number' => $number,
+        ]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $code = $row !== false && isset($row['code']) ? (int)$row['code'] : null;
+        $this->teamCodeCache[$categoryKey][$number] = $code;
+        return $code;
+    }
+
+    private function getClubInternalId(): ?int
+    {
+        if ($this->clubInternalId !== null) {
+            return $this->clubInternalId;
+        }
+
+        $stmt = $this->pdo->prepare('SELECT id FROM ' . self::TABLE_CLUB . ' WHERE cl_no = :cl_no LIMIT 1');
+        $stmt->execute(['cl_no' => (int)API_FFF_CLUB_ID]);
+        $id = $stmt->fetchColumn();
+        if ($id === false) {
+            $this->clubInternalId = null;
+        } else {
+            $this->clubInternalId = (int)$id;
+        }
+        return $this->clubInternalId;
     }
 
     /**
@@ -87,6 +170,8 @@ class MatchsModel
      */
     public function getAllMatchs(?bool $isResult = null, ?int $limit = null): array
     {
+        $clubId = (int)API_FFF_CLUB_ID;
+
         $sql = "SELECT 
                     m.*,
                     c.name as competition_name,
@@ -95,22 +180,35 @@ class MatchsModel
                     t.name as terrain_name,
                     t.address as terrain_address,
                     t.city as terrain_city,
-                    cc.name as opponent_name,
-                    cc.short_name as opponent_short_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.name as home_club_name,
+                    cc_home.short_name as home_club_short_name,
+                    cc_home.logo_url as home_logo,
+                    cc_away.name as away_club_name,
+                    cc_away.short_name as away_club_short_name,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no";
-        
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no";
+
+        $conditions = [];
+
         if ($isResult !== null) {
-            $sql .= " WHERE m.is_result = :is_result";
+            $conditions[] = 'm.is_result = :is_result';
         }
-        
+
+        if ($isResult === false) {
+            $conditions[] = 'm.date >= CURDATE()';
+        }
+
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
         $sql .= " ORDER BY m.date " . ($isResult === true ? 'DESC' : 'ASC');
         
         if ($limit !== null && $limit > 0) {
@@ -119,7 +217,6 @@ class MatchsModel
         }
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':club_id', API_FFF_CLUB_ID, PDO::PARAM_INT);
 
         if ($isResult !== null) {
             $stmt->bindValue(':is_result', $isResult ? 1 : 0, PDO::PARAM_INT);
@@ -176,6 +273,8 @@ class MatchsModel
         assert($id > 0, 'Match ID must be positive');
         assert(is_int($id), 'Match ID must be integer');
 
+        $clubId = (int)API_FFF_CLUB_ID;
+
         $sql = "SELECT
                     m.*,
                     c.name as competition_name,
@@ -186,24 +285,26 @@ class MatchsModel
                     t.city as terrain_city,
                     t.latitude as terrain_latitude,
                     t.longitude as terrain_longitude,
-                    cc.name as opponent_name,
-                    cc.short_name as opponent_short_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.name as home_club_name,
+                    cc_home.short_name as home_club_short_name,
+                    cc_home.logo_url as home_logo,
+                    cc_away.name as away_club_name,
+                    cc_away.short_name as away_club_short_name,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.id = :id
                 LIMIT 1";
         
         $stmt = $this->pdo->prepare($sql);
         $executed = $stmt->execute([
-            'id' => $id,
-            'club_id' => API_FFF_CLUB_ID
+            'id' => $id
         ]);
         assert($executed === true, 'Match fetch must succeed');
 
@@ -228,27 +329,27 @@ class MatchsModel
     {
         assert($maNo > 0, 'Match ma_no must be positive');
         
+        $clubId = (int)API_FFF_CLUB_ID;
+        
         $sql = "SELECT 
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.ma_no = :ma_no
                 LIMIT 1";
         
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            'ma_no' => $maNo,
-            'club_id' => API_FFF_CLUB_ID
+            'ma_no' => $maNo
         ]);
         
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -272,20 +373,22 @@ class MatchsModel
     {
         assert($competitionId > 0, 'Competition ID must be positive');
         
+        $clubId = (int)API_FFF_CLUB_ID;
+        
         $sql = "SELECT 
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.competition_id = :competition_id";
         
         if ($isResult !== null) {
@@ -301,8 +404,7 @@ class MatchsModel
         
         $stmt = $this->pdo->prepare($sql);
         $params = [
-            'competition_id' => $competitionId,
-            'club_id' => API_FFF_CLUB_ID
+            'competition_id' => $competitionId
         ];
         
         if ($isResult !== null) {
@@ -335,21 +437,23 @@ class MatchsModel
     {
         assert(!empty($category), 'Category cannot be empty');
         
+        $clubId = (int)API_FFF_CLUB_ID;
+        
         $sql = "SELECT 
                     m.*,
                     c.name as competition_name,
                     c.type as competition_type,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE (
                     (m.home_club_id = :club_id AND m.home_team_category = :category)
                     OR (m.away_club_id = :club_id AND m.away_team_category = :category)
@@ -397,12 +501,16 @@ class MatchsModel
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    cc_away.name as opponent_name,
+                    cc_away.short_name as opponent_short_name,
+                    cc_away.logo_url as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON m.away_club_id = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.home_club_id = :club_id";
         
         if ($isResult !== null) {
@@ -446,12 +554,16 @@ class MatchsModel
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    cc_home.name as opponent_name,
+                    cc_home.short_name as opponent_short_name,
+                    cc_home.logo_url as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON m.home_club_id = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.away_club_id = :club_id";
         
         if ($isResult !== null) {
@@ -521,21 +633,23 @@ class MatchsModel
         assert(isset($team['category_code']), 'Equipe must provide category_code');
         assert(isset($team['number']), 'Equipe must provide number');
 
+        $clubId = (int)API_FFF_CLUB_ID;
+
         $sql = "SELECT
                     m.*,
                     c.name as competition_name,
                     c.type as competition_type,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON
-                    (CASE
-                        WHEN m.home_club_id != :club_id_case THEN m.home_club_id
-                        ELSE m.away_club_id
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE (
                     (m.home_club_id = :club_id_home AND m.home_team_category = :home_category AND m.home_team_number = :home_team_number)
                     OR (m.away_club_id = :club_id_away AND m.away_team_category = :away_category AND m.away_team_number = :away_team_number)
@@ -559,7 +673,6 @@ class MatchsModel
         $stmt = $this->pdo->prepare($sql);
 
         $params = [
-            'club_id_case' => API_FFF_CLUB_ID,
             'club_id_home' => API_FFF_CLUB_ID,
             'club_id_away' => API_FFF_CLUB_ID,
             'home_category' => $team['category_code'],
@@ -603,20 +716,22 @@ class MatchsModel
         assert($journeeNumber > 0, 'Journee number must be positive');
         assert($competitionId > 0, 'Competition ID must be positive');
         
+        $clubId = (int)API_FFF_CLUB_ID;
+        
         $sql = "SELECT 
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.poule_journee_number = :journee_number 
                 AND m.competition_id = :competition_id
                 ORDER BY m.date ASC";
@@ -624,8 +739,7 @@ class MatchsModel
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             'journee_number' => $journeeNumber,
-            'competition_id' => $competitionId,
-            'club_id' => API_FFF_CLUB_ID
+            'competition_id' => $competitionId
         ]);
         
         $matchs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -647,20 +761,22 @@ class MatchsModel
         assert(!empty($dateStart), 'Start date cannot be empty');
         assert(!empty($dateEnd), 'End date cannot be empty');
         
+        $clubId = (int)API_FFF_CLUB_ID;
+        
         $sql = "SELECT 
                     m.*,
                     c.name as competition_name,
                     t.name as terrain_name,
-                    cc.name as opponent_name,
-                    cc.logo_url as opponent_logo
+                    cc_home.logo_url as home_logo,
+                    cc_away.logo_url as away_logo,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.name ELSE cc_home.name END as opponent_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.short_name ELSE cc_home.short_name END as opponent_short_name,
+                    CASE WHEN m.home_club_id = {$clubId} THEN cc_away.logo_url ELSE cc_home.logo_url END as opponent_logo
                 FROM " . self::TABLE . " m
                 LEFT JOIN " . self::TABLE_COMPETITIONS . " c ON m.competition_id = c.id
                 LEFT JOIN " . self::TABLE_TERRAINS . " t ON m.terrain_id = t.id
-                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc ON 
-                    (CASE 
-                        WHEN m.home_club_id != :club_id THEN m.home_club_id 
-                        ELSE m.away_club_id 
-                    END) = cc.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_home ON m.home_club_id = cc_home.cl_no
+                LEFT JOIN " . self::TABLE_CLUBS_CACHE . " cc_away ON m.away_club_id = cc_away.cl_no
                 WHERE m.date BETWEEN :date_start AND :date_end";
         
         if ($isResult !== null) {
@@ -677,8 +793,7 @@ class MatchsModel
         $stmt = $this->pdo->prepare($sql);
         $params = [
             'date_start' => $dateStart,
-            'date_end' => $dateEnd,
-            'club_id' => API_FFF_CLUB_ID
+            'date_end' => $dateEnd
         ];
         
         if ($isResult !== null) {

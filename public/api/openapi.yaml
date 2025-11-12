@@ -889,6 +889,14 @@ components:
           type: string
         away_team_name:
           type: string
+        home_logo:
+          type: string
+          format: uri
+          nullable: true
+        away_logo:
+          type: string
+          format: uri
+          nullable: true
         home_score:
           type: integer
           nullable: true

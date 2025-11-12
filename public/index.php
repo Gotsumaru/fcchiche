@@ -12,11 +12,23 @@ require_once __DIR__ . '/templates/header.php';
 ?>
       <section class="hero" aria-labelledby="hero-title">
         <div class="container hero__container">
-          <header class="hero__intro">
-            <span class="hero__eyebrow">Football Club Chiché</span>
-            <h1 class="hero__title" id="hero-title">Vibrez vert et blanc, chaque week-end</h1>
+          <header class="hero__intro" data-reveal="hero" data-reveal-delay="0">
+            <h1 class="hero__title" id="hero-title">F.C. Chiché</h1>
+            <span class="hero__tagline" role="text">
+              <img
+                class="hero__tagline-logo"
+                src="<?= $assetsBase ?>/images/logo.svg"
+                width="40"
+                height="40"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="hero__tagline-text">Pour l'amour du maillot vert</span>
+            </span>
           </header>
-          <figure class="hero__visual">
+          <figure class="hero__visual" data-reveal="hero" data-reveal-delay="0.15">
             <div class="hero__media">
               <picture>
                 <source
@@ -50,21 +62,13 @@ require_once __DIR__ . '/templates/header.php';
               </picture>
             </div>
           </figure>
-          <div class="hero__content">
-            <div class="hero__support" role="note">
-              <span class="hero__support-icon" aria-hidden="true">⚡️</span>
-              <div class="hero__support-copy">
-                <span class="hero__support-title">Billetterie express</span>
-                <a class="hero__support-link" href="<?= $basePath ?>/matchs">Réservez vos places en 2&nbsp;min</a>
-              </div>
-            </div>
+          <div class="hero__content" data-reveal="hero" data-reveal-delay="0.3">
             <p class="hero__subtitle">
-              Suivez nos équipes, préparez vos déplacements et vivez le club en temps réel avec des infos fiables et mises à
-              jour.
+              Ne manquez rien de la vie du club : résultats, matchs, événements et moments forts !
             </p>
             <div class="hero__actions" role="group" aria-label="Actions principales">
               <a class="btn btn--primary" href="<?= $basePath ?>/matchs">Voir le calendrier</a>
-              <a class="btn btn--outline" href="<?= $basePath ?>/resultats">Derniers résultats</a>
+              <a class="btn btn--primary" href="<?= $basePath ?>/resultats">Derniers résultats</a>
             </div>
           </div>
         </div>
@@ -72,166 +76,156 @@ require_once __DIR__ . '/templates/header.php';
 
       <section class="section section--story" aria-labelledby="story-title">
         <div class="container">
-          <div class="story__intro">
+          <div class="story__intro" data-reveal data-reveal-delay="0">
             <span class="section__eyebrow">Le club</span>
             <h2 class="section__title" id="story-title">Un écrin pour les verts et blancs</h2>
             <p class="section__subtitle">
-              Des vestiaires rénovés aux animations du club-house, nous mettons l'expérience de nos licenciés et supporters au
-              centre. Découvrez l'envers du décor d'un club familial qui cultive la performance.
+              Des vestiaires à la buvette, tout est pensé pour offrir le meilleur à <span style="font-weight: bold; color: #000000;">nos licenciés et nos supporters</span>. Entrez dans les coulisses <span style="font-weight: bold; color: #000000;">d’un club familial</span> où passion et performance vont de pair.
             </p>
           </div>
-          <div class="story__layout">
-            <div class="story__content">
-              <div class="story-points" role="list">
-                <article class="story-block" role="listitem">
-                  <span class="story-block__icon" aria-hidden="true">🏟</span>
-                  <div>
-                    <h3 class="story-block__title">Vestiaires premium</h3>
-                    <p class="story-block__text">
-                      Espaces remis à neuf avec zone de récupération, éclairage LED et sonorisation d'avant-match.
-                    </p>
+          <div class="story__layout" data-reveal data-reveal-delay="0.1">
+            <div class="club-showcase" role="list">
+              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.12">
+                <figure class="club-showcase__media">
+                  <div class="club-showcase__media-frame">
+                    <picture>
+                      <source
+                        srcset="
+                          <?= $assetsBase ?>/images/fcchiche_tableau.jpg 480w,
+                          <?= $assetsBase ?>/images/fcchiche_tableau.jpg 800w,
+                          <?= $assetsBase ?>/images/fcchiche_tableau.jpg 1200w
+                        "
+                        type="image/jpeg"
+                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
+                      />
+                      <source
+                        srcset="<?= $assetsBase ?>/images/fcchiche_tableau.jpg 1200w"
+                        type="image/png"
+                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
+                      />
+                      <img
+                        src="<?= $assetsBase ?>/images/fcchiche_tableau.jpg"
+                        width="1300"
+                        height="866"
+                        alt="Les nouveaux vestiaires du FC Chiché préparés avant un match"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
                   </div>
-                </article>
-                <article class="story-block" role="listitem">
-                  <span class="story-block__icon" aria-hidden="true">🎓</span>
-                  <div>
-                    <h3 class="story-block__title">École de foot labellisée</h3>
-                    <p class="story-block__text">
-                      Séances adaptées à chaque catégorie, éducateurs certifiés et suivi des progrès sur toute la saison.
-                    </p>
+                </figure>
+                <div class="club-showcase__content">
+                  <h3 class="club-showcase__title">Tableau Classements</h3>
+                  <p class="club-showcase__text">
+                    Nouveau tableau de classement sponsorisé par la <strong>Carrière de Luche</strong>, merci à eux !
+                  </p>
+                  <p class="club-showcase__text">
+                    Il nous permet d'afficher <strong>les rencontres et les classements</strong> pour nos trois équipes séniors.
+                  </p>
+                </div>
+              </article>
+              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.24">
+                <figure class="club-showcase__media">
+                  <div class="club-showcase__media-frame">
+                    <picture>
+                      <source
+                        srcset="<?= $assetsBase ?>/images/bal_du_foot.png 1200w"
+                        type="image/PNG"
+                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
+                      />
+                      <source
+                        srcset="<?= $assetsBase ?>/images/bal_du_foot.png 1200w"
+                        type="image/PNG"
+                        sizes="(min-width: 64rem) 480px, (min-width: 48rem) 60vw, 90vw"
+                      />
+                      <img
+                        src="<?= $assetsBase ?>/images/bal_du_foot.png"
+                        width="1600"
+                        height="1067"
+                        alt="Séance d'entraînement des jeunes joueurs du FC Chiché"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
                   </div>
-                </article>
-                <article class="story-block" role="listitem">
-                  <span class="story-block__icon" aria-hidden="true">🍻</span>
-                  <div>
-                    <h3 class="story-block__title">Club-house vivant</h3>
-                    <p class="story-block__text">
-                      Espace restauration, retransmissions et terrasse panoramique pour vivre les matches autrement.
-                    </p>
+                </figure>
+                <div class="club-showcase__content">
+                  <h3 class="club-showcase__title">Bal du Foot</h3>
+                  <p class="club-showcase__text">
+                    Le Football Club de Chiche organise un dinner dansant, avec traiteur, serveurs, un orchestre et de la bonne ambiance.
+                  </p>
+                  <p class="club-showcase__text">
+                    Il a lieu tous les ans le 10 Novembre pour accueil <strong>300+ personnes</strong>.
+                  </p>
+                </div>
+              </article>
+              <article class="club-showcase__item" role="listitem" data-reveal data-reveal-delay="0.36">
+                <figure class="club-showcase__media">
+                  <div class="club-showcase__media-frame">
+                    <picture>
+                      <source srcset="<?= $assetsBase ?>/images/Ecole_de_foot.jpg" type="image/webp" />
+                      <source srcset="<?= $assetsBase ?>/images/Ecole_de_foot.jpg" type="image/jpeg" />
+                      <img
+                        src="<?= $assetsBase ?>/images/Ecole_de_foot.jpg"
+                        width="1792"
+                        height="1024"
+                        alt="Bénévoles du FC Chiché en service derrière la buvette"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
                   </div>
-                </article>
-              </div>
-              <div class="story-stats" role="list">
-                <div class="story-stat" role="listitem">
-                  <span class="story-stat__value">220+</span>
-                  <span class="story-stat__label">licenciés accompagnés chaque saison</span>
+                </figure>
+                <div class="club-showcase__content">
+                  <h3 class="club-showcase__title">Ecole de Foot</h3>
+                  <p class="club-showcase__text">
+                    Recrutement d'un alternant pour la gestion de nos effectifs jeunes.
+                  </p>
+                  <p class="club-showcase__text">
+                    Avec <strong>50+ licenciés jeunes</strong> et une équipe évoluant dans chaque catégorie allant de <strong>U6 à U17</strong>.
+                  </p>
                 </div>
-                <div class="story-stat" role="listitem">
-                  <span class="story-stat__value">32</span>
-                  <span class="story-stat__label">séances hebdomadaires encadrées</span>
-                </div>
-                <div class="story-stat" role="listitem">
-                  <span class="story-stat__value">18 bénévoles</span>
-                  <span class="story-stat__label">mobilisés sur les jours de match</span>
-                </div>
-              </div>
-            </div>
-            <div class="story__media">
-              <figure class="story__visual story__visual--primary">
-                <div class="story__visual-media">
-                  <picture>
-                    <source
-                      srcset="
-                        <?= $assetsBase ?>/images/premiere-480.webp 480w,
-                        <?= $assetsBase ?>/images/premiere-800.webp 800w,
-                        <?= $assetsBase ?>/images/premiere-1200.webp 1200w
-                    "
-                    type="image/webp"
-                    sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 90vw"
-                  />
-                  <source
-                    srcset="<?= $assetsBase ?>/images/premiere.jpg 1200w"
-                    type="image/jpeg"
-                    sizes="(min-width: 72rem) 420px, (min-width: 48rem) 60vw, 90vw"
-                  />
-                  <img
-                    src="<?= $assetsBase ?>/images/premiere.jpg"
-                    width="1300"
-                    height="866"
-                    alt="Ambiance nocturne au Pas des Biches"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </picture>
-                </div>
-                <figcaption class="story__visual-caption">Ambiance nocturne au Pas des Biches</figcaption>
-              </figure>
-              <figure class="story__visual story__visual--secondary">
-                <div class="story__visual-media">
-                  <picture>
-                    <source srcset="<?= $assetsBase ?>/images/buvette.webp" type="image/webp" />
-                    <source srcset="<?= $assetsBase ?>/images/buvette.jpg" type="image/jpeg" />
-                    <img
-                      src="<?= $assetsBase ?>/images/buvette.jpg"
-                      width="1792"
-                      height="1024"
-                      alt="Préparation du club-house avant le match"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </picture>
-                </div>
-                <figcaption class="story__visual-caption">450 repas servis au club-house cette saison</figcaption>
-              </figure>
-              <figure class="story__visual story__visual--tertiary">
-                <div class="story__visual-media">
-                  <picture>
-                    <source
-                      srcset="
-                        <?= $assetsBase ?>/images/Reserve-480.webp 480w,
-                        <?= $assetsBase ?>/images/Reserve-800.webp 800w,
-                        <?= $assetsBase ?>/images/Reserve-1200.webp 1200w
-                      "
-                      type="image/webp"
-                      sizes="(min-width: 72rem) 320px, (min-width: 48rem) 40vw, 80vw"
-                    />
-                    <source
-                      srcset="<?= $assetsBase ?>/images/Reserve.jpg 1200w"
-                      type="image/jpeg"
-                      sizes="(min-width: 72rem) 320px, (min-width: 48rem) 40vw, 80vw"
-                    />
-                    <img
-                      src="<?= $assetsBase ?>/images/Reserve.jpg"
-                      width="1200"
-                      height="800"
-                      alt="Échauffement collectif de l'équipe réserve"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </picture>
-                </div>
-                <figcaption class="story__visual-caption">Échauffement collectif de l'équipe réserve</figcaption>
-              </figure>
+              </article>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="events-title">
-        <div class="container">
-          <div class="section__header">
-            <span class="section__eyebrow">Évènements</span>
-            <h2 class="section__title" id="events-title">Les prochains rendez-vous</h2>
-            <p class="section__subtitle">Matches, plateaux jeunes et animations organisés par le club.</p>
+      <section class="section section--alt section--events" aria-labelledby="events-title">
+        <div class="container_events">
+          <div class="section__header" data-reveal data-reveal-delay="0">
+            <h2 class="section__title section__title-events" id="events-title">Les prochains matchs.</h2>
+            <a class="section__action" href="<?= $basePath ?>/matchs">Voir le calendrier</a>
           </div>
-          <div class="home-scroll" data-component="home-events">
-            <button class="home-scroll__control" type="button" data-action="scroll-prev" aria-label="Voir les évènements précédents"></button>
-            <div class="home-scroll__track" data-component="home-events-list" aria-live="polite"></div>
-            <button class="home-scroll__control" type="button" data-action="scroll-next" aria-label="Voir les évènements suivants"></button>
+          <div class="home-scroll home-scroll--events" data-component="home-events" data-reveal data-reveal-delay="0.12">
+            <div class="home-scroll__track home-scroll__track-events" data-component="home-events-list" aria-live="polite"></div>
+            <div class="home-scroll__controls">
+              <button
+                type="button"
+                class="home-scroll__control"
+                data-action="scroll-prev"
+                aria-label="Voir les matchs précédents"
+              ></button>
+              <button
+                type="button"
+                class="home-scroll__control"
+                data-action="scroll-next"
+                aria-label="Voir les prochains matchs"
+              ></button>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="section section--alt" aria-labelledby="results-title">
+      <section class="section" aria-labelledby="results-title">
         <div class="container">
-          <div class="section__header">
-            <span class="section__eyebrow">Performances</span>
+          <div class="section__header" data-reveal data-reveal-delay="0">
             <h2 class="section__title" id="results-title">Derniers résultats du club</h2>
             <p class="section__subtitle" data-component="home-results-header">
               Chargement des dernières rencontres…
             </p>
           </div>
-          <div class="result-showcase" data-component="home-results">
+          <div class="result-showcase" data-component="home-results" data-reveal data-reveal-delay="0.12">
             <div class="result-showcase__gallery">
               <picture>
                 <source
@@ -250,6 +244,7 @@ require_once __DIR__ . '/templates/header.php';
               </picture>
             </div>
             <div class="result-showcase__stream">
+              <p class="result-showcase__hint">Résumés récents</p>
               <div class="home-scroll home-scroll--compact">
                 <div class="home-scroll__track home-scroll__track--compact" data-component="home-results-list" aria-live="polite"></div>
               </div>
@@ -260,14 +255,14 @@ require_once __DIR__ . '/templates/header.php';
 
       <section class="section" aria-labelledby="location-title">
         <div class="container">
-          <div class="section__header">
+          <div class="section__header" data-reveal data-reveal-delay="0">
             <span class="section__eyebrow">Notre stade</span>
             <h2 class="section__title" id="location-title">Retrouvez-nous à Chiché</h2>
             <p class="section__subtitle">
               Venez encourager les verts et blancs au complexe sportif. Buvette, tribunes couvertes et grand parking sont à votre disposition.
             </p>
           </div>
-          <div class="location">
+          <div class="location" data-reveal data-reveal-delay="0.12">
             <div class="location__map">
               <iframe
                 title="Localisation du FC Chiché"
@@ -296,12 +291,12 @@ require_once __DIR__ . '/templates/header.php';
 
       <section class="section section--alt" aria-labelledby="partners-title">
         <div class="container">
-          <div class="section__header">
+          <div class="section__header" data-reveal data-reveal-delay="0">
             <span class="section__eyebrow">Soutiens</span>
             <h2 class="section__title" id="partners-title">Nos partenaires</h2>
             <p class="section__subtitle">Un grand merci aux entreprises locales qui accompagnent le FC Chiché.</p>
           </div>
-          <div class="partner-carousel" data-component="partner-carousel">
+          <div class="partner-carousel" data-component="partner-carousel" data-reveal data-reveal-delay="0.12">
             <button
               type="button"
               class="partner-carousel__control partner-carousel__control--prev"

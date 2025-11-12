@@ -1,45 +1,22 @@
-# .htaccess PUBLIC - Routage SPA et sécurité
-# Placer dans public/
-
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
-    
-    # Forcer HTTPS (production)
-    # RewriteCond %{HTTPS} off
-    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-    
-    # API - Laisser passer
-    RewriteCond %{REQUEST_URI} ^/api/
-    RewriteRule ^ - [L]
-    
-    # Fichiers existants - Laisser passer
-    RewriteCond %{REQUEST_FILENAME} -f
-    RewriteRule ^ - [L]
-    
-    # Dossiers existants - Laisser passer
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
-    
-    # Tout le reste vers index.php (SPA routing)
-    RewriteRule ^ index.php [L]
-</IfModule>
 
-# Sécurité
-<IfModule mod_headers.c>
-    # CORS (ajuster en production)
-    Header set Access-Control-Allow-Origin "*"
-    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
-    
-    # Sécurité headers
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-XSS-Protection "1; mode=block"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-    
-    # CSP (ajuster selon besoins)
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self';"
+    # Ne pas reécrire les fichiers et dossiers existants
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Ne pas réécrire les requêtes API (.php files)
+    RewriteCond %{REQUEST_URI} !^/api/ [NC]
+    RewriteCond %{REQUEST_FILENAME} !\.php$ [NC]
+
+    # Ne pas réécrire les fichiers statiques du build React
+    RewriteCond %{REQUEST_URI} !^/dist/ [NC]
+    RewriteCond %{REQUEST_URI} !^/assets/ [NC]
+    RewriteCond %{REQUEST_URI} !^/equipes/ [NC]
+
+    # Rediriger tout vers index.html du React pour que React Router fonctionne
+    RewriteRule ^(.*)$ dist/index.html [QSA,L]
 </IfModule>
 
 # Compression GZIP
@@ -47,43 +24,13 @@
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
 </IfModule>
 
-# Cache navigateur
-<IfModule mod_expires.c>
-    ExpiresActive On
-    
-    # Images
-    ExpiresByType image/jpeg "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/svg+xml "access plus 1 year"
-    ExpiresByType image/webp "access plus 1 year"
-    
-    # CSS et JS
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    
-    # Fonts
-    ExpiresByType font/woff2 "access plus 1 year"
-    ExpiresByType font/woff "access plus 1 year"
-    
-    # Manifest et Service Worker (pas de cache)
-    ExpiresByType application/manifest+json "access plus 0 seconds"
-    <Files "service-worker.js">
-        ExpiresDefault "access plus 0 seconds"
-    </Files>
-</IfModule>
+# Cache
+<IfModule mod_headers.c>
+    <FilesMatch "\.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2)$">
+        Header set Cache-Control "max-age=31536000, public"
+    </FilesMatch>
 
-# Bloquer accès fichiers sensibles
-<FilesMatch "^\.">
-    Require all denied
-</FilesMatch>
-
-<FilesMatch "\.(sql|log|md)$">
-    Require all denied
-</FilesMatch>
-
-# PHP settings
-<IfModule mod_php.c>
-    php_flag display_errors Off
-    php_flag log_errors On
-    php_value error_log ../logs/php_errors.log
+    <FilesMatch "\.html$">
+        Header set Cache-Control "max-age=3600, must-revalidate"
+    </FilesMatch>
 </IfModule>

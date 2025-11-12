@@ -1,0 +1,71 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * Configuration principale FC Chiche
+ *
+ * IMPORTANT: Ce fichier est un TEMPLATE EXEMPLE
+ * Les secrets (DB_PASS, etc) doivent être configurés dans un fichier .env.local
+ * qui n'est JAMAIS versionné en git.
+ *
+ * Voir: config/loadenv.php pour charger les secrets de .env.local
+ */
+
+// Reporting erreurs strict
+error_reporting(E_ALL);
+ini_set('display_errors', ENV === 'development' ? '1' : '0');
+
+// Timezone
+date_default_timezone_set('Europe/Paris');
+
+// ===========================
+// Configuration BDD
+// ===========================
+// NOTE: Les credentials sont chargés depuis .env.local pour la sécurité
+// Voir: config/loadenv.php
+
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME', getenv('DB_NAME') ?: 'fcchiche');
+define('DB_USER', getenv('DB_USER') ?: 'fcchiche_user');
+define('DB_PASS', getenv('DB_PASS') ?: '');  // DOIT être défini dans .env.local
+define('DB_CHARSET', 'utf8mb4');
+define('DB_PREFIX', 'pprod_');
+
+// ===========================
+// Configuration API FFF
+// ===========================
+define('API_FFF_BASE_URL', 'https://api-dofa.fff.fr/api');
+define('API_FFF_CLUB_ID', 5403);
+define('API_FFF_TIMEOUT', 30);
+
+// ===========================
+// Chemins
+// ===========================
+define('ROOT_PATH', dirname(__DIR__));
+define('CONFIG_PATH', ROOT_PATH . '/config');
+define('SRC_PATH', ROOT_PATH . '/src');
+define('LOG_PATH', ROOT_PATH . '/logs');
+define('PUBLIC_PATH', ROOT_PATH . '/public');
+
+// ===========================
+// Environnement
+// ===========================
+define('ENV', getenv('ENV') ?: 'production');
+define('DEBUG_MODE', ENV === 'development');
+
+// Saison actuelle
+define('CURRENT_SEASON', 2025);
+
+// ===========================
+// Configuration synchronisation
+// ===========================
+define('SYNC_ENABLED', true);
+define('SYNC_TIMEOUT', 300); // 5 minutes max
+define('CACHE_DURATION', 3600); // 1 heure
+
+// ===========================
+// Logs
+// ===========================
+define('LOG_SYNC', true);
+define('LOG_ERRORS', true);
+define('LOG_MAX_SIZE', 10485760); // 10 MB

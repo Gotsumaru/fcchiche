@@ -209,7 +209,7 @@ $count = $models['equipes']->countEquipes();
 ### Méthodes principales
 
 ```php
-// CALENDRIER (matchs à venir)
+// CALENDRIER (matchs à venir — dates >= aujourd'hui)
 $prochains = $models['matchs']->getUpcomingMatchs(10);
 $calendrier = $models['matchs']->getAllMatchs(false, 20);
 
@@ -256,7 +256,7 @@ $nbResultats = $models['matchs']->countMatchs(true);
 Toutes les méthodes retournent des matchs enrichis avec:
 - Infos compétition (`competition_name`, `competition_type`, `competition_level`)
 - Infos terrain (`terrain_name`, `terrain_address`, `terrain_city`)
-- **Logo club adverse** (`opponent_logo`, `opponent_name`, `opponent_short_name`)
+- **Logos des clubs** (`home_logo`, `away_logo`, `opponent_logo`, `opponent_name`, `opponent_short_name`)
 
 ```php
 [
@@ -271,6 +271,8 @@ Toutes les méthodes retournent des matchs enrichis avec:
     'competition_name' => 'Championnat District',
     'competition_type' => 'CH',
     'terrain_name' => 'Stade Municipal',
+    'home_logo' => 'https://.../fc-chiche.svg',
+    'away_logo' => 'https://.../as-exemple.svg',
     'opponent_name' => 'AS EXEMPLE',
     'opponent_logo' => 'https://...' // 🆕 Logo automatique
 ]

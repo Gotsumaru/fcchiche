@@ -1,0 +1,42 @@
+{
+  "name": "fcchiche",
+  "version": "1.0.0",
+  "description": "- **Backend** : PHP 8.1 (vanilla) - **Base de données** : MySQL/MariaDB avec PDO - **API** : FFF API (api-dofa.fff.fr) - **Hébergement** : OVH (infrastructure mutualisée) - **Déploiement** : Dépôt Git OVH avec auto-déploiement continu (push = publication)",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:restart": "docker-compose restart",
+    "docker:logs": "docker-compose logs -f php-apache",
+    "test:full": "dotenv -e .env.development vite",
+    "test:ui": "vite",
+    "test:complete": "npm run docker:up && npm run test:full"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gotsumaru/fcchiche.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Gotsumaru/fcchiche/issues"
+  },
+  "homepage": "https://github.com/Gotsumaru/fcchiche#readme",
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.1.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.5",
+    "terser": "^5.44.1",
+    "vite": "^7.2.2"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.4.2"
+  }
+}

@@ -1,0 +1,83 @@
+# ======================
+# Dependencies
+# ======================
+node_modules/
+package-lock.json
+
+# ======================
+# Build outputs
+# ======================
+dist/
+build/
+public/dist/
+
+# Note: public/dist/ EST IGNORÉ
+# Raison: C'est un build généré, inutile en dev après npm install
+# Stratégie: Garder en git = sources + guides uniquement
+#           OVH reçoit via un script (seulement fichiers nécessaires)
+# Flux:
+#   1. Développement: npm run dev (sources fraîches)
+#   2. Avant livraison: npm run build (génère public/dist/)
+#   3. Git: Commiter sources + guides seulement
+#   4. OVH: Script copie dist/ + api/ + assets/ + config/
+
+# ======================
+# Environment & Secrets (CRITICAL)
+# ======================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+config/config.php
+config/config.local.php
+config/database.local.php
+
+# ======================
+# Docker (development only)
+# ======================
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+docker/
+DOCKER_TESTING.md
+
+# ======================
+# IDE & Editor
+# ======================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ======================
+# Logs & Temporary
+# ======================
+*.log
+logs/
+tmp/
+temp/
+cache/
+nul
+
+# ======================
+# OS Files
+# ======================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ======================
+# Testing & Debug
+# ======================
+debug.log
+test-results/
+coverage/
+
+# ======================
+# Claude Code
+# ======================
+.claude/settings.local.json
