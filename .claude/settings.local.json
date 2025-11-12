@@ -1,19 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)",
-      "Bash(cat:*)",
-      "Bash(npm run build:*)",
-      "Bash(git init:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(dir \"C:\\Développement\\fcchiche\\public\\api\")",
-      "Bash(curl:*)",
-      "Bash(dir \"C:\\Développement\\fcchiche\")",
-      "Bash(dir \"C:\\Développement\\fcchiche\\config\")",
-      "Bash(dir:*)",
-      "Bash(npm init -y)",
-      "Bash(ls -lah \"C:\\Développement\\fcchiche\\public\\dist\\assets\"\" 2>/dev/null | tail -10 || echo \"Build successful - files ready \")"
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
