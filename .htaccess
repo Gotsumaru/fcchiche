@@ -5,28 +5,27 @@
     RewriteEngine On
     RewriteBase /
 
-    # Ne pas réécrire les fichiers et dossiers qui existent
+    # Ne pas réécrire les fichiers et dossiers existants
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Redirige /api/ vers /public/api/
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-
-    # ========================================
-    # Redirige les requêtes API vers /public/api/
-    # ========================================
     RewriteRule ^api/(.*)$ public/api/$1 [QSA,L]
 
-    # ========================================
-    # Redirige les assets vers /public/
-    # ========================================
+    # Redirige /dist/ vers /public/dist/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^dist/(.*)$ public/dist/$1 [QSA,L]
+
+    # Redirige /assets/ vers /public/assets/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^assets/(.*)$ public/assets/$1 [QSA,L]
 
-    # ========================================
-    # Redirige tout le reste vers /public/index.html (React)
-    # ========================================
-    # Sauf les requêtes déjà gérées
-    RewriteCond %{REQUEST_URI} !^/api/
-    RewriteCond %{REQUEST_URI} !^/dist/
-    RewriteCond %{REQUEST_URI} !^/assets/
+    # Redirige tout le reste vers /public/index.html
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ public/index.html [QSA,L]
