@@ -62,7 +62,7 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-.container
+.container,
 .container_event {
   overflow: hidden;
 }

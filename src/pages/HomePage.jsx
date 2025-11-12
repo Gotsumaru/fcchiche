@@ -1,10 +1,33 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import apiClient from '../api'
+import MatchCard from '../components/MatchCard'
+import ResultCard from '../components/ResultCard'
+import { useHorizontalScroll } from '../hooks/useHorizontalScroll'
+
+// Helper function to format date
+function formatDate(dateString) {
+  if (!dateString) return 'TBA'
+  try {
+    const date = new Date(dateString)
+    const day = date.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit' })
+    const time = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    return `${day} ${time}`
+  } catch (e) {
+    return dateString
+  }
+}
 
 export default function HomePage() {
   const [upcomingMatches, setUpcomingMatches] = useState([])
   const [latestResults, setLatestResults] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const eventsScrollerRef = useRef(null)
+  const resultsScrollerRef = useRef(null)
+
+  // Initialize horizontal scroll for events and results
+  useHorizontalScroll(eventsScrollerRef)
+  useHorizontalScroll(resultsScrollerRef)
 
   useEffect(() => {
     loadData()
@@ -12,12 +35,15 @@ export default function HomePage() {
 
   async function loadData() {
     try {
+      setError(null)
       const upcoming = await apiClient.getUpcomingMatches(6)
-      const results = await apiClient.getLatestResults(6)
       setUpcomingMatches(upcoming)
+
+      const results = await apiClient.getLatestResults(6)
       setLatestResults(results)
     } catch (error) {
       console.error('Failed to load data:', error)
+      setError('Impossible de charger les données. Vérifiez que le serveur PHP est actif.')
     } finally {
       setLoading(false)
     }
@@ -215,18 +241,31 @@ export default function HomePage() {
             <h2 className="section__title section__title-events" id="events-title">Les prochains matchs.</h2>
             <a className="section__action" href="/matchs">Voir le calendrier</a>
           </div>
-          <div className="home-scroll home-scroll--events" data-component="home-events" data-reveal data-reveal-delay="0.12">
+          <div
+            ref={eventsScrollerRef}
+            className="home-scroll home-scroll--events"
+            data-component="home-events"
+            data-reveal
+            data-reveal-delay="0.12"
+          >
+            {error && (
+              <div style={{ padding: '20px', color: '#d32f2f', textAlign: 'center' }}>
+                {error}
+              </div>
+            )}
+            {loading && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                Chargement des matchs...
+              </div>
+            )}
+            {!loading && upcomingMatches.length === 0 && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                Aucun match à venir
+              </div>
+            )}
             <div className="home-scroll__track home-scroll__track-events" data-component="home-events-list" aria-live="polite">
               {!loading && upcomingMatches.map((match) => (
-                <div key={match.id} className="event-item">
-                  <div className="event-item__date">{match.date}</div>
-                  <div className="event-item__teams">
-                    <div className="event-team">{match.home}</div>
-                    <span className="event-vs">vs</span>
-                    <div className="event-team">{match.away}</div>
-                  </div>
-                  {match.competition && <div className="event-item__comp">{match.competition}</div>}
-                </div>
+                <MatchCard key={match.id} match={match} />
               ))}
             </div>
             <div className="home-scroll__controls">
@@ -253,7 +292,7 @@ export default function HomePage() {
           <div className="section__header" data-reveal data-reveal-delay="0">
             <h2 className="section__title" id="results-title">Derniers résultats du club</h2>
             <p className="section__subtitle" data-component="home-results-header">
-              Chargement des dernières rencontres…
+              {loading ? 'Chargement des dernières rencontres…' : (latestResults.length > 0 ? `${latestResults.length} match(s) récent(s)` : 'Aucun résultat')}
             </p>
           </div>
           <div className="result-showcase" data-component="home-results" data-reveal data-reveal-delay="0.12">
@@ -276,17 +315,28 @@ export default function HomePage() {
             </div>
             <div className="result-showcase__stream">
               <p className="result-showcase__hint">Résumés récents</p>
-              <div className="home-scroll home-scroll--compact">
+              <div
+                ref={resultsScrollerRef}
+                className="home-scroll home-scroll--compact"
+              >
                 <div className="home-scroll__track home-scroll__track--compact" data-component="home-results-list" aria-live="polite">
                   {!loading && latestResults.map((result) => (
-                    <div key={result.id} className="result-item">
-                      <div className="result-item__date">{result.date}</div>
-                      <div className="result-item__score">{result.score}</div>
-                      <div className="result-item__teams">
-                        <span>{result.home}</span> <span className="vs">vs</span> <span>{result.away}</span>
-                      </div>
-                    </div>
+                    <ResultCard key={result.id} result={result} />
                   ))}
+                </div>
+                <div className="home-scroll__controls">
+                  <button
+                    type="button"
+                    className="home-scroll__control"
+                    data-action="scroll-prev"
+                    aria-label="Voir les résultats précédents"
+                  ></button>
+                  <button
+                    type="button"
+                    className="home-scroll__control"
+                    data-action="scroll-next"
+                    aria-label="Voir les résultats suivants"
+                  ></button>
                 </div>
               </div>
             </div>

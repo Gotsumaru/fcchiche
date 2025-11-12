@@ -1,11 +1,20 @@
 /**
  * API Client - Communicates with PHP backend
+ *
+ * In development: Uses mock data for testing UI
+ * In production: Uses PHP API on same domain (/api)
  */
 
 import { mockMatches } from './mockData'
 
+// Configuration API
 const API_BASE = '/api'
-const USE_MOCK_DATA = import.meta.env.DEV // Use mock data in development
+
+// Décider d'utiliser les mock data:
+// - En production: toujours utiliser l'API réelle
+// - En dev: utiliser la variable VITE_USE_MOCK_DATA (default: true pour UI testing rapide)
+// - Si VITE_USE_REAL_API=true: forcer l'API réelle même en dev
+const USE_MOCK_DATA = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_DATA !== 'false'
 
 class ApiClient {
   async request(endpoint, options = {}) {
@@ -32,8 +41,18 @@ class ApiClient {
         setTimeout(() => resolve(mockMatches.upcoming.slice(0, limit)), 300)
       })
     }
-    const result = await this.request('/matchs.php?is_result=false&limit=' + limit)
-    return result.data || []
+    const result = await this.request('/matchs.php?upcoming=' + limit)
+    const data = result.data || []
+    // Map PHP field names to React component expectations
+    return data.map(match => ({
+      id: match.id,
+      date: match.date_time,
+      home: match.home_name,
+      away: match.away_name,
+      competition: match.competition_name,
+      location: match.terrain_name,
+      ...match // Include all original fields for flexibility
+    }))
   }
 
   async getLatestResults(limit = 6) {
@@ -42,8 +61,21 @@ class ApiClient {
         setTimeout(() => resolve(mockMatches.results.slice(0, limit)), 300)
       })
     }
-    const result = await this.request('/matchs.php?is_result=true&limit=' + limit)
-    return result.data || []
+    const result = await this.request('/matchs.php?last_results=' + limit)
+    const data = result.data || []
+    // Map PHP field names to React component expectations
+    return data.map(match => ({
+      id: match.id,
+      date: match.date_time,
+      home: match.home_name,
+      away: match.away_name,
+      score: match.home_score !== null && match.away_score !== null
+        ? `${match.home_score}-${match.away_score}`
+        : 'N/A',
+      competition: match.competition_name,
+      location: match.terrain_name,
+      ...match // Include all original fields for flexibility
+    }))
   }
 
   async getMatches(params = {}) {

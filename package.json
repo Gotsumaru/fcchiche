@@ -6,7 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:restart": "docker-compose restart",
+    "docker:logs": "docker-compose logs -f php-apache",
+    "test:full": "dotenv -e .env.development vite",
+    "test:ui": "vite",
+    "test:complete": "npm run docker:up && npm run test:full"
   },
   "repository": {
     "type": "git",
@@ -27,5 +35,8 @@
     "react-router-dom": "^7.9.5",
     "terser": "^5.44.1",
     "vite": "^7.2.2"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.4.2"
   }
 }

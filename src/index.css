@@ -89,8 +89,8 @@ li {
 }
 
 [data-reveal] {
-  opacity: 0;
-  transform: translate3d(0, 1.5rem, 0);
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
   transition: opacity 0.65s ease-out, transform 0.65s ease-out;
   transition-delay: var(--reveal-delay, 0s);
   will-change: opacity, transform;
