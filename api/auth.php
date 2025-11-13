@@ -14,7 +14,7 @@ declare(strict_types=1);
  * GET /api/auth?action=csrf - Obtenir token CSRF
  */
 
-$basePath = dirname(__DIR__, 2);
+$basePath = dirname(__DIR__);
 require_once $basePath . '/config/bootstrap.php';
 require_once $basePath . '/src/Utils/ApiResponse.php';
 require_once $basePath . '/src/Utils/ApiAuth.php';

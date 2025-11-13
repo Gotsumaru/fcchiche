@@ -21,7 +21,7 @@ declare(strict_types=1);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$basePath = dirname(__DIR__, 2);
+$basePath = dirname(__DIR__);
 require_once $basePath . '/config/bootstrap.php';
 require_once $basePath . '/src/Models/ModelsLoader.php';
 require_once $basePath . '/src/Utils/ApiResponse.php';

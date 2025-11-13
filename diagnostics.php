@@ -22,8 +22,10 @@ $files = [
     'config/loadenv.php' => $baseDir . '/config/loadenv.php',
     'config/config.php' => $baseDir . '/config/config.php',
     'config/database.php' => $baseDir . '/config/database.php',
-    'public/api/config.php' => $baseDir . '/public/api/config.php',
-    'public/dist/index.html' => $baseDir . '/public/dist/index.html',
+    'config/bootstrap.php' => $baseDir . '/config/bootstrap.php',
+    'api/config.php' => $baseDir . '/api/config.php',
+    'index.html' => $baseDir . '/index.html',
+    'src/Models/ModelsLoader.php' => $baseDir . '/src/Models/ModelsLoader.php',
     '.env.local' => $baseDir . '/.env.local',
 ];
 

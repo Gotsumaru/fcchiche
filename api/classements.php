@@ -15,7 +15,7 @@ declare(strict_types=1);
  * - /api/classements?competition_id=123&journees_count=true - Nombre de journées
  */
 
-$basePath = dirname(__DIR__, 2);
+$basePath = dirname(__DIR__);
 require_once $basePath . '/config/bootstrap.php';
 require_once $basePath . '/src/Models/ModelsLoader.php';
 require_once $basePath . '/src/Utils/ApiResponse.php';
