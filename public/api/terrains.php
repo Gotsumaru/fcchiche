@@ -11,7 +11,7 @@ declare(strict_types=1);
  * - /api/terrains?gps=true - Terrains avec coordonnées GPS
  */
 
-$basePath = dirname(__DIR__, 2);
+$basePath = dirname(__DIR__);
 require_once $basePath . '/config/bootstrap.php';
 require_once $basePath . '/src/Models/ModelsLoader.php';
 require_once $basePath . '/src/Utils/ApiResponse.php';
