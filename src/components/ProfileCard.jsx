@@ -17,6 +17,7 @@ const adjust = (v, fMin, fMax, tMin, tMax) => round(tMin + ((tMax - tMin) * (v -
 
 const ProfileCardComponent = ({
   avatarUrl = '<Placeholder for avatar URL>',
+  avatarContent,
   iconUrl = '<Placeholder for icon URL>',
   grainUrl = '<Placeholder for grain URL>',
   innerGradient,
@@ -28,6 +29,7 @@ const ProfileCardComponent = ({
   enableMobileTilt = false,
   mobileTiltSensitivity = 5,
   miniAvatarUrl,
+  miniAvatarContent,
   name = 'Javi A. Torres',
   title = 'Software Engineer',
   handle = 'javicodes',
@@ -313,30 +315,38 @@ const ProfileCardComponent = ({
             <div className="pc-shine" />
             <div className="pc-glare" />
             <div className="pc-content pc-avatar-content">
-              <img
-                className="avatar"
-                src={avatarUrl}
-                alt={`${name || 'User'} avatar`}
-                loading="lazy"
-                onError={e => {
-                  const t = e.target;
-                  t.style.display = 'none';
-                }}
-              />
+              {avatarContent ? (
+                avatarContent
+              ) : (
+                <img
+                  className="avatar"
+                  src={avatarUrl}
+                  alt={`${name || 'User'} avatar`}
+                  loading="lazy"
+                  onError={e => {
+                    const t = e.target;
+                    t.style.display = 'none';
+                  }}
+                />
+              )}
               {showUserInfo && (
                 <div className="pc-user-info">
                   <div className="pc-user-details">
                     <div className="pc-mini-avatar">
-                      <img
-                        src={miniAvatarUrl || avatarUrl}
-                        alt={`${name || 'User'} mini avatar`}
-                        loading="lazy"
-                        onError={e => {
-                          const t = e.target;
-                          t.style.opacity = '0.5';
-                          t.src = avatarUrl;
-                        }}
-                      />
+                      {miniAvatarContent ? (
+                        miniAvatarContent
+                      ) : (
+                        <img
+                          src={miniAvatarUrl || avatarUrl}
+                          alt={`${name || 'User'} mini avatar`}
+                          loading="lazy"
+                          onError={e => {
+                            const t = e.target;
+                            t.style.opacity = '0.5';
+                            t.src = avatarUrl;
+                          }}
+                        />
+                      )}
                     </div>
                     <div className="pc-user-text">
                       <div className="pc-handle">@{handle}</div>

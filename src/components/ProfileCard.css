@@ -303,6 +303,10 @@
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .pc-mini-avatar img {
@@ -310,6 +314,13 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+
+.pc-points-badge {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .pc-user-text {
@@ -322,14 +333,16 @@
 .pc-handle {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.95);
   line-height: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .pc-status {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .pc-contact-btn {
@@ -379,11 +392,8 @@
   margin: 0;
   font-size: min(5svh, 3em);
   margin: 0;
-  background-image: linear-gradient(to bottom, #fff, #6f6fbe);
-  background-size: 1em 1.5em;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
 }
 
 .pc-details p {
@@ -392,13 +402,8 @@
   top: -12px;
   white-space: nowrap;
   font-size: 16px;
-  margin: 0 auto;
-  width: min-content;
-  background-image: linear-gradient(to bottom, #fff, #4a4ac0);
-  background-size: 1em 1.5em;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes glow-bg {

@@ -4,6 +4,7 @@
  */
 
 import ProfileCard from './ProfileCard'
+import './ResultCard.css'
 
 export default function ResultCard({ result }) {
   if (!result) return null
@@ -100,6 +101,10 @@ export default function ResultCard({ result }) {
 
   const matchResult = getMatchResult()
 
+  // Logo FC Chiché ou de l'adversaire (défini avant usage)
+  const homeLogo = homeIsChiche ? resolveLogo(result.home_name) : result.home_logo
+  const awayLogo = awayIsChiche ? resolveLogo(result.away_name) : result.away_logo
+
   // Formater la date
   const formatDate = (dateString) => {
     if (!dateString) return 'TBA'
@@ -114,10 +119,33 @@ export default function ResultCard({ result }) {
     }
   }
 
-  // Créer une image composite avec les deux logos
-  const createMatchAvatarUrl = () => {
-    // Utiliser l'image spécifique pour les résultats
-    return '/assets/images/resultat_match.png'
+  // Créer le contenu de l'avatar avec les logos des équipes
+  const createMatchAvatar = () => {
+    return (
+      <div className="result-avatar">
+        <img
+          src="/assets/images/resultat_match.png"
+          alt="Match result background"
+          className="result-avatar__bg"
+        />
+        <div className="result-avatar__logos">
+          {homeLogo && (
+            <img
+              src={homeLogo}
+              alt={result.home_name}
+              className="result-avatar__logo result-avatar__logo--home"
+            />
+          )}
+          {awayLogo && (
+            <img
+              src={awayLogo}
+              alt={result.away_name}
+              className="result-avatar__logo result-avatar__logo--away"
+            />
+          )}
+        </div>
+      </div>
+    )
   }
 
   // Couleurs selon résultat
@@ -141,19 +169,23 @@ export default function ResultCard({ result }) {
 
   const colors = resultColors[matchResult]
 
-  // Logo FC Chiché ou de l'adversaire
-  const homeLogo = homeIsChiche ? resolveLogo(result.home_name) : result.home_logo
-  const awayLogo = awayIsChiche ? resolveLogo(result.away_name) : result.away_logo
-
   const score = `${result.home_score ?? '-'} - ${result.away_score ?? '-'}`
   const teamNames = `${result.home_name || 'Dom.'} vs ${result.away_name || 'Ext.'}`
 
   const resultText = matchResult === 'win' ? '✓ Victoire' : matchResult === 'loss' ? '✗ Défaite' : '= Match nul'
 
+  // Calculer les points
+  const points = matchResult === 'win' ? '+3' : matchResult === 'draw' ? '+1' : '+0'
+
+  // Créer le composant des points
+  const pointsBadge = (
+    <div className="pc-points-badge">{points}</div>
+  )
+
   return (
     <ProfileCard
-      avatarUrl={createMatchAvatarUrl()}
-      miniAvatarUrl={homeLogo || awayLogo}
+      avatarContent={createMatchAvatar()}
+      miniAvatarContent={pointsBadge}
       name={score}
       title={teamNames}
       handle={formatCategory(result.competition_name || result.competition)}
