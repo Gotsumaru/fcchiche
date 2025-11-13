@@ -5,26 +5,23 @@ export default defineConfig({
   plugins: [react()],
   root: './',
   base: '/',
-  publicDir: 'public',
+  publicDir: 'static',  // Assets statiques uniquement (manifest, SW, images)
   server: {
     port: 5174,
     middlewareMode: false,
     proxy: {
       '/api': {
-        // Déterminer le target selon l'environnement
-        // - Si DOCKER_DEV=true : localhost:8080 (serveur PHP local Docker)
-        // - Sinon : https://fcchiche.fr (OVH production)
         target: process.env.DOCKER_DEV === 'true'
           ? 'http://localhost:8080'
           : 'https://fcchiche.fr',
         changeOrigin: true,
-        rewrite: (path) => path, // Garde le chemin /api intact
-        secure: false, // Pour éviter les erreurs SSL en dev
+        rewrite: (path) => path,
+        secure: false,
       }
     }
   },
   build: {
-    outDir: 'public/dist',
+    outDir: 'dist',      // Build React à la racine
     emptyOutDir: true,
     minify: 'terser',
     target: 'es2020',
