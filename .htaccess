@@ -1,6 +1,3 @@
-# .htaccess RACINE - Redirige vers /public/
-# Compatible avec DocumentRoot=/preprod et déploiement Git OVH
-
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
@@ -10,65 +7,24 @@
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # Redirige /api/ vers /public/api/
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^api/(.*)$ public/api/$1 [QSA,L]
+    # Ne pas réécrire les requêtes API
+    RewriteCond %{REQUEST_URI} ^/api/ [NC]
+    RewriteRule ^ - [L]
 
-    # Redirige /dist/ vers /public/dist/
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^dist/(.*)$ public/dist/$1 [QSA,L]
-
-    # Redirige /assets/ vers /public/assets/
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^assets/(.*)$ public/assets/$1 [QSA,L]
-
-    # Redirige tout le reste vers /public/index.html
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ public/index.html [QSA,L]
+    # Rediriger tout le reste vers index.html (React Router)
+    RewriteRule ^(.*)$ index.html [QSA,L]
 </IfModule>
 
-# ========================================
-# SÉCURITÉ - Bloquer accès aux dossiers sensibles
-# ========================================
-<DirectoryMatch "^(config|src|logs|sql|cron|tools)">
+# Bloquer accès aux dossiers sensibles
+<DirectoryMatch "^(config|cron|logs|sql)">
     Require all denied
 </DirectoryMatch>
 
+# Bloquer fichiers cachés et sensibles
 <FilesMatch "^\.">
     Require all denied
 </FilesMatch>
 
-<FilesMatch "\.(env|example|git)">
+<FilesMatch "\.(env|example|git|md)$">
     Require all denied
 </FilesMatch>
-
-# ========================================
-# PERFORMANCE - Compression GZIP
-# ========================================
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
-</IfModule>
-
-# ========================================
-# PERFORMANCE - Cache navigateur
-# ========================================
-<IfModule mod_headers.c>
-    # Cache long pour assets statiques
-    <FilesMatch "\.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2)$">
-        Header set Cache-Control "max-age=31536000, public"
-    </FilesMatch>
-
-    # Cache court pour HTML
-    <FilesMatch "\.html$">
-        Header set Cache-Control "max-age=3600, must-revalidate"
-    </FilesMatch>
-
-    # Pas de cache pour APIs
-    <FilesMatch "\.php$">
-        Header set Cache-Control "no-cache, no-store, must-revalidate"
-    </FilesMatch>
-</IfModule>

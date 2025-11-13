@@ -1,83 +1,33 @@
-# Configuration Apache pour API FC Chiche
+<IfModule mod_rewrite.c>
+    RewriteEngine On
 
-# Activer le moteur de réécriture
-RewriteEngine On
+    # Gérer les requêtes OPTIONS (preflight CORS)
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+</IfModule>
 
-# Forcer HTTPS en production
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-# Autoriser CORS pour fcchiche.fr (géré aussi en PHP)
+# CORS
 <IfModule mod_headers.c>
-    # En développement : autoriser localhost
     SetEnvIf Origin "https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$" ORIGIN_ALLOWED=$0
     SetEnvIf Origin "https?://(.*\.)?fcchiche\.fr$" ORIGIN_ALLOWED=$0
-    
+
     Header set Access-Control-Allow-Origin "%{ORIGIN_ALLOWED}e" env=ORIGIN_ALLOWED
     Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
     Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-CSRF-Token"
-    Header set Access-Control-Max-Age "3600"
     Header set Access-Control-Allow-Credentials "true"
 </IfModule>
 
-# Gérer les requêtes OPTIONS (preflight CORS)
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^(.*)$ $1 [R=200,L]
-
-# Désactiver l'affichage du listing de répertoires
+# Pas de listing
 Options -Indexes
 
-# Fichiers par défaut
-DirectoryIndex index.php
-
-# Protection contre les injections
-<IfModule mod_rewrite.c>
-    # Bloquer requêtes malveillantes
-    RewriteCond %{QUERY_STRING} (<|%3C).*script.*(>|%3E) [NC,OR]
-    RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
-    RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
-    RewriteRule .* - [F,L]
-</IfModule>
-
-# Cacher fichiers sensibles
+# Bloquer fichiers cachés
 <FilesMatch "^\.">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </FilesMatch>
 
-# Compression GZIP
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE application/json
-    AddOutputFilterByType DEFLATE text/plain
-</IfModule>
-
-# Cache control pour API (pas de cache par défaut)
+# Pas de cache pour API
 <IfModule mod_headers.c>
-    # API dynamique : pas de cache
-    <FilesMatch "\.(php)$">
+    <FilesMatch "\.php$">
         Header set Cache-Control "no-cache, no-store, must-revalidate"
-        Header set Pragma "no-cache"
-        Header set Expires "0"
     </FilesMatch>
-</IfModule>
-
-# Limiter taille des requêtes POST/PUT (10MB max)
-<IfModule mod_php.c>
-    php_value upload_max_filesize 10M
-    php_value post_max_size 10M
-</IfModule>
-
-# Timeout personnalisé pour API
-<IfModule mod_php.c>
-    php_value max_execution_time 60
-    php_value max_input_time 60
-</IfModule>
-
-# Protection contre hotlinking
-<IfModule mod_rewrite.c>
-    RewriteCond %{HTTP_REFERER} !^$
-    RewriteCond %{HTTP_REFERER} !^https?://(.*\.)?fcchiche\.fr [NC]
-    RewriteCond %{HTTP_REFERER} !^https?://localhost [NC]
-    RewriteCond %{REQUEST_URI} !^/api/ [NC]
-    RewriteRule \.(json)$ - [F,L]
 </IfModule>
