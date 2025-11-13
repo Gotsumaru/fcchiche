@@ -1,7 +1,9 @@
 /**
  * Result Card Component
- * Displays a match result with color-coded background (green=win, red=loss, gray=draw)
+ * Displays a match result with color-coded ProfileCard (green=win, red=loss, gray=draw)
  */
+
+import ProfileCard from './ProfileCard'
 
 export default function ResultCard({ result }) {
   if (!result) return null
@@ -60,77 +62,66 @@ export default function ResultCard({ result }) {
       const date = new Date(dateString)
       return date.toLocaleDateString('fr-FR', {
         day: '2-digit',
-        month: 'short',
-        year: 'numeric'
+        month: 'short'
       })
     } catch (e) {
       return dateString
     }
   }
 
+  // Créer une image composite avec les deux logos
+  const createMatchAvatarUrl = () => {
+    // Pour l'instant, on utilisera une placeholder
+    // TODO: créer une image composite dynamique avec les 2 logos
+    return '/assets/images/rencontre.png'
+  }
+
+  // Couleurs selon résultat
+  const resultColors = {
+    win: {
+      gradient: 'linear-gradient(145deg, #00b40044 0%, #00d40022 100%)',
+      glow: 'rgba(0, 180, 0, 0.67)',
+      glowSize: '60%'
+    },
+    loss: {
+      gradient: 'linear-gradient(145deg, #dc262644 0%, #ef444422 100%)',
+      glow: 'rgba(220, 38, 38, 0.67)',
+      glowSize: '60%'
+    },
+    draw: {
+      gradient: 'linear-gradient(145deg, #78787844 0%, #98989822 100%)',
+      glow: 'rgba(120, 120, 120, 0.67)',
+      glowSize: '60%'
+    }
+  }
+
+  const colors = resultColors[matchResult]
+
+  // Logo FC Chiché ou de l'adversaire
+  const homeLogo = homeIsChiche ? resolveLogo(result.home_name) : result.home_logo
+  const awayLogo = awayIsChiche ? resolveLogo(result.away_name) : result.away_logo
+
+  const score = `${result.home_score ?? '-'} - ${result.away_score ?? '-'}`
+  const teamNames = `${result.home_name || 'Dom.'} vs ${result.away_name || 'Ext.'}`
+
+  const resultText = matchResult === 'win' ? '✓ Victoire' : matchResult === 'loss' ? '✗ Défaite' : '= Match nul'
+
   return (
-    <article
-      className={`result-card result-card--${matchResult}`}
-      data-result-id={result.id}
-    >
-      {/* Header */}
-      <div className="result-card__header">
-        <span className="result-card__competition">{result.competition_name || result.competition}</span>
-        <span className="result-card__date">{formatDate(result.date_time || result.date)}</span>
-      </div>
-
-      {/* Match display */}
-      <div className="result-card__match">
-        {/* Home team */}
-        <div className="result-card__team">
-          {(homeIsChiche || result.home_logo) && (
-            <img
-              className="result-card__logo"
-              src={homeIsChiche ? resolveLogo(result.home_name) : result.home_logo}
-              alt={result.home_name || result.home}
-              loading="lazy"
-              onError={(e) => {
-                e.target.style.display = 'none'
-              }}
-            />
-          )}
-          <span className="result-card__team-name">{result.home_name || result.home}</span>
-        </div>
-
-        {/* Score */}
-        <div className="result-card__score">
-          <span className="result-card__score-value">
-            {result.home_score !== null && result.home_score !== undefined ? result.home_score : '-'}
-          </span>
-          <span className="result-card__score-separator">-</span>
-          <span className="result-card__score-value">
-            {result.away_score !== null && result.away_score !== undefined ? result.away_score : '-'}
-          </span>
-        </div>
-
-        {/* Away team */}
-        <div className="result-card__team">
-          <span className="result-card__team-name">{result.away_name || result.away}</span>
-          {(awayIsChiche || result.away_logo) && (
-            <img
-              className="result-card__logo"
-              src={awayIsChiche ? resolveLogo(result.away_name) : result.away_logo}
-              alt={result.away_name || result.away}
-              loading="lazy"
-              onError={(e) => {
-                e.target.style.display = 'none'
-              }}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Result badge */}
-      <div className="result-card__badge">
-        {matchResult === 'win' && '✓ Victoire'}
-        {matchResult === 'loss' && '✗ Défaite'}
-        {matchResult === 'draw' && '= Match nul'}
-      </div>
-    </article>
+    <ProfileCard
+      avatarUrl={createMatchAvatarUrl()}
+      miniAvatarUrl={homeLogo || awayLogo}
+      name={score}
+      title={teamNames}
+      handle={result.competition_name || result.competition}
+      status={formatDate(result.date_time || result.date)}
+      contactText={resultText}
+      showUserInfo={true}
+      enableTilt={true}
+      enableMobileTilt={false}
+      innerGradient={colors.gradient}
+      behindGlowColor={colors.glow}
+      behindGlowSize={colors.glowSize}
+      className="result-match-card"
+    />
   )
 }

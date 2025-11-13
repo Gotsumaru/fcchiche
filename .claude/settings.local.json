@@ -11,7 +11,8 @@
       "Bash(for file in public/api/*.php)",
       "Bash(do sed -i 's/dirname(__DIR__, 2)/dirname(__DIR__)/g' \"$file\")",
       "Bash(done)",
-      "WebFetch(domain:reactbits.dev)"
+      "WebFetch(domain:reactbits.dev)",
+      "Bash(npx shadcn@latest add:*)"
     ],
     "deny": [],
     "ask": []
