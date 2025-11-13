@@ -1,0 +1,74 @@
+name: Deploy Preprod
+
+on:
+  push:
+    branches:
+      - preprod  # Se déclenche sur tout push vers preprod
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Checkout du code source
+      - name: Checkout preprod branch
+        uses: actions/checkout@v4
+        with:
+          ref: preprod
+          fetch-depth: 0  # Historique complet pour pusher vers autre branche
+      
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
+      
+      # 4. Build l'application
+      - name: Build application
+        run: npm run build
+      
+      # 5. Vérifier que le build existe
+      - name: Verify build output
+        run: |
+          if [ ! -d "public/dist" ]; then
+            echo "❌ Build folder not found"
+            exit 1
+          fi
+          echo "✅ Build successful"
+          ls -la public/dist/
+      
+      # 6. Déployer vers la branche preprod-deploy
+      - name: Deploy to preprod-deploy branch
+        run: |
+          # Configuration Git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          # Créer/switch vers branche preprod-deploy
+          git checkout --orphan preprod-deploy || git checkout preprod-deploy
+          
+          # Nettoyer la branche (garder que .git)
+          git rm -rf . 2>/dev/null || true
+          
+          # Copier UNIQUEMENT le contenu de public/dist/ à la racine
+          cp -r public/dist/* .
+          
+          # Ajouter tous les fichiers du build
+          git add -A
+          
+          # Commit
+          COMMIT_MSG="Deploy build from preprod @ $(date '+%Y-%m-%d %H:%M:%S')"
+          git commit -m "$COMMIT_MSG" || echo "No changes to commit"
+          
+          # Push vers preprod-deploy (force pour écraser l'historique)
+          git push origin preprod-deploy --force
+      
+      - name: Deployment complete
+        run: |
+          echo "✅ Deployment successful"
+          echo "🌐 OVH will update preprod.fcchiche.fr in ~2-5 minutes"

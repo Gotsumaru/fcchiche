@@ -9,7 +9,6 @@ package-lock.json
 # ======================
 dist/
 build/
-public/dist/
 
 # Note: public/dist/ EST IGNORÉ
 # Raison: C'est un build généré, inutile en dev après npm install
