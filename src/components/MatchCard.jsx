@@ -53,29 +53,18 @@ export default function MatchCard({ match }) {
   // Formater la catégorie
   const formatCategory = (category) => {
     if (!category) return ''
+    const categoryUpper = category.toUpperCase()
 
-    // Normaliser la chaîne
-    const normalized = category.toUpperCase().trim()
-
-    // Le PHP backend crée "Senior 1/2/3" basé sur le CODE de l'équipe (pprod_equipes.code)
-    // On transforme UNIQUEMENT les catégories seniors, pas les jeunes (U17, U15, etc.)
-
-    // Pattern: "SENIOR 1" ou "SENIORS 1" → Première (uniquement pour seniors)
-    if (/^SENIORS?\s+1\b/.test(normalized)) {
+    if (categoryUpper.includes('SENIOR 3') || categoryUpper.includes('SENIORS 3')) {
+      return 'Réserve B'
+    }
+    if (categoryUpper.includes('SENIOR 2') || categoryUpper.includes('SENIORS 2')) {
+      return 'Réserve A'
+    }
+    if (categoryUpper.includes('SENIOR 1') || categoryUpper.includes('SENIORS 1')) {
       return 'Première'
     }
 
-    // Pattern: "SENIOR 2" ou "SENIORS 2" → Réserve A (uniquement pour seniors)
-    if (/^SENIORS?\s+2\b/.test(normalized)) {
-      return 'Réserve A'
-    }
-
-    // Pattern: "SENIOR 3" ou "SENIORS 3" → Réserve B (uniquement pour seniors)
-    if (/^SENIORS?\s+3\b/.test(normalized)) {
-      return 'Réserve B'
-    }
-
-    // Pour les autres catégories (U17, U15, etc.), afficher tel quel
     return category
   }
 
