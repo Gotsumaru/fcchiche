@@ -52,6 +52,11 @@ jobs:
           shopt -s dotglob
           cp -r dist/* /tmp/deploy/
 
+          echo "📦 Copie des assets statiques (images, etc.)..."
+          # Copier les assets statiques (images, css, docs)
+          mkdir -p /tmp/deploy/assets
+          cp -r public/assets/* /tmp/deploy/assets/
+
           echo "📦 Copie des fichiers PHP backend..."
 
           # Copier les endpoints API PHP
@@ -75,7 +80,21 @@ jobs:
 
           # Copier la configuration (sans les fichiers sensibles .example)
           mkdir -p /tmp/deploy/config
-          cp config/*.php /tmp/deploy/config/ 2>/dev/null || true
+          # Ne copier QUE les fichiers non-sensibles (bootstrap, database structure, etc.)
+          for file in config/*.php; do
+            filename=$(basename "$file")
+            # Ignorer les fichiers .example et config.php (sensible)
+            if [[ ! "$filename" =~ \.example$ ]] && [[ "$filename" != "config.php" ]]; then
+              cp "$file" /tmp/deploy/config/ 2>/dev/null || true
+            fi
+          done
+
+          # Copier config.php.example comme référence
+          if [ -f "config/config.php.example" ]; then
+            cp config/config.php.example /tmp/deploy/config/
+          fi
+
+          echo "⚠️ IMPORTANT: Le fichier config/config.php doit être créé manuellement sur le serveur avec les credentials de preprod"
 
           # Copier les scripts cron
           cp -r cron /tmp/deploy/
