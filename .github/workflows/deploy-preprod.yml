@@ -103,35 +103,38 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Gotsumaru/fcchiche.git
-          
-          # Créer une branche orpheline temporaire
-          git checkout --orphan preprod-deploy-temp
-          
-          # Supprimer tous les fichiers trackés
+
+          # Fetch pour récupérer la branche preprod-deploy si elle existe
+          git fetch origin preprod-deploy:preprod-deploy 2>/dev/null || echo "Branche preprod-deploy n'existe pas encore, elle sera créée"
+
+          # Checkout ou créer la branche preprod-deploy
+          git checkout preprod-deploy 2>/dev/null || git checkout -b preprod-deploy
+
+          # Supprimer tous les fichiers trackés (sauf .git)
           git rm -rf . 2>/dev/null || true
-          
+
           # Copier les fichiers préparés
           shopt -s dotglob
           cp -r /tmp/deploy/* . 2>/dev/null || true
-          
+
           echo "📦 Fichiers à commiter :"
           ls -la
-          
+
           # Ajouter tous les fichiers
           git add -A
-          
+
           # Vérifier qu'il y a des changements
           if git diff --staged --quiet; then
             echo "⚠️ No changes to commit"
             exit 0
           fi
-          
+
           # Commit
           COMMIT_MSG="Deploy React + PHP from preprod @ $(date '+%Y-%m-%d %H:%M:%S')"
           git commit -m "$COMMIT_MSG"
-          
-          # Push en forçant
-          git push origin preprod-deploy-temp:preprod-deploy --force
+
+          # Push (sans force, historique préservé)
+          git push origin preprod-deploy
       
       - name: Deployment complete
         run: |
