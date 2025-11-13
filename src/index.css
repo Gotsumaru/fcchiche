@@ -1375,14 +1375,14 @@ ul {
 }
 
 .match-card__team--home {
-  bottom: clamp(1.5rem, 6vw, 2.5rem);
+  top: clamp(1.5rem, 5vw, 2.5rem);
   left: clamp(1.5rem, 5vw, 2.5rem);
   text-align: left;
 }
 
 .match-card__team--away {
   right: clamp(1.5rem, 5vw, 2.5rem);
-  top: clamp(1.5rem, 5vw, 2.5rem);
+  bottom: clamp(1.5rem, 6vw, 2.5rem);
   text-align: right;
   justify-items: end;
 }
