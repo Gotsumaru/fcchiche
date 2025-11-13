@@ -60,14 +60,15 @@ class MatchsModel
         assert(isset($match['away_name']), 'Away name must be defined');
 
         // Expose a human-readable category label for the FC Chiché team
-        // Requirement: for Seniors Masculins (SEM), display "Senior {code}" where code/number is the team number.
-        // We compute this at retrieval time (PHP), not in SQL nor DB.
+        // Résoudre le code de l'équipe (1, 2, 3) depuis pprod_equipes
+        // Ce code détermine : 1=Première, 2=Réserve A, 3=Réserve B
         $isHomeSide = (bool)$match['is_home'];
         $sidePrefix = $isHomeSide ? 'home' : 'away';
         $teamCategory = $match[$sidePrefix . '_team_category'] ?? null;
         $teamNumber = $match[$sidePrefix . '_team_number'] ?? null;
 
-        if (is_string($teamCategory) && strtoupper(trim($teamCategory)) === 'SEM' && $teamNumber !== null) {
+        // Essayer de résoudre le code pour TOUTES les catégories (pas seulement SEM)
+        if (is_string($teamCategory) && $teamNumber !== null) {
             $num = (int)$teamNumber;
             if ($num > 0) {
                 $code = $this->resolveTeamCodeForClubCategoryNumber($teamCategory, $num);
@@ -75,15 +76,6 @@ class MatchsModel
                     // Front-end prefers category_label first when present
                     $match['category_label'] = 'Senior ' . $code;
                 }
-            }
-        }
-
-        // Fallback: si pas de category_label et qu'on a un competition_name, essayer d'extraire le numéro d'équipe
-        if (!isset($match['category_label']) && isset($match['competition_name'])) {
-            $competitionName = $match['competition_name'];
-            // Tenter d'extraire "Senior X" ou "Seniors X" du nom de compétition
-            if (preg_match('/Seniors?\s+(\d+)/i', $competitionName, $matches)) {
-                $match['category_label'] = 'Senior ' . $matches[1];
             }
         }
 
