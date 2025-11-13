@@ -16,19 +16,34 @@ export default function ResultCard({ result }) {
     // Normaliser la chaîne
     const normalized = category.toUpperCase().trim()
 
-    // Vérifier les patterns exacts avec boundaries pour éviter les faux positifs
-    // Pattern: "SENIOR 1" ou "SENIORS 1"
+    // Pattern: "SENIOR 1" ou "SENIORS 1" (du PHP category_label)
     if (/SENIORS?\s+1\b/.test(normalized)) {
       return 'Première'
     }
 
-    // Pattern: "SENIOR 2" ou "SENIORS 2"
+    // Pattern: "SENIOR 2" ou "SENIORS 2" (du PHP category_label)
     if (/SENIORS?\s+2\b/.test(normalized)) {
       return 'Réserve A'
     }
 
-    // Pattern: "SENIOR 3" ou "SENIORS 3"
+    // Pattern: "SENIOR 3" ou "SENIORS 3" (du PHP category_label)
     if (/SENIORS?\s+3\b/.test(normalized)) {
+      return 'Réserve B'
+    }
+
+    // Patterns pour les compétitions brutes (quand category_label n'est pas créé)
+    // Départemental 1 ou D1 → Première
+    if (/D[ÉE]PARTEMENTAL\s+1\b|(?:^|\s)D1\b/.test(normalized)) {
+      return 'Première'
+    }
+
+    // Départemental 2-3 ou D2-D3 → Réserve A
+    if (/D[ÉE]PARTEMENTAL\s+[23]\b|(?:^|\s)D[23]\b/.test(normalized)) {
+      return 'Réserve A'
+    }
+
+    // Départemental 4-5 ou D4-D5 → Réserve B
+    if (/D[ÉE]PARTEMENTAL\s+[45]\b|(?:^|\s)D[45]\b/.test(normalized)) {
       return 'Réserve B'
     }
 
