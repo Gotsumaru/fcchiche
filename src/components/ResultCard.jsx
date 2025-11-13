@@ -155,6 +155,9 @@ export default function ResultCard({ result }) {
     <div className="pc-points-badge">{points}</div>
   )
 
+  // Détecter si on est sur mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+
   return (
     <ProfileCard
       avatarContent={createMatchAvatar()}
@@ -165,7 +168,7 @@ export default function ResultCard({ result }) {
       status={formatDate(result.date_time || result.date)}
       contactText={resultText}
       showUserInfo={true}
-      enableTilt={true}
+      enableTilt={!isMobile}
       enableMobileTilt={false}
       mobileTiltSensitivity={3}
       innerGradient={colors.gradient}

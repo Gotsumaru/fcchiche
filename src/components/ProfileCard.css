@@ -37,6 +37,21 @@
   touch-action: pan-y;
 }
 
+/* Désactiver tilt sur mobile pour les cartes de résultats */
+@media (max-width: 768px) {
+  .result-match-card.pc-card-wrapper {
+    touch-action: pan-x pan-y;
+  }
+
+  .result-match-card .pc-card-shell {
+    pointer-events: none;
+  }
+
+  .result-match-card .pc-contact-btn {
+    pointer-events: auto;
+  }
+}
+
 .pc-behind {
   position: absolute;
   inset: 0;
