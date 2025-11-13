@@ -12,42 +12,23 @@ export default function ResultCard({ result }) {
   // Formater la catégorie
   const formatCategory = (category) => {
     if (!category) return ''
-    const categoryUpper = category.toUpperCase()
 
-    // Senior 1 / Première équipe
-    if (categoryUpper.includes('SENIOR 1') ||
-        categoryUpper.includes('SENIORS 1') ||
-        categoryUpper.includes('DÉPARTEMENTAL 1') ||
-        categoryUpper.includes('DEPARTEMENTAL 1') ||
-        categoryUpper.includes('DEPARTAMENTAL 1') ||
-        categoryUpper.includes('D1') ||
-        categoryUpper.includes('RÉGIONAL') ||
-        categoryUpper.includes('REGIONAL')) {
+    // Normaliser la chaîne
+    const normalized = category.toUpperCase().trim()
+
+    // Vérifier les patterns exacts avec boundaries pour éviter les faux positifs
+    // Pattern: "SENIOR 1" ou "SENIORS 1"
+    if (/SENIORS?\s+1\b/.test(normalized)) {
       return 'Première'
     }
 
-    // Senior 2 / Réserve A
-    if (categoryUpper.includes('SENIOR 2') ||
-        categoryUpper.includes('SENIORS 2') ||
-        categoryUpper.includes('DÉPARTEMENTAL 2') ||
-        categoryUpper.includes('DEPARTEMENTAL 2') ||
-        categoryUpper.includes('DEPARTAMENTAL 2') ||
-        categoryUpper.includes('D2') ||
-        categoryUpper.includes('DÉPARTEMENTAL 3') ||
-        categoryUpper.includes('DEPARTEMENTAL 3') ||
-        categoryUpper.includes('D3')) {
+    // Pattern: "SENIOR 2" ou "SENIORS 2"
+    if (/SENIORS?\s+2\b/.test(normalized)) {
       return 'Réserve A'
     }
 
-    // Senior 3 / Réserve B
-    if (categoryUpper.includes('SENIOR 3') ||
-        categoryUpper.includes('SENIORS 3') ||
-        categoryUpper.includes('DÉPARTEMENTAL 4') ||
-        categoryUpper.includes('DEPARTEMENTAL 4') ||
-        categoryUpper.includes('D4') ||
-        categoryUpper.includes('DÉPARTEMENTAL 5') ||
-        categoryUpper.includes('DEPARTEMENTAL 5') ||
-        categoryUpper.includes('D5')) {
+    // Pattern: "SENIOR 3" ou "SENIORS 3"
+    if (/SENIORS?\s+3\b/.test(normalized)) {
       return 'Réserve B'
     }
 
