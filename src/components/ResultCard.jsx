@@ -116,9 +116,8 @@ export default function ResultCard({ result }) {
 
   // Créer une image composite avec les deux logos
   const createMatchAvatarUrl = () => {
-    // Pour l'instant, on utilisera une placeholder
-    // TODO: créer une image composite dynamique avec les 2 logos
-    return '/assets/images/rencontre.png'
+    // Utiliser l'image spécifique pour les résultats
+    return '/assets/images/resultat_match.png'
   }
 
   // Couleurs selon résultat
