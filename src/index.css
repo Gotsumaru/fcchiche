@@ -1375,14 +1375,14 @@ ul {
 }
 
 .match-card__team--home {
-  top: clamp(1.5rem, 5vw, 2.5rem);
+  bottom: clamp(1.5rem, 6vw, 2.5rem);
   left: clamp(1.5rem, 5vw, 2.5rem);
   text-align: left;
 }
 
 .match-card__team--away {
   right: clamp(1.5rem, 5vw, 2.5rem);
-  bottom: clamp(1.5rem, 6vw, 2.5rem);
+  top: clamp(1.5rem, 5vw, 2.5rem);
   text-align: right;
   justify-items: end;
 }
@@ -1425,6 +1425,37 @@ ul {
   color: rgba(255, 255, 255, 0.92);
 }
 
+.match-card__center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.match-card__date {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+}
+
+.match-card__vs {
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .match-card__center-block {
   position: relative;
   z-index: 3;
@@ -1443,12 +1474,6 @@ ul {
   letter-spacing: 0.45em;
   text-indent: 0.45em;
   color: rgba(255, 255, 255, 0.75);
-}
-
-.match-card__date {
-  font-size: clamp(1.25rem, 2.8vw, 1.6rem);
-  font-weight: 700;
-  letter-spacing: -0.015em;
 }
 
 .match-card__time {

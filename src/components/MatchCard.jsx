@@ -31,7 +31,7 @@ export default function MatchCard({ match }) {
   }
 
   // Résoudre le logo (utiliser logo.svg pour FC Chiché)
-  const resolveLogo = (logoUrl, teamName) => {
+  const resolveLogo = (teamName) => {
     const isFCChiche = teamName?.toUpperCase().includes('FC CHICHE') ||
                        teamName?.toUpperCase().includes('CHICHE') ||
                        teamName?.toUpperCase() === 'FC CHICHE'
@@ -40,8 +40,15 @@ export default function MatchCard({ match }) {
       return '/assets/images/logo.svg'
     }
 
-    return logoUrl
+    // Pour les autres équipes, retourner null (pas de logo pour l'instant)
+    return null
   }
+
+  // Déterminer quelle équipe doit avoir son logo affiché
+  const homeIsChiche = match.home_name?.toUpperCase().includes('CHICHE') ||
+                       match.home_name?.toUpperCase().includes('FC CHICHE')
+  const awayIsChiche = match.away_name?.toUpperCase().includes('CHICHE') ||
+                       match.away_name?.toUpperCase().includes('FC CHICHE')
 
   // Formater la date
   const formatDate = (dateString) => {
@@ -81,11 +88,20 @@ export default function MatchCard({ match }) {
 
       {/* Home team badge */}
       <div className="match-card__team match-card__team--home">
-        {match.home_logo && (
+        {homeIsChiche && (
           <img
-            src={resolveLogo(match.home_logo, match.home_name || match.home)}
+            src={resolveLogo(match.home_name || match.home)}
             alt={match.home_name || match.home}
             loading="lazy"
+            style={{ width: 'clamp(52px, 14vw, 76px)', height: 'clamp(52px, 14vw, 76px)', objectFit: 'contain' }}
+          />
+        )}
+        {match.home_logo && !homeIsChiche && (
+          <img
+            src={match.home_logo}
+            alt={match.home_name || match.home}
+            loading="lazy"
+            style={{ width: 'clamp(52px, 14vw, 76px)', height: 'clamp(52px, 14vw, 76px)', objectFit: 'contain' }}
             onError={(e) => {
               e.target.style.display = 'none'
             }}
@@ -96,11 +112,20 @@ export default function MatchCard({ match }) {
 
       {/* Away team badge */}
       <div className="match-card__team match-card__team--away">
-        {match.away_logo && (
+        {awayIsChiche && (
           <img
-            src={resolveLogo(match.away_logo, match.away_name || match.away)}
+            src={resolveLogo(match.away_name || match.away)}
             alt={match.away_name || match.away}
             loading="lazy"
+            style={{ width: 'clamp(52px, 14vw, 76px)', height: 'clamp(52px, 14vw, 76px)', objectFit: 'contain' }}
+          />
+        )}
+        {match.away_logo && !awayIsChiche && (
+          <img
+            src={match.away_logo}
+            alt={match.away_name || match.away}
+            loading="lazy"
+            style={{ width: 'clamp(52px, 14vw, 76px)', height: 'clamp(52px, 14vw, 76px)', objectFit: 'contain' }}
             onError={(e) => {
               e.target.style.display = 'none'
             }}
