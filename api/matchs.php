@@ -18,6 +18,8 @@ declare(strict_types=1);
  * 
  * POST/PUT/DELETE: Protégés authentification admin
  */
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 $basePath = dirname(__DIR__, 2);
 require_once $basePath . '/config/bootstrap.php';
