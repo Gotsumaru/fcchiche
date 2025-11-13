@@ -46,30 +46,58 @@ jobs:
       - name: Prepare deployment folder (React + PHP)
         run: |
           mkdir -p /tmp/deploy
-          
+
           echo "📦 Copie du build React..."
-          # Copier le build React
+          # Copier le build React (assets, index.html, etc.)
           shopt -s dotglob
           cp -r dist/* /tmp/deploy/
-          
+
           echo "📦 Copie des fichiers PHP backend..."
-          # Copier les dossiers PHP nécessaires
-          cp -r api /tmp/deploy/
-          cp -r models /tmp/deploy/
-          
-          # Si tu as d'autres dossiers/fichiers PHP nécessaires, les ajouter ici :
-          # cp -r templates /tmp/deploy/    # Si templates est utilisé
-          # cp -r config /tmp/deploy/        # Si config n'est pas sensible
-          # cp index.php /tmp/deploy/        # Si tu as un index.php de routage
-          
+
+          # Copier les endpoints API PHP
+          cp -r public/api /tmp/deploy/
+
+          # Copier les points d'entrée PHP
+          cp public/index.php /tmp/deploy/
+          cp public/index-react.php /tmp/deploy/
+
+          # Copier le dossier templates si présent
+          if [ -d "public/templates" ]; then
+            cp -r public/templates /tmp/deploy/
+          fi
+
+          # Copier les classes PHP backend
+          mkdir -p /tmp/deploy/src
+          cp -r src/API /tmp/deploy/src/
+          cp -r src/Models /tmp/deploy/src/
+          cp -r src/Database /tmp/deploy/src/
+          cp -r src/Utils /tmp/deploy/src/
+
+          # Copier la configuration (sans les fichiers sensibles .example)
+          mkdir -p /tmp/deploy/config
+          cp config/*.php /tmp/deploy/config/ 2>/dev/null || true
+
+          # Copier les scripts cron
+          cp -r cron /tmp/deploy/
+
+          # Copier les fichiers de configuration serveur
+          cp .htaccess /tmp/deploy/
+          if [ -f "public/.htaccess" ]; then
+            cp public/.htaccess /tmp/deploy/api/
+          fi
+
+          # Copier diagnostics.php à la racine
+          cp diagnostics.php /tmp/deploy/
+
           echo ""
           echo "📦 Structure finale du déploiement :"
           tree -L 2 /tmp/deploy/ || find /tmp/deploy/ -maxdepth 2 -print
-          
+
           echo ""
           echo "📊 Statistiques :"
           echo "Fichiers React : $(find /tmp/deploy/assets -type f 2>/dev/null | wc -l)"
-          echo "Fichiers PHP : $(find /tmp/deploy/api /tmp/deploy/models -type f -name '*.php' 2>/dev/null | wc -l)"
+          echo "Fichiers API : $(find /tmp/deploy/api -type f -name '*.php' 2>/dev/null | wc -l)"
+          echo "Fichiers Models : $(find /tmp/deploy/src/Models -type f -name '*.php' 2>/dev/null | wc -l)"
       
       - name: Deploy to preprod-deploy branch
         run: |
