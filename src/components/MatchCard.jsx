@@ -50,6 +50,24 @@ export default function MatchCard({ match }) {
   const awayIsChiche = match.away_name?.toUpperCase().includes('CHICHE') ||
                        match.away_name?.toUpperCase().includes('FC CHICHE')
 
+  // Formater la catégorie
+  const formatCategory = (category) => {
+    if (!category) return ''
+    const categoryUpper = category.toUpperCase()
+
+    if (categoryUpper.includes('SENIOR 3') || categoryUpper.includes('SENIORS 3')) {
+      return 'Réserve B'
+    }
+    if (categoryUpper.includes('SENIOR 2') || categoryUpper.includes('SENIORS 2')) {
+      return 'Réserve A'
+    }
+    if (categoryUpper.includes('SENIOR 1') || categoryUpper.includes('SENIORS 1')) {
+      return 'Première'
+    }
+
+    return category
+  }
+
   // Formater la date
   const formatDate = (dateString) => {
     if (!dateString) return 'TBA'
@@ -136,7 +154,7 @@ export default function MatchCard({ match }) {
 
       {/* Category label */}
       <span className="match-card__category">
-        {match.category_label || match.competition}
+        {formatCategory(match.category_label || match.competition)}
       </span>
 
       {/* Center block with date and score */}

@@ -8,6 +8,24 @@ import ProfileCard from './ProfileCard'
 export default function ResultCard({ result }) {
   if (!result) return null
 
+  // Formater la catégorie
+  const formatCategory = (category) => {
+    if (!category) return ''
+    const categoryUpper = category.toUpperCase()
+
+    if (categoryUpper.includes('SENIOR 3') || categoryUpper.includes('SENIORS 3')) {
+      return 'Réserve B'
+    }
+    if (categoryUpper.includes('SENIOR 2') || categoryUpper.includes('SENIORS 2')) {
+      return 'Réserve A'
+    }
+    if (categoryUpper.includes('SENIOR 1') || categoryUpper.includes('SENIORS 1')) {
+      return 'Première'
+    }
+
+    return category
+  }
+
   // Résoudre le logo (utiliser logo.svg pour FC Chiché)
   const resolveLogo = (teamName) => {
     const isFCChiche = teamName?.toUpperCase().includes('FC CHICHE') ||
@@ -112,12 +130,13 @@ export default function ResultCard({ result }) {
       miniAvatarUrl={homeLogo || awayLogo}
       name={score}
       title={teamNames}
-      handle={result.competition_name || result.competition}
+      handle={formatCategory(result.competition_name || result.competition)}
       status={formatDate(result.date_time || result.date)}
       contactText={resultText}
       showUserInfo={true}
       enableTilt={true}
-      enableMobileTilt={false}
+      enableMobileTilt={true}
+      mobileTiltSensitivity={3}
       innerGradient={colors.gradient}
       behindGlowColor={colors.glow}
       behindGlowSize={colors.glowSize}

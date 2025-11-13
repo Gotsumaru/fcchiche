@@ -287,58 +287,52 @@ export default function HomePage() {
       </section>
 
       {/* LATEST RESULTS SECTION */}
-      <section className="section" aria-labelledby="results-title">
-        <div className="container">
+      <section className="section section--alt section--events" aria-labelledby="results-title">
+        <div className="container_events">
           <div className="section__header" data-reveal data-reveal-delay="0">
-            <h2 className="section__title" id="results-title">Derniers résultats du club</h2>
-            <p className="section__subtitle" data-component="home-results-header">
-              {loading ? 'Chargement des dernières rencontres…' : (latestResults.length > 0 ? `${latestResults.length} match(s) récent(s)` : 'Aucun résultat')}
-            </p>
+            <h2 className="section__title section__title-events" id="results-title">Derniers résultats du club.</h2>
+            <a className="section__action" href="/resultats">Voir les résultats</a>
           </div>
-          <div className="result-showcase" data-component="home-results" data-reveal data-reveal-delay="0.12">
-            <div className="result-showcase__gallery">
-              <picture>
-                <source
-                  srcSet="/assets/images/galeries/441321599_943464427577563_1527836518105961020_n.jpg 2048w"
-                  type="image/jpeg"
-                  sizes="(min-width: 75rem) 420px, (min-width: 48rem) 60vw, 100vw"
-                />
-                <img
-                  src="/assets/images/galeries/441321599_943464427577563_1527836518105961020_n.jpg"
-                  width="2048"
-                  height="1670"
-                  alt="Scène de match du FC Chiché capturée depuis la tribune principale"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
-            </div>
-            <div className="result-showcase__stream">
-              <p className="result-showcase__hint">Résumés récents</p>
-              <div
-                ref={resultsScrollerRef}
-                className="home-scroll home-scroll--compact"
-              >
-                <div className="home-scroll__track home-scroll__track--compact" data-component="home-results-list" aria-live="polite">
-                  {!loading && latestResults.map((result) => (
-                    <ResultCard key={result.id} result={result} />
-                  ))}
-                </div>
-                <div className="home-scroll__controls">
-                  <button
-                    type="button"
-                    className="home-scroll__control"
-                    data-action="scroll-prev"
-                    aria-label="Voir les résultats précédents"
-                  ></button>
-                  <button
-                    type="button"
-                    className="home-scroll__control"
-                    data-action="scroll-next"
-                    aria-label="Voir les résultats suivants"
-                  ></button>
-                </div>
+          <div
+            ref={resultsScrollerRef}
+            className="home-scroll home-scroll--events"
+            data-component="home-results"
+            data-reveal
+            data-reveal-delay="0.12"
+          >
+            {error && (
+              <div style={{ padding: '20px', color: '#d32f2f', textAlign: 'center' }}>
+                {error}
               </div>
+            )}
+            {loading && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                Chargement des résultats...
+              </div>
+            )}
+            {!loading && latestResults.length === 0 && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                Aucun résultat
+              </div>
+            )}
+            <div className="home-scroll__track home-scroll__track-events" data-component="home-results-list" aria-live="polite">
+              {!loading && latestResults.map((result) => (
+                <ResultCard key={result.id} result={result} />
+              ))}
+            </div>
+            <div className="home-scroll__controls">
+              <button
+                type="button"
+                className="home-scroll__control"
+                data-action="scroll-prev"
+                aria-label="Voir les résultats précédents"
+              ></button>
+              <button
+                type="button"
+                className="home-scroll__control"
+                data-action="scroll-next"
+                aria-label="Voir les résultats suivants"
+              ></button>
             </div>
           </div>
         </div>
