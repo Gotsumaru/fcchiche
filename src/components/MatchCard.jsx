@@ -55,14 +55,41 @@ export default function MatchCard({ match }) {
     if (!category) return ''
     const categoryUpper = category.toUpperCase()
 
-    if (categoryUpper.includes('SENIOR 3') || categoryUpper.includes('SENIORS 3')) {
-      return 'Réserve B'
+    // Senior 1 / Première équipe
+    if (categoryUpper.includes('SENIOR 1') ||
+        categoryUpper.includes('SENIORS 1') ||
+        categoryUpper.includes('DÉPARTEMENTAL 1') ||
+        categoryUpper.includes('DEPARTEMENTAL 1') ||
+        categoryUpper.includes('DEPARTAMENTAL 1') ||
+        categoryUpper.includes('D1') ||
+        categoryUpper.includes('RÉGIONAL') ||
+        categoryUpper.includes('REGIONAL')) {
+      return 'Première'
     }
-    if (categoryUpper.includes('SENIOR 2') || categoryUpper.includes('SENIORS 2')) {
+
+    // Senior 2 / Réserve A
+    if (categoryUpper.includes('SENIOR 2') ||
+        categoryUpper.includes('SENIORS 2') ||
+        categoryUpper.includes('DÉPARTEMENTAL 2') ||
+        categoryUpper.includes('DEPARTEMENTAL 2') ||
+        categoryUpper.includes('DEPARTAMENTAL 2') ||
+        categoryUpper.includes('D2') ||
+        categoryUpper.includes('DÉPARTEMENTAL 3') ||
+        categoryUpper.includes('DEPARTEMENTAL 3') ||
+        categoryUpper.includes('D3')) {
       return 'Réserve A'
     }
-    if (categoryUpper.includes('SENIOR 1') || categoryUpper.includes('SENIORS 1')) {
-      return 'Première'
+
+    // Senior 3 / Réserve B
+    if (categoryUpper.includes('SENIOR 3') ||
+        categoryUpper.includes('SENIORS 3') ||
+        categoryUpper.includes('DÉPARTEMENTAL 4') ||
+        categoryUpper.includes('DEPARTEMENTAL 4') ||
+        categoryUpper.includes('D4') ||
+        categoryUpper.includes('DÉPARTEMENTAL 5') ||
+        categoryUpper.includes('DEPARTEMENTAL 5') ||
+        categoryUpper.includes('D5')) {
+      return 'Réserve B'
     }
 
     return category
