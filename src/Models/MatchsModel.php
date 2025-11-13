@@ -78,6 +78,15 @@ class MatchsModel
             }
         }
 
+        // Fallback: si pas de category_label et qu'on a un competition_name, essayer d'extraire le numéro d'équipe
+        if (!isset($match['category_label']) && isset($match['competition_name'])) {
+            $competitionName = $match['competition_name'];
+            // Tenter d'extraire "Senior X" ou "Seniors X" du nom de compétition
+            if (preg_match('/Seniors?\s+(\d+)/i', $competitionName, $matches)) {
+                $match['category_label'] = 'Senior ' . $matches[1];
+            }
+        }
+
         return $match;
     }
 

@@ -57,37 +57,25 @@ export default function MatchCard({ match }) {
     // Normaliser la chaîne
     const normalized = category.toUpperCase().trim()
 
-    // Pattern: "SENIOR 1" ou "SENIORS 1" (du PHP category_label)
+    // Le PHP backend crée "Senior 1/2/3" basé sur le CODE de l'équipe (pprod_equipes.code)
+    // On ne peut pas mapper basé sur Départemental X car ça ne correspond pas au code équipe
+
+    // Pattern: "SENIOR 1" ou "SENIORS 1" → Première
     if (/SENIORS?\s+1\b/.test(normalized)) {
       return 'Première'
     }
 
-    // Pattern: "SENIOR 2" ou "SENIORS 2" (du PHP category_label)
+    // Pattern: "SENIOR 2" ou "SENIORS 2" → Réserve A
     if (/SENIORS?\s+2\b/.test(normalized)) {
       return 'Réserve A'
     }
 
-    // Pattern: "SENIOR 3" ou "SENIORS 3" (du PHP category_label)
+    // Pattern: "SENIOR 3" ou "SENIORS 3" → Réserve B
     if (/SENIORS?\s+3\b/.test(normalized)) {
       return 'Réserve B'
     }
 
-    // Patterns pour les compétitions brutes (quand category_label n'est pas créé)
-    // Départemental 1 ou D1 → Première
-    if (/D[ÉE]PARTEMENTAL\s+1\b|(?:^|\s)D1\b/.test(normalized)) {
-      return 'Première'
-    }
-
-    // Départemental 2-3 ou D2-D3 → Réserve A
-    if (/D[ÉE]PARTEMENTAL\s+[23]\b|(?:^|\s)D[23]\b/.test(normalized)) {
-      return 'Réserve A'
-    }
-
-    // Départemental 4-5 ou D4-D5 → Réserve B
-    if (/D[ÉE]PARTEMENTAL\s+[45]\b|(?:^|\s)D[45]\b/.test(normalized)) {
-      return 'Réserve B'
-    }
-
+    // Si pas de category_label du PHP, afficher tel quel
     return category
   }
 
