@@ -172,7 +172,7 @@ export default function ResultCard({ result }) {
       miniAvatarContent={pointsBadge}
       name={score}
       title={teamNames}
-      handle={formatCategory(result.competition_name || result.competition)}
+      handle={formatCategory(result.category_label || result.competition_name || result.competition)}
       status={formatDate(result.date_time || result.date)}
       contactText={resultText}
       showUserInfo={true}
