@@ -287,7 +287,7 @@ export default function HomePage() {
       </section>
 
       {/* LATEST RESULTS SECTION */}
-      <section className="section section--alt section--events" aria-labelledby="results-title">
+      <section className="section section--events" aria-labelledby="results-title">
         <div className="container_events">
           <div className="section__header" data-reveal data-reveal-delay="0">
             <h2 className="section__title section__title-events" id="results-title">Derniers résultats du club.</h2>

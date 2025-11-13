@@ -43,18 +43,18 @@
   z-index: 0;
   pointer-events: none;
   background: radial-gradient(
-    circle at var(--pointer-x) var(--pointer-y),
+    circle at 50% 50%,
     var(--behind-glow-color) 0%,
     transparent var(--behind-glow-size)
   );
   filter: blur(50px) saturate(1.1);
-  opacity: 0;
+  opacity: 0.5;
   transition: opacity 200ms ease;
 }
 
-.pc-card-wrapper:hover,
-.pc-card-wrapper.active {
-  --card-opacity: 0;
+.pc-card-wrapper:hover .pc-behind,
+.pc-card-wrapper.active .pc-behind {
+  opacity: 0;
 }
 
 .pc-card {
@@ -67,9 +67,9 @@
   background-blend-mode: color-dodge, normal, normal, normal;
   animation: glow-bg 12s linear infinite;
   box-shadow: none;
-  transition: transform 1s ease;
+  transition: transform 1s ease, box-shadow 0.3s ease;
   transform: translateZ(0) rotateX(0deg) rotateY(0deg);
-  background: transparent;
+  background: rgba(15, 15, 20, 0.95);
   backface-visibility: hidden;
   overflow: hidden;
 }
@@ -78,6 +78,7 @@
 .pc-card.active {
   transition: none;
   transform: translateZ(0) rotateX(var(--rotate-y)) rotateY(var(--rotate-x));
+  box-shadow: none;
 }
 
 .pc-card-shell.entering .pc-card {
@@ -100,7 +101,7 @@
   inset: 0;
   position: absolute;
   background-image: var(--inner-gradient);
-  background-color: transparent;
+  background-color: rgba(10, 10, 15, 0.85);
   transform: none;
 }
 
