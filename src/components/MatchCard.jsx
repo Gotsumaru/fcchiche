@@ -50,7 +50,7 @@ export default function MatchCard({ match }) {
       href="#"
       className="match-card"
       data-match-id={match.id}
-      aria-label={`Match ${match.home} vs ${match.away} le ${formatDate(match.date)}`}
+      aria-label={`Match ${match.home_name || match.home} vs ${match.away_name || match.away} le ${formatDate(match.date)}`}
     >
       {/* Background image */}
       <div className="match-card__background">
@@ -68,28 +68,32 @@ export default function MatchCard({ match }) {
 
       {/* Home team badge */}
       <div className="match-card__team match-card__team--home">
-        <img
-          src={`/assets/images/${match.home?.toLowerCase().replace(/\s+/g, '_')}.png`}
-          alt={match.home}
-          loading="lazy"
-          onError={(e) => {
-            e.target.style.display = 'none'
-          }}
-        />
-        <span className="match-card__team-name">{match.home}</span>
+        {match.home_logo && (
+          <img
+            src={match.home_logo}
+            alt={match.home_name || match.home}
+            loading="lazy"
+            onError={(e) => {
+              e.target.style.display = 'none'
+            }}
+          />
+        )}
+        <span className="match-card__team-name">{match.home_name || match.home}</span>
       </div>
 
       {/* Away team badge */}
       <div className="match-card__team match-card__team--away">
-        <img
-          src={`/assets/images/${match.away?.toLowerCase().replace(/\s+/g, '_')}.png`}
-          alt={match.away}
-          loading="lazy"
-          onError={(e) => {
-            e.target.style.display = 'none'
-          }}
-        />
-        <span className="match-card__team-name">{match.away}</span>
+        {match.away_logo && (
+          <img
+            src={match.away_logo}
+            alt={match.away_name || match.away}
+            loading="lazy"
+            onError={(e) => {
+              e.target.style.display = 'none'
+            }}
+          />
+        )}
+        <span className="match-card__team-name">{match.away_name || match.away}</span>
       </div>
 
       {/* Category label */}

@@ -37,17 +37,19 @@ export default function ResultCard({ result }) {
         <div className="result-card__match-display">
           {/* Home team */}
           <div className="result-card__team-block">
-            <img
-              className="result-card__team-logo"
-              src={`/assets/images/${result.home?.toLowerCase().replace(/\s+/g, '_')}.png`}
-              alt={`Logo ${result.home}`}
-              loading="lazy"
-              onError={(e) => {
-                e.target.style.display = 'none'
-              }}
-            />
+            {result.home_logo && (
+              <img
+                className="result-card__team-logo"
+                src={result.home_logo}
+                alt={`Logo ${result.home_name || result.home}`}
+                loading="lazy"
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                }}
+              />
+            )}
             <div className="result-card__team-info">
-              <div className="result-card__team-name">{result.home}</div>
+              <div className="result-card__team-name">{result.home_name || result.home}</div>
               <div className="result-card__team-score">
                 {result.home_score !== undefined ? result.home_score : '-'}
               </div>
@@ -62,20 +64,22 @@ export default function ResultCard({ result }) {
           {/* Away team */}
           <div className="result-card__team-block">
             <div className="result-card__team-info">
-              <div className="result-card__team-name">{result.away}</div>
+              <div className="result-card__team-name">{result.away_name || result.away}</div>
               <div className="result-card__team-score">
                 {result.away_score !== undefined ? result.away_score : '-'}
               </div>
             </div>
-            <img
-              className="result-card__team-logo"
-              src={`/assets/images/${result.away?.toLowerCase().replace(/\s+/g, '_')}.png`}
-              alt={`Logo ${result.away}`}
-              loading="lazy"
-              onError={(e) => {
-                e.target.style.display = 'none'
-              }}
-            />
+            {result.away_logo && (
+              <img
+                className="result-card__team-logo"
+                src={result.away_logo}
+                alt={`Logo ${result.away_name || result.away}`}
+                loading="lazy"
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
