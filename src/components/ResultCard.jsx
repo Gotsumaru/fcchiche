@@ -162,7 +162,7 @@ export default function ResultCard({ result }) {
       contactText={resultText}
       showUserInfo={true}
       enableTilt={true}
-      enableMobileTilt={true}
+      enableMobileTilt={false}
       mobileTiltSensitivity={3}
       innerGradient={colors.gradient}
       behindGlowColor={colors.glow}
