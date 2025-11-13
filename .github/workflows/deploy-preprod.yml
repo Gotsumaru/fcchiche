@@ -113,7 +113,7 @@ jobs:
           # Supprimer tous les fichiers trackés (sauf .git)
           git rm -rf . 2>/dev/null || true
 
-          # Copier les fichiers préparés
+          # Copier les fichiers préparés 
           shopt -s dotglob
           cp -r /tmp/deploy/* . 2>/dev/null || true
 
