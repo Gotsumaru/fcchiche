@@ -17,24 +17,24 @@ export default function ResultCard({ result }) {
     const normalized = category.toUpperCase().trim()
 
     // Le PHP backend crée "Senior 1/2/3" basé sur le CODE de l'équipe (pprod_equipes.code)
-    // On ne peut pas mapper basé sur Départemental X car ça ne correspond pas au code équipe
+    // On transforme UNIQUEMENT les catégories seniors, pas les jeunes (U17, U15, etc.)
 
-    // Pattern: "SENIOR 1" ou "SENIORS 1" → Première
-    if (/SENIORS?\s+1\b/.test(normalized)) {
+    // Pattern: "SENIOR 1" ou "SENIORS 1" → Première (uniquement pour seniors)
+    if (/^SENIORS?\s+1\b/.test(normalized)) {
       return 'Première'
     }
 
-    // Pattern: "SENIOR 2" ou "SENIORS 2" → Réserve A
-    if (/SENIORS?\s+2\b/.test(normalized)) {
+    // Pattern: "SENIOR 2" ou "SENIORS 2" → Réserve A (uniquement pour seniors)
+    if (/^SENIORS?\s+2\b/.test(normalized)) {
       return 'Réserve A'
     }
 
-    // Pattern: "SENIOR 3" ou "SENIORS 3" → Réserve B
-    if (/SENIORS?\s+3\b/.test(normalized)) {
+    // Pattern: "SENIOR 3" ou "SENIORS 3" → Réserve B (uniquement pour seniors)
+    if (/^SENIORS?\s+3\b/.test(normalized)) {
       return 'Réserve B'
     }
 
-    // Si pas de category_label du PHP, afficher tel quel
+    // Pour les autres catégories (U17, U15, etc.), afficher tel quel
     return category
   }
 
