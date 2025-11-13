@@ -9,13 +9,16 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
+    permissions:
+      contents: write  # ← Permission d'écriture explicite
+    
     steps:
       - name: Checkout preprod branch
         uses: actions/checkout@v4
         with:
           ref: preprod
           fetch-depth: 0
-          token: ${{ secrets.DEPLOY_TOKEN }}
+          # Pas de token: utilise GITHUB_TOKEN par défaut
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -43,55 +46,41 @@ jobs:
       
       - name: Prepare deployment folder
         run: |
-          # Créer un dossier temporaire propre
           mkdir -p /tmp/deploy
-          
-          # Copier UNIQUEMENT le contenu de public/dist/
           cp -r public/dist/* /tmp/deploy/
-          
-          # Copier les fichiers cachés (si présents)
           cp -r public/dist/.* /tmp/deploy/ 2>/dev/null || true
           
           echo "📦 Contenu du dossier de déploiement :"
           ls -la /tmp/deploy/
       
       - name: Deploy to preprod-deploy branch
-        env:
-          GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
-          # Configuration Git
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/Gotsumaru/fcchiche.git
           
-          # Créer une branche orpheline propre (sans historique)
+          # Utiliser GITHUB_TOKEN par défaut
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Gotsumaru/fcchiche.git
+          
           git checkout --orphan preprod-deploy-temp
-          
-          # Supprimer TOUS les fichiers du working directory
           git rm -rf . 2>/dev/null || true
           rm -rf * .* 2>/dev/null || true
           
-          # Copier les fichiers depuis /tmp/deploy
           cp -r /tmp/deploy/* .
           cp -r /tmp/deploy/.* . 2>/dev/null || true
           
           echo "📦 Fichiers à commiter :"
           ls -la
           
-          # Ajouter tous les fichiers
           git add -A
           
-          # Vérifier qu'il y a bien des fichiers à commiter
           if git diff --staged --quiet; then
             echo "⚠️ No changes to commit"
             exit 0
           fi
           
-          # Commit
           COMMIT_MSG="Deploy build from preprod @ $(date '+%Y-%m-%d %H:%M:%S')"
           git commit -m "$COMMIT_MSG"
           
-          # Forcer le push (écrase la branche preprod-deploy)
           git push origin preprod-deploy-temp:preprod-deploy --force
       
       - name: Deployment complete
