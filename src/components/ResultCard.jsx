@@ -6,6 +6,19 @@
 export default function ResultCard({ result }) {
   if (!result) return null
 
+  // Résoudre le logo (utiliser logo.svg pour FC Chiché)
+  const resolveLogo = (logoUrl, teamName) => {
+    const isFCChiche = teamName?.toUpperCase().includes('FC CHICHE') ||
+                       teamName?.toUpperCase().includes('CHICHE') ||
+                       teamName?.toUpperCase() === 'FC CHICHE'
+
+    if (isFCChiche) {
+      return '/assets/images/logo.svg'
+    }
+
+    return logoUrl
+  }
+
   // Formater la date
   const formatDate = (dateString) => {
     if (!dateString) return 'TBA'
@@ -40,7 +53,7 @@ export default function ResultCard({ result }) {
             {result.home_logo && (
               <img
                 className="result-card__team-logo"
-                src={result.home_logo}
+                src={resolveLogo(result.home_logo, result.home_name || result.home)}
                 alt={`Logo ${result.home_name || result.home}`}
                 loading="lazy"
                 onError={(e) => {
@@ -72,7 +85,7 @@ export default function ResultCard({ result }) {
             {result.away_logo && (
               <img
                 className="result-card__team-logo"
-                src={result.away_logo}
+                src={resolveLogo(result.away_logo, result.away_name || result.away)}
                 alt={`Logo ${result.away_name || result.away}`}
                 loading="lazy"
                 onError={(e) => {

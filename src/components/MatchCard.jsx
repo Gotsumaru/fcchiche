@@ -30,6 +30,19 @@ export default function MatchCard({ match }) {
     return '/assets/images/rencontre.png'
   }
 
+  // Résoudre le logo (utiliser logo.svg pour FC Chiché)
+  const resolveLogo = (logoUrl, teamName) => {
+    const isFCChiche = teamName?.toUpperCase().includes('FC CHICHE') ||
+                       teamName?.toUpperCase().includes('CHICHE') ||
+                       teamName?.toUpperCase() === 'FC CHICHE'
+
+    if (isFCChiche) {
+      return '/assets/images/logo.svg'
+    }
+
+    return logoUrl
+  }
+
   // Formater la date
   const formatDate = (dateString) => {
     if (!dateString) return 'TBA'
@@ -70,7 +83,7 @@ export default function MatchCard({ match }) {
       <div className="match-card__team match-card__team--home">
         {match.home_logo && (
           <img
-            src={match.home_logo}
+            src={resolveLogo(match.home_logo, match.home_name || match.home)}
             alt={match.home_name || match.home}
             loading="lazy"
             onError={(e) => {
@@ -85,7 +98,7 @@ export default function MatchCard({ match }) {
       <div className="match-card__team match-card__team--away">
         {match.away_logo && (
           <img
-            src={match.away_logo}
+            src={resolveLogo(match.away_logo, match.away_name || match.away)}
             alt={match.away_name || match.away}
             loading="lazy"
             onError={(e) => {
