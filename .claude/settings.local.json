@@ -10,7 +10,8 @@
       "Bash(npm run build:*)",
       "Bash(for file in public/api/*.php)",
       "Bash(do sed -i 's/dirname(__DIR__, 2)/dirname(__DIR__)/g' \"$file\")",
-      "Bash(done)"
+      "Bash(done)",
+      "WebFetch(domain:reactbits.dev)"
     ],
     "deny": [],
     "ask": []
