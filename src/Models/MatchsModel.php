@@ -62,13 +62,14 @@ class MatchsModel
         // Expose a human-readable category label for the FC Chiché team
         // Résoudre le code de l'équipe (1, 2, 3) depuis pprod_equipes
         // Ce code détermine : 1=Première, 2=Réserve A, 3=Réserve B
+        // IMPORTANT: Uniquement pour SEM (Seniors), pas pour les jeunes (U17, U15, etc.)
         $isHomeSide = (bool)$match['is_home'];
         $sidePrefix = $isHomeSide ? 'home' : 'away';
         $teamCategory = $match[$sidePrefix . '_team_category'] ?? null;
         $teamNumber = $match[$sidePrefix . '_team_number'] ?? null;
 
-        // Essayer de résoudre le code pour TOUTES les catégories (pas seulement SEM)
-        if (is_string($teamCategory) && $teamNumber !== null) {
+        // Ne créer category_label QUE pour les seniors (SEM)
+        if (is_string($teamCategory) && strtoupper(trim($teamCategory)) === 'SEM' && $teamNumber !== null) {
             $num = (int)$teamNumber;
             if ($num > 0) {
                 $code = $this->resolveTeamCodeForClubCategoryNumber($teamCategory, $num);
